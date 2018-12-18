@@ -1,0 +1,21 @@
+# node git vscode npm webpack
+.git
+.vscode
+node_modules
+npm-debug.log
+package-lock.json
+webpack.config.js
+tsconfig.json
+.npmignore
+.gitignore
+
+# src
+src
+
+# dist
+dist/dts
+dist/test
+dist/cjs/dts
+dist/cjs/test
+dist/umd/dts
+dist/umd/test
