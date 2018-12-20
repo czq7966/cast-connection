@@ -36,7 +36,8 @@ export class Preview {
     
 
     constructor() {
-        (ADHOCCAST.WebRTC as ADHOCCAST.IWebRTC).platform = ADHOCCAST.EPlatform.browser;
+        ADHOCCAST.Config.platform = ADHOCCAST.EPlatform.browser;
+        ADHOCCAST.AssignWebRTC({});
         this.params = new URLSearchParams(location.search);
         let signalerUrl = window.location.origin;        
         signalerUrl = 'http://192.168.252.87:13170'
@@ -135,9 +136,10 @@ export class Preview {
         if (this.state.stream && (this.state.iceState == "connected" || this.state.iceState == "completed")) {
             this.state.info = 'sharing...';
             setTimeout(() => {
-                this.elemVideo.srcObject = this.state.stream;
-            }, 0)
+                this.elemVideo.srcObject = this.state.stream; 
+            }, 100)
             this.render();
+            
         }
     }
     doGo = () => {

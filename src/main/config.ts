@@ -9,16 +9,15 @@ export enum EPlatform {
     browser = 'browser'
 }
 export class Config {
+    static platform: EPlatform = EPlatform.browser;
     bandwidth: number
     codec: string
-    platform: EPlatform;
     iceServers: RTCIceServer[]
     rtcConfig: RTCConfiguration
 
     constructor() {
         this.bandwidth = 0;
         this.codec = ECodecs.default;
-        this.platform = EPlatform.browser;
         this.iceServers = [
             // {
             //     'urls': [

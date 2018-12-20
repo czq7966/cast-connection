@@ -1,37 +1,41 @@
-import { EPlatform } from "./config";
+// import { EPlatform } from "./config";
 
 
-var isBrowser = false;
+// var isBrowser = false;
 
-export interface IWebRTC {
-    platform: EPlatform;
-    RTCPeerConnection: RTCPeerConnection
-    RTCIceCandidate: RTCIceCandidate
-    RTCSessionDescription: RTCSessionDescription
-    RTCView: any
-    MediaStream: MediaStream
-    MediaStreamTrack: MediaStreamTrack
-    getUserMedia: any
+// export interface IWebRTC {
+//     platform: EPlatform;
+//     RTCPeerConnection: RTCPeerConnection
+//     RTCIceCandidate: RTCIceCandidate
+//     RTCSessionDescription: RTCSessionDescription
+//     RTCView: any
+//     MediaStream: MediaStream
+//     MediaStreamTrack: MediaStreamTrack
+//     getUserMedia: any
+// }
+
+
+// if(isBrowser) {
+//     WebRTC = {
+//         platform: EPlatform.browser,
+//         MediaStreamTrack: window['MediaStreamTrack'],
+//         getUserMedia: window.navigator.getUserMedia,
+//         RTCPeerConnection: window['RTCPeerConnection'],
+//         RTCSessionDescription: window['RTCSessionDescription'],
+//         RTCIceCandidate: window['RTCIceCandidate'],
+//         RTCView: null,
+//         MediaStream: window['MediaStream']
+//     }
+// } else {
+//     WebRTC = {
+//         platform: EPlatform.reactnative
+//     } as IWebRTC;
+// }
+
+var WebRTC: any = {};
+function AssignWebRTC(rnWebRTC) {
+    Object.keys(rnWebRTC).forEach(key => { WebRTC[key] = rnWebRTC[key] });    
 }
 
-var WebRTC: any;
-if(isBrowser) {
-    WebRTC = {
-        platform: EPlatform.browser,
-        MediaStreamTrack: window['MediaStreamTrack'],
-        getUserMedia: window.navigator.getUserMedia,
-        RTCPeerConnection: window['RTCPeerConnection'],
-        RTCSessionDescription: window['RTCSessionDescription'],
-        RTCIceCandidate: window['RTCIceCandidate'],
-        RTCView: null,
-        MediaStream: window['MediaStream']
-    }
-} else {
-    WebRTC = {
-        platform: EPlatform.reactnative
-    } as IWebRTC;
-}
-WebRTC.isBrowser = isBrowser;
-
-export { WebRTC }
+export { WebRTC, AssignWebRTC}
 

@@ -4,7 +4,7 @@ import { IUser } from "./user";
 import { sdpHelper } from "./helper/sdp";
 import { Config, ECodecs, EPlatform } from "./config";
 import { Streams } from "./streams";
-import { WebRTC, IWebRTC } from "./webrtc";
+import { WebRTC } from "./webrtc";
 
 export enum ERTCPeerEvents {
     onconnectionstatechange = 'connectionstatechange',
@@ -64,6 +64,7 @@ export class Peer extends Base {
 
         this.eventEmitter.addListener(ERTCPeerEvents.ontrack, this.onTrack)
         this.eventEmitter.addListener(ERTCPeerEvents.onstream, this.onStream)        
+        this.eventEmitter.addListener(ERTCPeerEvents.onaddstream, this.onAddStream)      
         this.eventEmitter.addListener(ERTCPeerEvents.onicecandidate, this.onIceCandidate)   
         
         //流状态事件
@@ -115,6 +116,11 @@ export class Peer extends Base {
         this.eventEmitter.removeListener(ESignalerMessageType.answer, this.onAnswer)
         this.eventEmitter.removeListener(ESignalerMessageType.candidate, this.onCandidate)
         this.eventEmitter.removeListener(ESignalerMessageType.icecomplete, this.onIceComplete)   
+
+        this.eventEmitter.removeListener(ERTCPeerEvents.ontrack, this.onTrack)
+        this.eventEmitter.removeListener(ERTCPeerEvents.onstream, this.onStream)        
+        this.eventEmitter.removeListener(ERTCPeerEvents.onaddstream, this.onAddStream)      
+        this.eventEmitter.removeListener(ERTCPeerEvents.onicecandidate, this.onIceCandidate)           
         
         //流状态事件
         this.streams.eventEmitter.removeListener(ERTCPeerEvents.onrecvstream, this.onRecvStream)
@@ -142,7 +148,15 @@ export class Peer extends Base {
     }    
     rtc() {
         if (!this._rtc) {
-            this._rtc = new RTCPeerConnection(this.getConfig().rtcConfig);
+            switch(Config.platform) {
+                case EPlatform.reactnative:
+                    this._rtc = new WebRTC.RTCPeerConnection(this.getConfig().rtcConfig)
+                    break;
+                default :
+                    this._rtc = new RTCPeerConnection(this.getConfig().rtcConfig);
+                    break;
+            }
+            
             this.initRTCEvents(this._rtc);
         }
         return this._rtc
@@ -168,33 +182,6 @@ export class Peer extends Base {
         return this.config;
     }
 
-    // createOffer2(): Promise<any> {        
-    //     return new Promise((resolve, reject) => {
-    //         let rtc = this.rtc as any;
-    //         let getOffer = (sdp) => {
-    //             rtc.setLocalDescription()
-
-    //         }
-    //         rtc.createOffer(())
-    //         {
-    //             offerToReceiveAudio: true,
-    //             offerToReceiveVideo: true
-    //         }).then((sdp) => {
-    //             this.rtc().setLocalDescription(sdp)
-    //             .then(() => {
-    //                 this.sendOffer(sdp);
-    //                 resolve();
-    //             })           
-    //             .catch((err) => {
-    //                 console.error(err)
-    //                 reject(err)
-    //             })             
-    //         }).catch((err) => {
-    //             console.error(err)
-    //             reject(err)
-    //         })
-    //     })
-    // }
     createOffer(): Promise<any> {        
         return new Promise((resolve, reject) => {
             this.rtc().createOffer({
@@ -233,30 +220,9 @@ export class Peer extends Base {
         }
         this.user.sendMessage(msg)
     }
-
-    createAnswer_bak(): Promise<any> {
-        return new Promise((resolve, reject) => {
-            this.rtc().createAnswer({
-                offerToReceiveAudio: true,
-                offerToReceiveVideo: true
-            }).then((sdp) => {
-                this.rtc().setLocalDescription(sdp)
-                .then(() => {
-                    this.sendAnswer(sdp);
-                    resolve();
-                })           
-                .catch((err) => {
-                    console.error(err)
-                    reject(err)
-                })             
-            }).catch((err) => {
-                console.error(err)
-                reject(err)
-            })
-        })
-    }    
+ 
     createAnswer(): Promise<any> {        
-        switch((WebRTC as IWebRTC).platform) {
+        switch(Config.platform) {
             case EPlatform.reactnative :
                 return this.createAnswer_reactnative();
                 break;
@@ -338,7 +304,7 @@ export class Peer extends Base {
 
     //网络事件
     onOffer = (data: any) => {
-        switch((WebRTC as IWebRTC).platform) {
+        switch(Config.platform) {
             case EPlatform.reactnative :
             return this.onOffer_reactnative(data);
                 break;
@@ -383,7 +349,7 @@ export class Peer extends Base {
         })
     }     
     onCandidate = (data: any) => {
-        switch(this.config.platform) {
+        switch(Config.platform) {
             case EPlatform.reactnative :
                 return this.onCandidate_reactnative(data);
                 break;
@@ -403,7 +369,7 @@ export class Peer extends Base {
         console.log('add candidate', data, this.user.socketId)
         this.rtc().addIceCandidate(new WebRTC.RTCIceCandidate(data))
         .catch(err => {
-            console.log('add Ic eCandidate error:', err)
+            console.log('add IceCandidate error:', err)
         })
     }    
     onIceComplete = () => {
@@ -411,7 +377,7 @@ export class Peer extends Base {
     }    
     onTrack = (ev: RTCTrackEvent) => {
         let streams = ev.streams;
-        streams.forEach(stream => {
+        streams.forEach(stream => {            
             this.streams.addRecvStream(stream)
         })
     }
@@ -419,6 +385,10 @@ export class Peer extends Base {
         let stream = ev.stream as MediaStream;
         this.streams.addRecvStream(stream);
     }
+    onAddStream = (ev: Event) => {
+        let stream = ev['stream'] as MediaStream;
+        this.streams.addRecvStream(stream);    
+    }    
     onRecvStream = (stream: MediaStream) => {
         this.eventEmitter.emit(ERTCPeerEvents.onrecvstream, stream, this);
     } 
