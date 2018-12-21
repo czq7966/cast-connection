@@ -5,6 +5,7 @@ import { sdpHelper } from "./helper/sdp";
 import { Config, ECodecs, EPlatform } from "./config";
 import { Streams } from "./streams";
 import { WebRTC } from "./webrtc";
+import { DataChannels } from "./datachannels";
 
 export enum ERTCPeerEvents {
     onconnectionstatechange = 'connectionstatechange',
@@ -31,17 +32,20 @@ export class Peer extends Base {
     config: Config;
     user: IUser
     streams: Streams;
+    datachannels: DataChannels;
     private _rtcevents;
     private _rtc: RTCPeerConnection    
     constructor(user: IUser) {
         super()
         this.config = new Config();
         this.streams = new Streams(this);
+        this.datachannels = new DataChannels(this);
         this._rtcevents = {};
         this.user = user;        
         this.initEvents();
     }
     destroy() {      
+        this.datachannels.close();
         this._rtc && this._rtc.close();
         this.unInitEvents();
         this.streams.destroy();        
@@ -156,16 +160,16 @@ export class Peer extends Base {
                     this._rtc = new RTCPeerConnection(this.getConfig().rtcConfig);
                     break;
             }
-            
             this.initRTCEvents(this._rtc);
         }
         return this._rtc
     }
 
 
-    doICE(stream: MediaStream) {
+    doICE(stream: MediaStream): Promise<any> {
         if (this.addSendStream(stream)) {
-            this.createOffer();        
+            this.datachannels.createDataChannel();              
+            return this.createOffer();     
         }
     }
     addSendStream(stream: MediaStream): boolean {    
@@ -199,8 +203,14 @@ export class Peer extends Base {
                 // sdp.sdp = sdpHelper.disableNACK(sdp.sdp);
                 this.rtc().setLocalDescription(sdp)
                 .then(() => {
-                    this.sendOffer(sdp);
-                    resolve();
+                    this.sendOffer(sdp)
+                    .then(() => {
+                        resolve();
+                    })
+                    .catch(err => {
+                        reject(err)
+                    })
+                    
                 })           
                 .catch((err) => {
                     console.error(err)
@@ -212,13 +222,13 @@ export class Peer extends Base {
             })
         })
     }    
-    sendOffer(sdp?: RTCSessionDescriptionInit) {
+    sendOffer(sdp?: RTCSessionDescriptionInit): Promise<any> {
         sdp = sdp || this.rtc().localDescription.toJSON();
         let msg: ISignalerMessage = {
             type: ESignalerMessageType.offer,
             data: sdp
         }
-        this.user.sendMessage(msg)
+        return this.user.sendMessage(msg)
     }
  
     createAnswer(): Promise<any> {        
@@ -239,8 +249,13 @@ export class Peer extends Base {
             }).then((sdp) => {
                 this.rtc().setLocalDescription(sdp)
                 .then(() => {
-                    this.sendAnswer(sdp);
-                    resolve();
+                    this.sendAnswer(sdp)
+                    .then(() => {
+                        resolve();
+                    })
+                    .catch(err => {
+                        reject(err);
+                    })                    
                 })           
                 .catch((err) => {
                     console.error(err)
@@ -258,11 +273,17 @@ export class Peer extends Base {
             let createAnswerSuccess = (sdp) => {
                 console.log('createAnswerSuccess', sdp)
                 let setLocalDescriptionSuccess = () => {
-                    this.sendAnswer(sdp);
-                    resolve();
+                    this.sendAnswer(sdp)
+                    .then(() => {
+                        resolve();
+                    })
+                    .catch(err => {
+                        reject(err);
+                    })  
                 }
                 let setLocalDescriptionFailed = (err) => {
                     console.log('createAnswerFailed', err)
+                    reject(err);
                 }
                 rtc.setLocalDescription(sdp, setLocalDescriptionSuccess, setLocalDescriptionFailed)
             }
@@ -274,27 +295,27 @@ export class Peer extends Base {
         })
     }         
 
-    sendAnswer(sdp?: RTCSessionDescriptionInit) {
+    sendAnswer(sdp?: RTCSessionDescriptionInit): Promise<any> {
         sdp = sdp || this.rtc().localDescription.toJSON();
         let msg: ISignalerMessage = {
             type: ESignalerMessageType.answer,
             data: sdp
         }
-        this.user.sendMessage(msg)
+        return this.user.sendMessage(msg)
     }
 
-    onIceCandidate = (ev: RTCPeerConnectionIceEvent) => {
+    onIceCandidate = (ev: RTCPeerConnectionIceEvent): Promise<any> => {
         if (ev.candidate) {
             let msg: ISignalerMessage = {
                 type: ESignalerMessageType.candidate,
                 data: ev.candidate.toJSON()
             }            
-            this.user.sendMessage(msg)
+            return this.user.sendMessage(msg)
         } else {
             let msg: ISignalerMessage = {
                 type: ESignalerMessageType.icecomplete,
             }
-            this.user.sendMessage(msg)
+            return this.user.sendMessage(msg)
         }
     }
 
