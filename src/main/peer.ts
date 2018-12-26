@@ -6,6 +6,7 @@ import { Config, ECodecs, EPlatform } from "./config";
 import { Streams } from "./streams";
 import { WebRTC } from "./webrtc";
 import { DataChannels } from "./datachannels";
+import { Input } from "./input";
 
 export enum ERTCPeerEvents {
     onconnectionstatechange = 'connectionstatechange',
@@ -33,6 +34,7 @@ export class Peer extends Base {
     user: IUser
     streams: Streams;
     datachannels: DataChannels;
+    input: Input;
     private _rtcevents;
     private _rtc: RTCPeerConnection    
     constructor(user: IUser) {
@@ -40,6 +42,7 @@ export class Peer extends Base {
         this.config = new Config();
         this.streams = new Streams(this);
         this.datachannels = new DataChannels(this);
+        this.input = new Input(this.datachannels);
         this._rtcevents = {};
         this.user = user;        
         this.initEvents();
@@ -48,12 +51,17 @@ export class Peer extends Base {
         this.datachannels.close();
         this._rtc && this._rtc.close();
         this.unInitEvents();
-        this.streams.destroy();        
-        delete this._rtcevents
+        this.input.destroy();
+        this.datachannels.destroy();
+        this.streams.destroy();     
+   
+        delete this._rtcevents;
         delete this._rtc;
         delete this.user;
         delete this.config;
         delete this.streams;
+        delete this.input;
+        delete this.datachannels;        
         super.destroy();
     }
     close() {
@@ -75,6 +83,7 @@ export class Peer extends Base {
         this.streams.eventEmitter.addListener(ERTCPeerEvents.onrecvstream, this.onRecvStream)
         
         //Log监视RTC状态变化
+        /*
         this.eventEmitter.addListener(ERTCPeerEvents.onconnectionstatechange, (ev) => {
             this._rtc && 
             console.log('on'+ERTCPeerEvents.onconnectionstatechange+':', this.rtc().connectionState, this.user.socketId)
@@ -113,6 +122,7 @@ export class Peer extends Base {
         this.eventEmitter.addListener(ERTCPeerEvents.ontrack, ev => {            
             console.warn('ontrack:', this.user.socketId);
         })  
+        */
     }
     unInitEvents() {
         this.unInitRTCEvents(this._rtc);
@@ -167,8 +177,8 @@ export class Peer extends Base {
 
 
     doICE(stream: MediaStream): Promise<any> {
-        if (this.addSendStream(stream)) {
-            this.datachannels.createDataChannel();              
+        if (this.addSendStream(stream)) {            
+            this.createDataChannels()             
             return this.createOffer();     
         }
     }
@@ -184,6 +194,9 @@ export class Peer extends Base {
     getConfig(): Config {
         this.eventEmitter.emit(EPeerEvents.ongetconfig, this.config);
         return this.config;
+    }
+    createDataChannels() {
+        this.datachannels.createDataChannels();
     }
 
     createOffer(): Promise<any> {        

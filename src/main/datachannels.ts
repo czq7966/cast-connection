@@ -2,6 +2,9 @@ import { Base } from "./base"
 import { Peer, ERTCPeerEvents } from "./peer";
 import { DataChannel, EDataChannelLabel } from "./datachannel";
 
+export enum EDataChannelsEvents {
+    onAddDataChannel = 'onAddDataChannel'
+}
 
 export class DataChannels extends Base {
     peer: Peer
@@ -41,7 +44,7 @@ export class DataChannels extends Base {
         let rtcchannel = ev.channel;
         if (rtcchannel) {
             let channel = this.getChannel(rtcchannel.label);
-            if (channel.rtcchannel === rtcchannel) {
+            if (channel && channel.rtcchannel === rtcchannel) {
                 console.log('data channel had exists ' + rtcchannel.label)
 
             } else {
@@ -56,12 +59,12 @@ export class DataChannels extends Base {
                 this.closeChannel(channel.rtcchannel.label);
                 channel.channels = this;
                 this.channels[channel.rtcchannel.label] = channel;
+                this.eventEmitter.emit(EDataChannelsEvents.onAddDataChannel, channel)
             }
         }
     }
-    createDataChannel(label?: string): DataChannel {
-        if (this.peer) {
-            label = label? label : EDataChannelLabel.default;
+    createDataChannel(label: string): DataChannel {
+        if (this.peer && label) {
             let channel = this.getChannel(label);
             if (!channel) {
                 let rtcchannel = this.peer.rtc().createDataChannel(label);
@@ -71,14 +74,19 @@ export class DataChannels extends Base {
             return channel;
         }
     }
+    createDataChannels(){
+        Object.keys(EDataChannelLabel).forEach(key => {
+            let label = EDataChannelLabel[key]
+
+            this.createDataChannel(label)
+        })
+    }    
     getChannel(label: string): DataChannel {
         return this.channels[label];
     }
-    getDefaultChannel(): DataChannel {
-        return this.getChannel(EDataChannelLabel.default);
-    }
-    getGestureChannel(): DataChannel {
-        return this.getChannel(EDataChannelLabel.gesture);
+
+    getInputChannel(): DataChannel {
+        return this.getChannel(EDataChannelLabel.input);
     }    
     closeChannel(label: string) {
         let channel = this.getChannel(label);

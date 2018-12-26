@@ -39,7 +39,6 @@ export class User extends Base implements IUser {
     signaler: Signaler;
     peer: Peer;
     room: Room;
-    // stream: MediaStream;
     streams: Streams;
     constructor(user: IUserParams) {
         super();
@@ -50,7 +49,6 @@ export class User extends Base implements IUser {
         this.signaler = user.signaler;
         this.peer = new Peer(this);
         this.room = user.room;
-        // this.stream = user.stream;
         this.initEvents();
     }
     destroy() {        
@@ -107,15 +105,9 @@ export class User extends Base implements IUser {
     }
 
     onReady(query: IUserQuery) {
-        // let currUser = this.room.currUser();
         this.isReady = true;
         this.room.sendStreamsToUser(this);
-        // this.addSendStream(this.room.currUser().stream);
-        // currUser.isOwner && this.addStream(this.room.currUser().stream);
     }
-    // onTrack = (ev: RTCTrackEvent) => {
-    //     this.eventEmitter.emit(ERTCPeerEvents.ontrack, ev, this);
-    // }
     onIceConnectionStateChange = (ev: Event) => {
         this.room.eventEmitter.emit(ERTCPeerEvents.oniceconnectionstatechange, ev, this, this.room);
     }
@@ -126,24 +118,9 @@ export class User extends Base implements IUser {
 
     stopSharing(): Promise<any> {
         return this.streams.stopSendStreams();
-        // return new Promise((resolve, reject) => {
-        //     if (this.stream) {
-        //         let stream = this.stream;
-        //         let onInactive = (ev) => {
-        //             stream.removeEventListener('inactive', onInactive);
-        //             resolve()
-        //         }
-        //         stream.addEventListener('inactive', onInactive);  
-        //         stream.getTracks().forEach(track => {
-        //             track.stop();
-        //         })                   
-        //     } else {
-        //         resolve()
-        //     }
-        // })
     }
 
-    imReady() {
+    imReady(): Promise<any> {
         let msg: ISignalerMessage = {
             type: ESignalerMessageType.ready
         }
@@ -153,9 +130,9 @@ export class User extends Base implements IUser {
             isOwner: this.isOwner,
             msg: msg
         }
-        this.signaler.sendMessage(query)
+        return this.signaler.sendMessage(query)
     }
-    sayHello(to?: string) {
+    sayHello(to?: string): Promise<any> {
         let msg: ISignalerMessage = {
             type: ESignalerMessageType.hello    
         }
@@ -166,49 +143,27 @@ export class User extends Base implements IUser {
             to: to,
             msg: msg                
         }
-        this.signaler.sendMessage(query);
+        return this.signaler.sendMessage(query);
     }   
-    sendMessage(msg: any) {
+    sendMessage(msg: any): Promise<any> {
         let query: IUserQuery = {
             roomid: this.room.roomid,
             to:  this.socketId,
             msg: msg
         }
-        this.signaler.sendMessage(query)
+        return this.signaler.sendMessage(query)
     }    
     addSendStream(stream: MediaStream) {
         if (stream && !this.streams.getSendStream(stream.id)) {
             this.streams.addSendStream(stream);
             this.doICE();
         }
-        // if (stream) {
-        //     if (!this.stream || this.stream.id != stream.id) {
-        //         this.stream = stream; 
-        //         let onInactive = (ev) => {
-        //             stream.removeEventListener('inactive', onInactive);
-        //             this.onSendStreamInactive(stream);
-        //         }
-        //         stream.addEventListener('inactive', onInactive);          
-        //         this.doICE();     
-        //     }
-        // }
     } 
     addSendStreams(streams: Array<MediaStream>) {
         streams.forEach(stream => {
             this.addSendStream(stream);
         })
-        
-        // if (stream) {
-        //     if (!this.stream || this.stream.id != stream.id) {
-        //         this.stream = stream; 
-        //         let onInactive = (ev) => {
-        //             stream.removeEventListener('inactive', onInactive);
-        //             this.onSendStreamInactive(stream);
-        //         }
-        //         stream.addEventListener('inactive', onInactive);          
-        //         this.doICE();     
-        //     }
-        // }
+
     }     
     doICE() {
         if (this.isReady) {
@@ -216,9 +171,6 @@ export class User extends Base implements IUser {
                 this.peer.doICE(stream);
             })
         }
-        // if (this.stream && this.isReady) {
-        //     this.peer.doICE(this.stream);
-        // }
     }
     isCurrUser(): boolean {
         return this.socketId === this.signaler.id();

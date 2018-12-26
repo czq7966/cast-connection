@@ -102,6 +102,58 @@ class Connection extends Base {
     close(): void;
 }
 
+enum EDataChannelLabel {
+    input = "datachannel_label_input"
+}
+enum EDataChannelEvents {
+    onbufferedamountlow = "datachannel_bufferedamountlow",
+    onclose = "datachannel_close",
+    onerror = "datachannel_error",
+    onmessage = "datachannel_message",
+    onopen = "datachannel_open"
+}
+class DataChannel extends Base {
+    rtcchannel: RTCDataChannel;
+    channels: DataChannels;
+    constructor(channels: DataChannels, rtcchannel: RTCDataChannel);
+    destroy(): void;
+    initEvents(): void;
+    unInitEvents(): void;
+    initChannelEvents(channel: RTCDataChannel): void;
+    unInitChannelEvents(channel: RTCDataChannel): void;
+    onBufferedAmountLow: (ev: Event) => void;
+    onClose: (ev: Event) => void;
+    onError: (ev: RTCErrorEvent) => void;
+    onMessage: (ev: MessageEvent) => void;
+    onOpen: (ev: Event) => void;
+    close(): void;
+    sendMessage(msg: Object): Promise<any>;
+}
+
+enum EDataChannelsEvents {
+    onAddDataChannel = "onAddDataChannel"
+}
+class DataChannels extends Base {
+    peer: Peer;
+    channels: {
+        [label: string]: DataChannel;
+    };
+    constructor(peer: Peer);
+    destroy(): void;
+    attachPeer(peer: Peer): void;
+    initEvents(peer: Peer): void;
+    unInitEvents(peer: Peer): void;
+    onDataChannel: (ev: RTCDataChannelEvent) => void;
+    addDataChannel(channel: DataChannel): void;
+    createDataChannel(label: string): DataChannel;
+    createDataChannels(): void;
+    getChannel(label: string): DataChannel;
+    getInputChannel(): DataChannel;
+    closeChannel(label: string): void;
+    closeChannels(): void;
+    close(): void;
+}
+
 interface IDispatcher extends IBase {
 }
 class Dispatcher extends Base {
@@ -115,6 +167,111 @@ class Dispatcher extends Base {
     onLeaveRoom: (query: IUserQuery) => void;
     onCloseRoom: (query: IUserQuery) => void;
     onMessage: (query: IUserQuery) => void;
+}
+
+enum EInputEvents {
+    onDispatchEvent = "onDispatchEvent",
+    onInputEvent = "onInputEvent"
+}
+enum EInputDevice {
+    mouse = "mouse",
+    touch = "touch",
+    keyboard = "keyboard"
+}
+enum EInputDeviceMouseType {
+    mousedown = "mousePressed",
+    mouseup = "mouseReleased",
+    mouseenter = "mouseEnter",
+    mouseleave = "mouseLeave",
+    mousemove = "mouseMoved",
+    mouseover = "mouseOver",
+    mouseout = "mouseOut",
+    wheel = "mouseWheel"
+}
+enum EInputDeviceTouchType {
+    touchStart = "touchStart",
+    touchMove = "touchMove",
+    touchEnd = "touchEnd",
+    touchCancel = "touchCancel"
+}
+enum EInputDeviceKeyType {
+    keyDown = "keyDown",
+    keyUp = "keyUp",
+    rawKeyDown = "rawKeyDown",
+    char = "char"
+}
+enum EInputOS {
+    window = "window",
+    android = "android"
+}
+enum EInputPlatform {
+    browser = "browser",
+    reactnative = "reactnative"
+}
+interface IInputPoint {
+    x: number;
+    y: number;
+}
+interface ITouchPoint {
+    x: number;
+    y: number;
+    radiusX?: number;
+    radiusY?: number;
+    rotationAngle?: number;
+    force?: number;
+    id?: number;
+}
+interface ITouchEvent extends ICavansEvent {
+    type?: EInputDeviceTouchType;
+    points?: Array<ITouchPoint>;
+}
+interface IMousePoint {
+    x: number;
+    y: number;
+    button?: 'none' | 'left' | 'middle' | 'right';
+    clickCount?: number;
+    deltaX?: number;
+    deltaY?: number;
+}
+interface IMouseEvent extends ICavansEvent, IMousePoint {
+    type?: EInputDeviceMouseType;
+}
+interface ICavansEvent {
+    OS?: EInputOS;
+    platform?: EInputPlatform;
+    modifiers?: number;
+    timestamp?: number;
+    sourceX?: number;
+    sourceY?: number;
+    destX?: number;
+    destY?: number;
+    async?: boolean;
+}
+type IInputEvent = ITouchEvent | IMouseEvent;
+class Input extends Base {
+    OS: EInputOS;
+    platform: EInputPlatform;
+    datachannel: DataChannel;
+    datachannels: DataChannels;
+    constructor(datachannels: DataChannels);
+    destroy(): void;
+    initEvents(): void;
+    unInitEvents(): void;
+    onAddDataChannel: (datachannel: DataChannel) => void;
+    unInitDataChannelEvents(): void;
+    onDataChannelMessage: (ev: MessageEvent) => void;
+    onDataChannelOpen: () => void;
+    onDataChannelClose: () => void;
+    dispatchEvent(event: IInputEvent): void;
+    inputEvent(event: IInputEvent): void;
+    sendEvent(event: IInputEvent): Promise<any>;
+    dealInputEvent(event: IInputEvent): void;
+    inputEventWindow(event: IInputEvent): void;
+    inputEventAndroid(event: IInputEvent): void;
+    inputEventWindowBrowser(event: IInputEvent): void;
+    inputEventAndroidBrowser(event: IInputEvent): void;
+    inputEventAndroidReactnative(event: IInputEvent): void;
+    calcInputEventXY(point: IInputPoint, source: IInputPoint, dest: IInputPoint): IInputPoint;
 }
 
 enum ERTCPeerEvents {
@@ -141,6 +298,8 @@ class Peer extends Base {
     config: Config;
     user: IUser;
     streams: Streams;
+    datachannels: DataChannels;
+    input: Input;
     constructor(user: IUser);
     destroy(): void;
     close(): void;
@@ -149,16 +308,17 @@ class Peer extends Base {
     initRTCEvents(rtc: RTCPeerConnection): void;
     unInitRTCEvents(rtc: RTCPeerConnection): void;
     rtc(): RTCPeerConnection;
-    doICE(stream: MediaStream): void;
+    doICE(stream: MediaStream): Promise<any>;
     addSendStream(stream: MediaStream): boolean;
     getConfig(): Config;
+    createDataChannels(): void;
     createOffer(): Promise<any>;
-    sendOffer(sdp?: RTCSessionDescriptionInit): void;
+    sendOffer(sdp?: RTCSessionDescriptionInit): Promise<any>;
     createAnswer(): Promise<any>;
     createAnswer_reactnative(): Promise<any>;
     createAnswer_browser(): Promise<any>;
-    sendAnswer(sdp?: RTCSessionDescriptionInit): void;
-    onIceCandidate: (ev: RTCPeerConnectionIceEvent) => void;
+    sendAnswer(sdp?: RTCSessionDescriptionInit): Promise<any>;
+    onIceCandidate: (ev: RTCPeerConnectionIceEvent) => Promise<any>;
     stopSharing(): Promise<any>;
     onOffer: (data: any) => void;
     onOffer_browser: (data: any) => void;
@@ -330,9 +490,9 @@ class User extends Base implements IUser {
     onIceConnectionStateChange: (ev: Event) => void;
     onRecvStream: (stream: MediaStream) => void;
     stopSharing(): Promise<any>;
-    imReady(): void;
-    sayHello(to?: string): void;
-    sendMessage(msg: any): void;
+    imReady(): Promise<any>;
+    sayHello(to?: string): Promise<any>;
+    sendMessage(msg: any): Promise<any>;
     addSendStream(stream: MediaStream): void;
     addSendStreams(streams: Array<MediaStream>): void;
     doICE(): void;

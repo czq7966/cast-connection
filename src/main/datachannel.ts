@@ -10,8 +10,8 @@ enum _EDataChannelEvents {
 }
 var DataChannelEventPrefix = 'datachannel_';
 export enum EDataChannelLabel {
-    default = 'datachannel_label_default',
-    gesture = 'datachannel_label_gesture'
+    // default = 'datachannel_label_default',
+    input = 'datachannel_label_input'
 }
 export enum EDataChannelEvents {
     onbufferedamountlow = "datachannel_bufferedamountlow",
@@ -82,7 +82,7 @@ export class  DataChannel extends Base {
     }    
 
     onBufferedAmountLow = (ev: Event) => {
-        console.log('on data channel buffered amount low')
+        // console.log('on data channel buffered amount low')
     }
     onClose = (ev: Event) => {
         console.log('on data channel close')
@@ -91,15 +91,19 @@ export class  DataChannel extends Base {
         console.log('on data channel error', ev)
     }
     onMessage = (ev: MessageEvent) => {        
-        console.log('on data channel message: ' , ev.data, ev)
+        // console.log('on data channel message: ' , ev.data, ev)
     }
     onOpen = (ev: Event) => {
-        let time = Date.now().toString()
-        console.log('on data channel open ', this, time)
-        
-        this.rtcchannel.send(time)
+        console.log('on data channel open ', this)
     }           
     close() {
         this.rtcchannel.close();
     }     
+    sendMessage(msg: Object): Promise<any> {
+        if (this.rtcchannel && this.rtcchannel.readyState === 'open') {
+            this.rtcchannel.send(JSON.stringify(msg));
+        } else {
+            return Promise.reject('data channel is ' + this.rtcchannel.readyState)
+        }
+    }
 }
