@@ -82,7 +82,7 @@ export class  DataChannel extends Base {
     }    
 
     onBufferedAmountLow = (ev: Event) => {
-        // console.log('on data channel buffered amount low')
+        console.log('on data channel buffered amount low')
     }
     onClose = (ev: Event) => {
         console.log('on data channel close')

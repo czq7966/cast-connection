@@ -37,6 +37,14 @@ export class Rooms extends Base {
     count() {
         return Object.keys(this.rooms).length
     }
+    userCount(): number {
+        let result = 0;
+        Object.keys(this.rooms).forEach(roomid => {
+            let room = this.getRoom(roomid)
+            result = result + room.userCount();
+        })
+        return result;
+    }
 
 
     onCloseRoom = (query: IUserQuery) => {

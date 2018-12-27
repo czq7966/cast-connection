@@ -224,6 +224,7 @@ interface ITouchPoint {
 interface ITouchEvent extends ICavansEvent {
     type?: EInputDeviceTouchType;
     points?: Array<ITouchPoint>;
+    touchPoints?: Array<ITouchPoint>;
 }
 interface IMousePoint {
     x: number;

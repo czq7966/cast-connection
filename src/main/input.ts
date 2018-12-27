@@ -12,11 +12,6 @@ export enum EInputDevice {
     keyboard = 'keyboard'
 }
 export enum EInputDeviceMouseType {
-    // mousePressed = 'mousePressed',
-    // mouseReleased = 'mouseReleased',
-    // mouseMoved = 'mouseMoved',
-    // // mouseWheel = 'mouseWheel',
-
     mousedown = 'mousePressed',
     mouseup = 'mouseReleased',
     mouseenter = 'mouseEnter',
@@ -31,11 +26,6 @@ export enum EInputDeviceTouchType {
     touchMove = 'touchMove',
     touchEnd = 'touchEnd',
     touchCancel = 'touchCancel',
-
-    // touchStart = 'touchStart',
-    // touchEnd = 'touchEnd',
-    // touchMove = 'touchMove',
-    // mouseWheel = 'touchCancel'
 }
 export enum EInputDeviceKeyType {
     keyDown = 'keyDown',
@@ -220,33 +210,22 @@ export class Input extends Base {
         }
         let handleTouchEvent  = () => {
             let evt = event as ITouchEvent;
-            let evtMouse = event as IMouseEvent;
+            evt.touchPoints = [];
             evt.points.forEach(point => {
                 let p = this.calcInputEventXY({x: point.x, y: point.y}, {x: evt.sourceX, y: evt.sourceY}, {x: evt.destX, y: evt.destY});
                 if (p.x >= 0 ) {
                     point.x = p.x;
                     point.y = p.y;
-                    console.log(point, evt.points)
-                    // this.dispatchEvent(evt)
                 }            
             })
-            
-
-
-
             switch(event.type) {
-                // case EInputDeviceTouchType.touchStart:
-                    // evt.type = EInputDeviceMouseType.mousedown
                 case EInputDeviceTouchType.touchCancel:
                 case EInputDeviceTouchType.touchEnd:
-                    evt.touchPoints = []
                     break;
                 default:
                     evt.touchPoints = evt.points;   
                     break;
             }
-            
-
             this.dispatchEvent(evt);
         }
                     
@@ -266,21 +245,19 @@ export class Input extends Base {
             case EInputDeviceMouseType.mouseenter:
             case EInputDeviceMouseType.mouseleave:                    
             case EInputDeviceMouseType.mouseout:
-            case EInputDeviceMouseType.mouseover:     
-         
+            case EInputDeviceMouseType.mouseover:              
                 break;
-
-
             default: 
                 break;
         }        
 
     }
     inputEventAndroidBrowser(event: IInputEvent) {
+        this.inputEventWindowBrowser(event)
 
     }
     inputEventAndroidReactnative(event: IInputEvent) {
-
+        this.inputEventWindowBrowser(event)
     }
     calcInputEventXY(point: IInputPoint, source: IInputPoint, dest: IInputPoint): IInputPoint {
             let x = 0, y = 0;

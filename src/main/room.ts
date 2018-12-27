@@ -6,7 +6,8 @@ import { ERTCPeerEvents } from "./peer";
 import { Streams } from "./streams";
 
 export enum ERoomEvents {
-    onadduser = 'onadduser'
+    onadduser = 'onadduser',
+    ondeluser = 'ondeluser'
 }
 export interface IRoomParams {
     roomid: string
@@ -136,9 +137,10 @@ export class Room extends Base implements IRoom {
     delUser(socketId: string) {
         let user = this.users[socketId];
         if (user) {
-            user.destroy();
-        }
-        delete this.users[socketId];
+            delete this.users[socketId];
+            this.eventEmitter.emit(ERoomEvents.ondeluser, user)
+            user.destroy();            
+        }        
     }
     clearUsers() {
         Object.keys(this.users).forEach(key => {
@@ -181,4 +183,7 @@ export class Room extends Base implements IRoom {
             this.users[key].close();
         })      
     }    
+    userCount(): number {
+        return this.getUsers().length;
+    }
 }
