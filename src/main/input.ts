@@ -53,6 +53,8 @@ export interface ITouchPoint {
     rotationAngle?: number
     force?: number
     id?: number
+    deltaX?: number,
+    deltaY?: number,    
 }
 export interface ITouchEvent extends ICavansEvent {
     type?: EInputDeviceTouchType,    

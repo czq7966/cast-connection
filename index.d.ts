@@ -220,6 +220,8 @@ interface ITouchPoint {
     rotationAngle?: number;
     force?: number;
     id?: number;
+    deltaX?: number;
+    deltaY?: number;
 }
 interface ITouchEvent extends ICavansEvent {
     type?: EInputDeviceTouchType;
@@ -336,7 +338,8 @@ class Peer extends Base {
 }
 
 enum ERoomEvents {
-    onadduser = "onadduser"
+    onadduser = "onadduser",
+    ondeluser = "ondeluser"
 }
 interface IRoomParams {
     roomid: string;
@@ -386,6 +389,7 @@ class Room extends Base implements IRoom {
     addSendStream(stream: MediaStream, user?: IUser): void;
     sendStreamsToUser(user?: IUser): void;
     close(): void;
+    userCount(): number;
 }
 
 enum ERoomsEvents {
@@ -401,6 +405,7 @@ class Rooms extends Base {
     initEvents(): void;
     unInitEvents(): void;
     count(): number;
+    userCount(): number;
     onCloseRoom: (query: IUserQuery) => void;
     newRoom(roomid: string, password?: string): Room;
     getRoom(roomid: string): Room;
