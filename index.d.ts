@@ -508,6 +508,7 @@ function AssignWebRTC(rnWebRTC: any): void;
 
 class Gesture extends Base {
     input: Input;
+    touchStartCount: number;
     constructor(input: Input);
     destroy(): void;
     inputEvent(event: IInputEvent): void;
@@ -520,7 +521,7 @@ class Gesture extends Base {
     calcInputEventXY(point: IInputPoint, source: IInputPoint, dest: IInputPoint): IInputPoint;
     changeTouchMode(): void;
     handleMouseEvent(evt: IMouseEvent): void;
-    handleTouchEvent(evt: ITouchEvent): void;
+    handleTouchEvent(event: ITouchEvent): void;
     handleTouchToMouseEvent(event: ITouchEvent): void;
 }
 
