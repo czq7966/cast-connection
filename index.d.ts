@@ -171,7 +171,8 @@ class Dispatcher extends Base {
 
 enum EInputEvents {
     onDispatchEvent = "onDispatchEvent",
-    onInputEvent = "onInputEvent"
+    onInputEvent = "onInputEvent",
+    onTouchModeEvent = "onTouchModeEvent"
 }
 enum EInputDevice {
     mouse = "mouse",
@@ -189,10 +190,10 @@ enum EInputDeviceMouseType {
     wheel = "mouseWheel"
 }
 enum EInputDeviceTouchType {
-    touchStart = "touchStart",
-    touchMove = "touchMove",
-    touchEnd = "touchEnd",
-    touchCancel = "touchCancel"
+    touchstart = "touchStart",
+    touchmove = "touchMove",
+    touchend = "touchEnd",
+    touchcancel = "touchCancel"
 }
 enum EInputDeviceKeyType {
     keyDown = "keyDown",
@@ -242,6 +243,7 @@ interface IMouseEvent extends ICavansEvent, IMousePoint {
 interface ICavansEvent {
     OS?: EInputOS;
     platform?: EInputPlatform;
+    touchMode?: EInputDevice;
     modifiers?: number;
     timestamp?: number;
     sourceX?: number;
@@ -254,8 +256,10 @@ type IInputEvent = ITouchEvent | IMouseEvent;
 class Input extends Base {
     OS: EInputOS;
     platform: EInputPlatform;
+    touchMode: EInputDevice;
     datachannel: DataChannel;
     datachannels: DataChannels;
+    gesture: Gesture;
     constructor(datachannels: DataChannels);
     destroy(): void;
     initEvents(): void;
@@ -268,13 +272,6 @@ class Input extends Base {
     dispatchEvent(event: IInputEvent): void;
     inputEvent(event: IInputEvent): void;
     sendEvent(event: IInputEvent): Promise<any>;
-    dealInputEvent(event: IInputEvent): void;
-    inputEventWindow(event: IInputEvent): void;
-    inputEventAndroid(event: IInputEvent): void;
-    inputEventWindowBrowser(event: IInputEvent): void;
-    inputEventAndroidBrowser(event: IInputEvent): void;
-    inputEventAndroidReactnative(event: IInputEvent): void;
-    calcInputEventXY(point: IInputPoint, source: IInputPoint, dest: IInputPoint): IInputPoint;
 }
 
 enum ERTCPeerEvents {
@@ -508,4 +505,22 @@ class User extends Base implements IUser {
 var WebRTC: any;
 function AssignWebRTC(rnWebRTC: any): void;
 { WebRTC, AssignWebRTC };
+
+class Gesture extends Base {
+    input: Input;
+    constructor(input: Input);
+    destroy(): void;
+    inputEvent(event: IInputEvent): void;
+    dealInputEvent(event: IInputEvent): void;
+    inputEventWindow(event: IInputEvent): void;
+    inputEventAndroid(event: IInputEvent): void;
+    inputEventWindowBrowser(event: IInputEvent): void;
+    inputEventAndroidBrowser(event: IInputEvent): void;
+    inputEventAndroidReactnative(event: IInputEvent): void;
+    calcInputEventXY(point: IInputPoint, source: IInputPoint, dest: IInputPoint): IInputPoint;
+    changeTouchMode(): void;
+    handleMouseEvent(evt: IMouseEvent): void;
+    handleTouchEvent(evt: ITouchEvent): void;
+    handleTouchToMouseEvent(event: ITouchEvent): void;
+}
 
