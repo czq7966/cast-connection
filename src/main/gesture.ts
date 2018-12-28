@@ -3,11 +3,14 @@ import { IInputEvent, EInputOS, EInputPlatform, Input, IInputPoint, IMouseEvent,
 
 export class Gesture extends Base {
     input: Input
+    touchStartCount: number;
     constructor(input: Input) {
         super();
         this.input = input;
+        this.touchStartCount = 0
     }
     destroy() {
+        delete this.touchStartCount;
         delete this.input;
         super.destroy();
     }
@@ -128,32 +131,47 @@ export class Gesture extends Base {
             this.input.dispatchEvent(evt)
         }        
     }
-    handleTouchEvent(evt: ITouchEvent) {
+    handleTouchEvent(event: ITouchEvent) {
         // if (evt.points.length >= 4) {                
         //     this.changeTouchMode();  
         //     return;             
         // }
 
         if (this.input.touchMode === EInputDevice.mouse) {
-            this.handleTouchToMouseEvent(evt)
+            this.handleTouchToMouseEvent(event)
         } else {
-            evt.touchPoints = [];
-            evt.points.forEach(point => {
-                let p = this.calcInputEventXY({x: point.x, y: point.y}, {x: evt.sourceX, y: evt.sourceY}, {x: evt.destX, y: evt.destY});
+            event.touchPoints = [];
+            event.points.forEach(point => {
+                let p = this.calcInputEventXY({x: point.x, y: point.y}, {x: event.sourceX, y: event.sourceY}, {x: event.destX, y: event.destY});
                 if (p.x >= 0 ) {
                     point.x = p.x;
                     point.y = p.y;
                 }            
             })
-            switch(evt.type) {
+            event.touchPoints = event.points;
+            switch(event.type) {
                 case EInputDeviceTouchType.touchcancel:
+                    event.touchPoints = [];
+                    this.touchStartCount = 0;
+                    this.input.dispatchEvent(event)
+                    break;
                 case EInputDeviceTouchType.touchend:
+                    event.touchPoints = [];
+                    this.touchStartCount--;
+                    this.touchStartCount <= 0 && (this.touchStartCount = 0, this.input.dispatchEvent(event))
+                    break;
+                case EInputDeviceTouchType.touchmove:
+                    event.touchPoints.length == 1 && this.input.dispatchEvent(event);                    
+                    break;
+                case EInputDeviceTouchType.touchstart:
+                    this.touchStartCount++;
+                    this.touchStartCount == 1 && this.input.dispatchEvent(event);
                     break;
                 default:
-                    evt.touchPoints = evt.points;   
+                    
                     break;
             }
-            this.input.dispatchEvent(evt);
+            
         }        
     }
     handleTouchToMouseEvent(event: ITouchEvent) {
