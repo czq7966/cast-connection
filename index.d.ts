@@ -226,8 +226,9 @@ interface ITouchPoint {
 }
 interface ITouchEvent extends ICavansEvent {
     type?: EInputDeviceTouchType;
-    points?: Array<ITouchPoint>;
     touchPoints?: Array<ITouchPoint>;
+    touches?: Array<ITouchPoint>;
+    changedTouches?: Array<ITouchPoint>;
 }
 interface IMousePoint {
     x: number;
@@ -508,7 +509,7 @@ function AssignWebRTC(rnWebRTC: any): void;
 
 class Gesture extends Base {
     input: Input;
-    touchStartCount: number;
+    touchCount: number;
     constructor(input: Input);
     destroy(): void;
     inputEvent(event: IInputEvent): void;

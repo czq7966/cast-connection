@@ -60,8 +60,9 @@ export interface ITouchPoint {
 }
 export interface ITouchEvent extends ICavansEvent {
     type?: EInputDeviceTouchType,    
-    points?: Array<ITouchPoint>
     touchPoints?: Array<ITouchPoint>
+    touches?: Array<ITouchPoint>
+    changedTouches?: Array<ITouchPoint>
 }
 export interface IMousePoint {
     x: number,

@@ -3,14 +3,14 @@ import { IInputEvent, EInputOS, EInputPlatform, Input, IInputPoint, IMouseEvent,
 
 export class Gesture extends Base {
     input: Input
-    touchStartCount: number;
+    touchCount: number;
     constructor(input: Input) {
         super();
         this.input = input;
-        this.touchStartCount = 0
+        this.touchCount = 0
     }
     destroy() {
-        delete this.touchStartCount;
+        delete this.touchCount;
         delete this.input;
         super.destroy();
     }
@@ -141,31 +141,36 @@ export class Gesture extends Base {
             this.handleTouchToMouseEvent(event)
         } else {
             event.touchPoints = [];
-            event.points.forEach(point => {
+            event.changedTouches.forEach(point => {
                 let p = this.calcInputEventXY({x: point.x, y: point.y}, {x: event.sourceX, y: event.sourceY}, {x: event.destX, y: event.destY});
                 if (p.x >= 0 ) {
                     point.x = p.x;
                     point.y = p.y;
                 }            
             })
-            event.touchPoints = event.points;
+            event.touchPoints = event.changedTouches;
             switch(event.type) {
                 case EInputDeviceTouchType.touchcancel:
                     event.touchPoints = [];
-                    this.touchStartCount = 0;
+                    this.touchCount = 0;
                     this.input.dispatchEvent(event)
                     break;
                 case EInputDeviceTouchType.touchend:
                     event.touchPoints = [];
-                    this.touchStartCount--;
-                    this.touchStartCount <= 0 && (this.touchStartCount = 0, this.input.dispatchEvent(event))
+                    this.touchCount = event.touches.length;
+                    this.touchCount <= 0 && (this.touchCount = 0, this.input.dispatchEvent(event))
                     break;
                 case EInputDeviceTouchType.touchmove:
-                    event.touchPoints.length == 1 && this.input.dispatchEvent(event);                    
+                    this.touchCount = event.touches.length;
+                    event.touches.length == 1 && this.input.dispatchEvent(event);                    
                     break;
                 case EInputDeviceTouchType.touchstart:
-                    this.touchStartCount++;
-                    this.touchStartCount == 1 && this.input.dispatchEvent(event);
+                    if (this.touchCount <= 0  ) {                        
+                        this.touchCount = event.touches.length;
+                        this.input.dispatchEvent(event);
+                    } else {
+                        this.touchCount = event.touches.length;
+                    }
                     break;
                 default:
                     
@@ -175,7 +180,7 @@ export class Gesture extends Base {
         }        
     }
     handleTouchToMouseEvent(event: ITouchEvent) {
-        event.points.forEach(point => {
+        event.changedTouches.forEach(point => {
             let p = this.calcInputEventXY({x: point.x, y: point.y}, {x: event.sourceX, y: event.sourceY}, {x: event.destX, y: event.destY});
             if (p.x >= 0 ) {
                 point.x = p.x;
@@ -183,13 +188,13 @@ export class Gesture extends Base {
             }            
         })        
         let evtMouse: IMouseEvent = { 
-                x: event.points[0].x, 
-                y: event.points[0].y,
+                x: event.changedTouches[0].x, 
+                y: event.changedTouches[0].y,
                 destX: event.destX,
                 destY: event.destY
             }
 
-        switch(event.points.length) {
+        switch(event.touches.length) {
             case 1:
                 evtMouse.button = 'left';                
                 evtMouse.clickCount = 1;                
@@ -198,8 +203,8 @@ export class Gesture extends Base {
                 evtMouse.button = 'left';                
                 evtMouse.clickCount = 0;           
                 evtMouse.type = EInputDeviceMouseType.wheel;  
-                evtMouse.deltaX = event.points[0].deltaX * 100 || 0;
-                evtMouse.deltaY = event.points[0].deltaX * 100 || 10;
+                evtMouse.deltaX = event.changedTouches[0].deltaX * 100 || 0;
+                evtMouse.deltaY = event.changedTouches[0].deltaX * 100 || 10;
                 break;
             case 3:
                 evtMouse.button = 'right';
