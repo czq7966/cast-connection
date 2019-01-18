@@ -325,6 +325,8 @@ class Peer extends Base {
     onOffer_browser: (data: any) => void;
     onOffer_reactnative: (data: any) => void;
     onAnswer: (data: any) => void;
+    onAnswer_browser: (data: any) => void;
+    onAnswer_reactnative: (data: any) => void;
     onCandidate: (data: any) => void;
     onCandidate_browser: (data: any) => void;
     onCandidate_reactnative: (data: any) => void;

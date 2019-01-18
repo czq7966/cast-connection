@@ -376,12 +376,35 @@ export class Peer extends Base {
     }      
 
     onAnswer = (data: any) => {
+        switch(Config.platform) {
+            case EPlatform.reactnative :
+            return this.onAnswer_reactnative(data);
+                break;
+            default:
+                return this.onAnswer_browser(data);
+                break            
+        }
+    }   
+    onAnswer_browser = (data: any) => {
         console.log('on answer')
-        this.rtc().setRemoteDescription(data)
+        let rtc = this.rtc() as any;
+        let setRemoteDescriptionSuccess = () => {
+            console.log('setRemoteDescriptionSuccess');
+        }
+        let setRemoteDescriptionFailed = (err) => {
+            console.log('setRemoteDescriptionFailed', err)
+
+        }
+        rtc.setRemoteDescription(data, setRemoteDescriptionSuccess, setRemoteDescriptionFailed)
+    }    
+    onAnswer_reactnative = (data: any) => {
+        console.log('on answer')
+        this.rtc().setRemoteDescription(new WebRTC.RTCSessionDescription(data))
         .catch(err => {
-            console.error(err)
+            console.log('Error',err)
         })
-    }     
+    }           
+
     onCandidate = (data: any) => {
         switch(Config.platform) {
             case EPlatform.reactnative :
