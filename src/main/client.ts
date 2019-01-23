@@ -1,5 +1,8 @@
 import * as io from 'socket.io-client'
 import { EventEmitter } from 'events';
+import * as Dts from './declare';
+import * as Cmds from './cmds/index'
+
 
 export enum ECustomEvents {
     message = 'room-message',
@@ -19,21 +22,6 @@ export interface IUserQuery {
     msg?: any
 }
 
-export enum EClientBaseEvents {
-    connect = 'connect',
-    connect_error = 'connect_error',
-    connect_timeout = 'connect_timeout',
-    connecting = 'connecting',
-    disconnect = 'disconnect',
-    error = 'error',
-    reconnect = 'reconnect',
-    reconnect_attempt = 'reconnect_attempt',
-    reconnect_failed = 'reconnect_failed',
-    reconnect_error = 'reconnect_error',
-    reconnecting = 'reconnecting',
-    // ping = 'ping',
-    // pong = 'pong'
-}
 
 export class Client {
     eventEmitter: EventEmitter;
@@ -73,12 +61,16 @@ export class Client {
             });        
             this.initEvents(this.socket);
 
-            this.socket.on(EClientBaseEvents.connect, () => {
+            this.socket.on(Dts.EClientSocketEvents.connect, () => {
+                this.socket.on(Dts.CommandID, () => {
+                    console.log('333333333333333333')
+                })                
                 resolve();
             })
-            this.socket.on(EClientBaseEvents.connect_error, (error) => {
+            this.socket.on(Dts.EClientSocketEvents.connect_error, (error) => {
                 reject(error);
-            })            
+            })     
+
 
             this.socket.connect();
         })      
@@ -88,7 +80,7 @@ export class Client {
     }
 
     initEvents(socket: SocketIOClient.Socket) {
-        [EClientBaseEvents, ECustomEvents].forEach(events => {
+        [Dts.EClientSocketEvents, [Dts.CommandID]].forEach(events => {
             Object.keys(events).forEach(key => {
                 let value = events[key];
                 socket.on(value, (...args:any[]) => {
@@ -97,7 +89,7 @@ export class Client {
                 })
             })
         })
-        socket.on(EClientBaseEvents.disconnect, () => {
+        socket.on(Dts.EClientSocketEvents.disconnect, () => {
             this.unInitEvents(socket);
         })
     }    
@@ -182,5 +174,26 @@ export class Client {
                 reject(error)
             }) 
         })
-    }    
+    }  
+    
+    sendCommand(cmd: Cmds.ICommandData): Promise<any> {
+        return new Promise((resolve, reject) => {
+            this.connect()
+            .then(() => {
+                this.socket.emit(Dts.CommandID, cmd , (result: boolean) => {
+                    if (result) {
+                        console.log('command success');
+                        resolve()                    
+                    } else {
+                        console.log('command failed' );
+                        reject()
+                    }
+                })  
+            })
+            .catch(error => {
+                reject(error)
+            }) 
+        })
+    }  
+        
 }

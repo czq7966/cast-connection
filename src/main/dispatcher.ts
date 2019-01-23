@@ -1,56 +1,46 @@
-import { Base, IBase } from "./base";
 import { Signaler } from "./signaler";
 import { Rooms } from "./rooms";
-import { ECustomEvents, IUserQuery } from "./client";
+import { CmdDispatcher } from './cmds/index'
+import * as Dts from "./declare";
+import * as Cmds from './cmds/index'
 
-export interface IDispatcher extends IBase {
 
+
+export interface IDispatcherConstructorParams extends Cmds.IBaseConstructorParams {
+    signaler: Signaler
 }
 
-export class Dispatcher extends Base {
+export interface IDispatcher extends Cmds.IDispatcher {
     signaler: Signaler
-    rooms: Rooms
-    constructor(signaler: Signaler, rooms: Rooms) {
-        super();
-        this.signaler = signaler;
-        this.rooms = rooms;
+}
+
+export class Dispatcher extends Cmds.Base implements IDispatcher {
+    signaler: Signaler
+    constructor(params: IDispatcherConstructorParams) {
+        super(params);
+        this.signaler = params.signaler;
         this.initEvents();
     }
     destroy() {
         this.unInitEvents();
         delete this.signaler;
-        delete this.rooms;
         super.destroy();
     }
 
     initEvents() {
-        this.signaler.eventEmitter.addListener(ECustomEvents.joinRoom, this.onJoinRoom)
-        this.signaler.eventEmitter.addListener(ECustomEvents.leaveRoom, this.onLeaveRoom)
-        this.signaler.eventEmitter.addListener(ECustomEvents.closeRoom, this.onCloseRoom)
-        this.signaler.eventEmitter.addListener(ECustomEvents.message, this.onMessage)
+        this.signaler.eventEmitter.addListener(Dts.CommandID, this.onCommand);
     }
     unInitEvents = () => {
-        this.signaler.eventEmitter.removeListener(ECustomEvents.joinRoom, this.onJoinRoom)
-        this.signaler.eventEmitter.removeListener(ECustomEvents.leaveRoom, this.onLeaveRoom)
-        this.signaler.eventEmitter.removeListener(ECustomEvents.closeRoom, this.onCloseRoom)
-        this.signaler.eventEmitter.removeListener(ECustomEvents.message, this.onMessage)
+        this.signaler.eventEmitter.removeListener(Dts.CommandID, this.onCommand);
     }
 
-    onJoinRoom = (query: IUserQuery) => {
-        let room = this.rooms.getRoom(query.roomid);
-        room && room.eventEmitter.emit(ECustomEvents.joinRoom, query);
+    onCommand = (cmd: Cmds.ICommandData) => {
+        CmdDispatcher.onCommand(cmd, this);
+        this.eventEmitter.emit(Dts.CommandID, cmd)
     }
-    onLeaveRoom = (query: IUserQuery) => {
-        let room = this.rooms.getRoom(query.roomid);
-        room && room.eventEmitter.emit(ECustomEvents.leaveRoom, query);
-    }    
-    onCloseRoom = (query: IUserQuery) => {
-        let room = this.rooms.getRoom(query.roomid);
-        room && room.eventEmitter.emit(ECustomEvents.closeRoom, query);
-        this.rooms.eventEmitter.emit(ECustomEvents.closeRoom, query);
-    }  
-    onMessage = (query: IUserQuery) => {
-        let room = this.rooms.getRoom(query.roomid);
-        room && room.eventEmitter.emit(ECustomEvents.message, query);        
+    sendCommand(cmd: Cmds.ICommandData): Promise<any> {
+        return this.signaler.sendCommand(cmd) 
     }
 }
+
+CmdDispatcher.setDispatcher(Dispatcher as any)

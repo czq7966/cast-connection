@@ -13,3 +13,5 @@ export * from './signaler'
 export * from './streams'
 export * from './user'
 export * from './webrtc'
+import * as Dts from './declare'
+export { Dts }

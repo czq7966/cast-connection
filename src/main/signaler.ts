@@ -1,4 +1,6 @@
 import { Client } from './client'; 
+import * as Cmds from './cmds/index'
+import { uuid } from './helper';
 
 export interface ISignalerMessage {
     type: ESignalerMessageType
@@ -14,6 +16,7 @@ export enum ESignalerMessageType {
     ready = 'message-ready'
 }
 
-export class Signaler extends Client {
 
+export class Signaler extends Client {
+    
 };

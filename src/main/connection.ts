@@ -1,20 +1,25 @@
 import { Signaler } from "./signaler";
 import { Rooms } from "./rooms";
-import { Base } from "./base";
-import { User } from "./user";
-import { IUserQuery, EClientBaseEvents, ECustomEvents } from "./client";
-import { Dispatcher } from "./dispatcher";
 
-export class Connection extends Base {
+import { Dispatcher, IDispatcherConstructorParams } from "./dispatcher";
+import * as Cmds from "./cmds";
+import { uuid } from "./helper";
+
+export class Connection extends Cmds.Base {    
     signaler: Signaler;
     rooms: Rooms;
     dispatcher: Dispatcher
     stream: MediaStream;
     constructor(url: string) {
         super()
+        this.instanceId = 'test';
         this.signaler = new Signaler(url);
-        this.rooms = new Rooms(this.signaler);
-        this.dispatcher = new Dispatcher(this.signaler, this.rooms);
+        let params: IDispatcherConstructorParams = {
+            instanceId: this.instanceId,
+            signaler: this.signaler,
+        }
+        this.dispatcher = Dispatcher.getInstance(params) 
+        this.rooms = new Rooms(this.instanceId);        
         this.initEvents();
     }    
     destroy() {
@@ -26,67 +31,95 @@ export class Connection extends Base {
         super.destroy();
     }
     initEvents() {
-        this.signaler.eventEmitter.addListener(EClientBaseEvents.disconnect, this.onDisconnect)
-        this.rooms.eventEmitter.addListener(ECustomEvents.closeRoom, this.onCloseRoom)
+        // this.signaler.eventEmitter.addListener(Dts.EClientSocketEvents.disconnect, this.onDisconnect)
+        // this.rooms.eventEmitter.addListener(ECustomEvents.closeRoom, this.onCloseRoom)
 
     }
     unInitEvents() {
-        this.rooms.eventEmitter.removeListener(ECustomEvents.closeRoom, this.onCloseRoom)
-        this.signaler.eventEmitter.removeListener(EClientBaseEvents.disconnect, this.onDisconnect)
+        // this.rooms.eventEmitter.removeListener(ECustomEvents.closeRoom, this.onCloseRoom)
+        // this.signaler.eventEmitter.removeListener(Dts.EClientSocketEvents.disconnect, this.onDisconnect)
     }
-    id(): string {
-        return this.signaler && this.signaler.id();
-    }
+    login() {
+        let cmd = new Cmds.CommandLoginReq({instanceId: this.dispatcher.instanceId})
+        cmd.data = {
+            props: {
+                user: { 
+                    id: uuid()
+                }
+            },
+            onResp: (cmd: Cmds.CommandLoginResp) => {                
+                if (cmd.data.props.result) {
+                    cmd.getInstance().eventEmitter.emit(Cmds.CommandID, cmd)
+                } else {
+                    console.error('login error', cmd.data.props.msg);
+                }
+            },
+            onTimeout: (cmd) => {
+                console.log('onTimeout', cmd)
 
-    openRoom(query: IUserQuery, url?: string): Promise<any> {
-        let promise =  this.signaler.openRoom(query, url);
-        promise.then((result) => {
-            query = result;
-            let room = this.rooms.newRoom(query.roomid, query.password);
-            let user = new User({ 
-                socketId: this.signaler.id(),
-                isOwner: true,
-                signaler: this.signaler
-            });
-            room.addUser(user);
-        })
-        return promise;
-    }
+            }
 
-    joinRoom(query: IUserQuery): Promise<any> {
-        let promise =  this.signaler.joinRoom(query);
-        promise.then(() => {
-            let room = this.rooms.newRoom(query.roomid, query.password);
-            let user = new User({ 
-                socketId: this.signaler.id(),
-                isOwner: false
-            });
-            room.addUser(user);
-            user.imReady();
-        })
-        .catch((err) => {
-
-        })
-        return promise;        
-    }         
-    leaveRoom(query: IUserQuery): Promise<any> {
-        let promise =  this.signaler.leaveRoom(query);
-        promise.then(() => {
-            this.rooms.delRoom(query.roomid);
-        })
-        return promise;          
-    }    
-    
-    onDisconnect = (reason) => {
-        this.eventEmitter.emit(EClientBaseEvents.disconnect, reason)
-    }
-    onCloseRoom = () => {
-        if (this.rooms.count() <= 0) {
-            this.signaler.disconnect();            
         }
-    }
-    close() {
-        this.rooms.close();
-        this.signaler.disconnect();        
+        cmd.sendCommand();
     }    
+    // id(): string {
+    //     return this.signaler && this.signaler.id();
+    // }
+
+    // openRoom(query: IUserQuery, url?: string): Promise<any> {
+    //     let promise =  this.signaler.openRoom(query, url);
+    //     promise.then((result) => {
+    //         query = result;
+    //         let room = this.rooms.newRoom(query.roomid, query.password);
+    //         let user = new User({ 
+    //             socketId: this.signaler.id(),
+    //             isOwner: true,
+    //             signaler: this.signaler
+    //         });
+    //         room.addUser(user);
+    //     })
+    //     return promise;
+    // }
+    joinRoom(query: any): Promise<any> {
+        return;
+    }
+    // joinRoom(query: IUserQuery): Promise<any> {
+    //     let promise =  this.signaler.joinRoom(query);
+    //     promise.then(() => {
+    //         let room = this.rooms.newRoom(query.roomid, query.password);
+    //         let user = new User({ 
+    //             socketId: this.signaler.id(),
+    //             isOwner: false
+    //         });
+    //         room.addUser(user);
+    //         user.imReady();
+    //     })
+    //     .catch((err) => {
+
+    //     })
+    //     return promise;        
+    // }         
+    // leaveRoom(query: IUserQuery): Promise<any> {
+    //     let promise =  this.signaler.leaveRoom(query);
+    //     promise.then(() => {
+    //         this.rooms.delRoom(query.roomid);
+    //     })
+    //     return promise;          
+    // }    
+    
+    // onDisconnect = (reason) => {
+    //     this.eventEmitter.emit(Dts.EClientSocketEvents.disconnect, reason)
+    // }
+    // onCloseRoom = () => {
+    //     if (this.rooms.count() <= 0) {
+    //         this.signaler.disconnect();            
+    //     }
+    // }
+    // close() {
+    //     this.rooms.close();
+    //     this.signaler.disconnect();        
+    // }    
+    close() {
+
+    }   
 }
