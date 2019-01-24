@@ -8,6 +8,7 @@ export enum ECommandId {
     none = 'none',
     // command = 'command',
     adhoc_login = 'adhoc_login',
+    adhoc_logout = 'adhoc_logout',
     adhoc_hello = 'adhoc_hello',
     stream_room_open = 'stream_room_open',
     stream_room_join = 'stream_room_join',
@@ -47,6 +48,7 @@ export interface IRoom {
     id: string
 }
 
+//
 // Command Login Req Props
 export interface ICommandLoginReqDataProps {
     user: IUser
@@ -66,4 +68,35 @@ export interface ICommandLoginRespDataProps {
 export interface ICommandLoginRespData extends Common.ICommandData {
     props?: ICommandLoginRespDataProps;
 }
+
+//
+// Command Logout Req Props
+export interface ICommandLogoutReqDataProps {
+    user: IUser
+}
+
+export interface ICommandLogoutReqData extends Common.ICommandData {
+    props?: ICommandLogoutReqDataProps;
+}
+
+//
+// Command Hello Req Props
+export interface ICommandHelloReqDataProps {
+    user: IUser
+}
+
+export interface ICommandHelloReqData extends Common.ICommandData {
+    props?: ICommandHelloReqDataProps;
+}
+
+// Command Hello Resp Props
+export interface ICommandHelloRespDataProps {
+    user?: IUser
+}
+
+export interface ICommandHelloRespData extends Common.ICommandData {
+    props?: ICommandHelloRespDataProps;
+}
+
+
 

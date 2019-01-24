@@ -1,7 +1,7 @@
 import { EventEmitter } from "events";
 
 export interface IClass {
-    new() : Object
+    new(params?: any) : Object
 }
 
 export interface IBase {
@@ -50,9 +50,9 @@ export class Base {
     }    
     
     constructor(params?: IBaseConstructorParams) {
-        params = params || {}
+        params = params || {}        
         this.notDestroyed = true;
-        this.instanceId = params.instanceId || Base.instanceDefauleName;
+        this.instanceId = params.instanceId === '' ? params.instanceId : (params.instanceId  || Base.instanceDefauleName);
         this.instanceSingle = params.instanceSingle;         
         this.eventEmitter = new EventEmitter();
         this.instanceEventEmitter = new EventEmitter();    

@@ -29,17 +29,25 @@ export class Dispatcher extends Cmds.Base implements IDispatcher {
 
     initEvents() {
         this.signaler.eventEmitter.addListener(Dts.CommandID, this.onCommand);
+        this.signaler.eventEmitter.addListener(Dts.EClientSocketEvents.disconnect, this.onDisconnect);
     }
     unInitEvents = () => {
         this.signaler.eventEmitter.removeListener(Dts.CommandID, this.onCommand);
+        this.signaler.eventEmitter.removeListener(Dts.EClientSocketEvents.disconnect, this.onDisconnect);        
     }
 
+    // Command
     onCommand = (cmd: Cmds.ICommandData) => {
         CmdDispatcher.onCommand(cmd, this);
         this.eventEmitter.emit(Dts.CommandID, cmd)
     }
     sendCommand(cmd: Cmds.ICommandData): Promise<any> {
         return this.signaler.sendCommand(cmd) 
+    }
+
+    // Network
+    onDisconnect = () => {
+        this.eventEmitter.emit(Dts.EClientSocketEvents.disconnect)
     }
 }
 

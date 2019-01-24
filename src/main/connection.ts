@@ -1,9 +1,10 @@
 import { Signaler } from "./signaler";
 import { Rooms } from "./rooms";
+import * as Services from './services'
 
 import { Dispatcher, IDispatcherConstructorParams } from "./dispatcher";
 import * as Cmds from "./cmds";
-import { uuid } from "./helper";
+// import { uuid } from "./helper";
 
 export class Connection extends Cmds.Base {    
     signaler: Signaler;
@@ -40,28 +41,22 @@ export class Connection extends Cmds.Base {
         // this.signaler.eventEmitter.removeListener(Dts.EClientSocketEvents.disconnect, this.onDisconnect)
     }
     login() {
-        let cmd = new Cmds.CommandLoginReq({instanceId: this.dispatcher.instanceId})
-        cmd.data = {
-            props: {
-                user: { 
-                    id: uuid()
-                }
-            },
-            onResp: (cmd: Cmds.CommandLoginResp) => {                
-                if (cmd.data.props.result) {
-                    cmd.getInstance().eventEmitter.emit(Cmds.CommandID, cmd)
-                } else {
-                    console.error('login error', cmd.data.props.msg);
-                }
-            },
-            onTimeout: (cmd) => {
-                console.log('onTimeout', cmd)
-
-            }
-
-        }
-        cmd.sendCommand();
+        let instanceId = this.instanceId;
+        let promise = Services.ServiceLogin.login(instanceId);
+        promise.then(() => {
+            Services.ServiceHello.sayHello(instanceId);
+        })
+        return promise;
     }    
+    isLogin() {
+        let instanceId = this.instanceId;
+        return Services.ServiceLogin.isLogin(instanceId);
+    }
+    logout() {
+        let instanceId = this.instanceId;
+        let promise = Services.ServiceLogout.logout(instanceId);
+        return promise;        
+    }
     // id(): string {
     //     return this.signaler && this.signaler.id();
     // }

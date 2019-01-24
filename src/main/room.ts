@@ -1,12 +1,14 @@
 import { IBase, Base } from "./base";
 import { IUser, User } from "./user";
-import { Signaler, ISignalerMessage, ESignalerMessageType } from "./signaler";
+import { Signaler } from "./signaler";
 import { ECustomEvents, IUserQuery } from "./client";
 import { ERTCPeerEvents } from "./peer";
 import { Streams } from "./streams";
-import { KeyValue } from "./helper";
+import { IRooms } from "./rooms";
+import { EClientSocketEvents } from "./declare";
 import * as Cmds from "./cmds";
-import { IRooms, ERoomsEvents } from "./rooms";
+import * as Services from './services'
+
 
 
 export enum ERoomEvents {
@@ -30,22 +32,24 @@ export interface IRoomParams {
 //     addSendStream(stream: MediaStream, user?: IUser)
 // }
 
-export enum ERoomEvents {
-    onDispatched_CommandLoginReq = 'onDispatched_CommandLoginReq',
-    onDispatched_CommandLoginResp = 'onDispatched_CommandLoginResp'    
+export interface IRoom extends Cmds.IBase {
+    item: Cmds.IRoom;
+    users: Cmds.Helper.KeyValue<User>;
+    getUser(user: Cmds.IUser | string): IUser
+
 }
 
-export class Room extends Cmds.Base {
+export class Room extends Cmds.Base implements IRoom {
     item: Cmds.IRoom;
     rooms: IRooms;
-    users: KeyValue<User>;
+    users: Cmds.Helper.KeyValue<User>;
     streams: Streams;
 
     constructor(rooms: IRooms, item: Cmds.IRoom) {
         super();
         this.rooms = rooms;
         this.item = Object.assign({}, item);
-        this.users = new KeyValue();
+        this.users = new Cmds.Helper.KeyValue();
         this.streams = new Streams(this);             
         this.initEvents();
     }
@@ -61,8 +65,8 @@ export class Room extends Cmds.Base {
     }
 
     initEvents() {
-        this.rooms.eventEmitter.addListener(ERoomsEvents.onDispatched_CommandLoginReq, this.onDispatched_CommandLoginReq)
-        this.rooms.eventEmitter.addListener(ERoomsEvents.onDispatched_CommandLoginResp, this.onDispatched_CommandLoginResp)
+        this.rooms.eventEmitter.addListener(Cmds.ECommandEvents.onDispatched, this.onDispatched_Command)
+        this.rooms.eventEmitter.addListener(EClientSocketEvents.disconnect, this.onNetwork_Disconnect);     
 
         // this.eventEmitter.addListener(ECustomEvents.joinRoom, this.onJoinRoom);
         // this.eventEmitter.addListener(ECustomEvents.leaveRoom, this.onLeaveRoom);
@@ -73,8 +77,9 @@ export class Room extends Cmds.Base {
         // this.eventEmitter.addListener(ERTCPeerEvents.onrecvstream, this.onRecvStream);        
     }
     unInitEvents() {
-        this.rooms.eventEmitter.removeListener(ERoomsEvents.onDispatched_CommandLoginReq, this.onDispatched_CommandLoginReq)
-        this.rooms.eventEmitter.removeListener(ERoomsEvents.onDispatched_CommandLoginResp, this.onDispatched_CommandLoginResp)
+        this.rooms.eventEmitter.removeListener(Cmds.ECommandEvents.onDispatched, this.onDispatched_Command)
+        this.rooms.eventEmitter.removeListener(EClientSocketEvents.disconnect, this.onNetwork_Disconnect);     
+
 
         // this.eventEmitter.removeListener(ECustomEvents.joinRoom, this.onJoinRoom)
         // this.eventEmitter.removeListener(ECustomEvents.leaveRoom, this.onLeaveRoom);
@@ -84,36 +89,34 @@ export class Room extends Cmds.Base {
         // this.eventEmitter.removeListener(ERTCPeerEvents.oniceconnectionstatechange, this.onIceConnectionStateChange);
         // this.eventEmitter.removeListener(ERTCPeerEvents.onrecvstream, this.onRecvStream);        
     }
-    onDispatched_CommandLoginReq = (cmd: Cmds.CommandLoginReq) => {
-        //belong to other room , return
-        if (this.item.id !== cmd.data.props.user.room.id) {
-            return;
-        }
 
-        let data = cmd.data;        
-        let us = data.props.user;
-        let user = this.getUser(us.id);
-        if (!user) {
-            user = this.getUser(us);
-            this.eventEmitter.emit(ERoomEvents.onDispatched_CommandLoginReq, cmd);
+    // Command
+    onDispatched_Command = (cmd: Cmds.ICommand) => {
+        let cmdId = cmd.data.cmdId;
+        let type = cmd.data.type;
+        switch(cmdId) {
+            case Cmds.ECommandId.adhoc_login:
+                type === Cmds.ECommandType.resp ?
+                    Services.ServiceLogin.Room.onDispatched.resp(this, cmd as any) : null;
+                break;
+            case Cmds.ECommandId.adhoc_hello:
+                type === Cmds.ECommandType.req ?
+                    Services.ServiceHello.Room.onDispatched.req(this, cmd as any) :
+                type === Cmds.ECommandType.resp ?
+                    Services.ServiceHello.Room.onDispatched.resp(this, cmd as any) : null;
+                break;
+            case Cmds.ECommandId.adhoc_logout:
+                type === Cmds.ECommandType.req ?
+                    Services.ServiceLogout.Room.onDispatched.req(this, cmd as any) : null
+            default:
+                break;
         }
+        this.eventEmitter.emit(Cmds.ECommandEvents.onDispatched, cmd);
     }
 
-    onDispatched_CommandLoginResp = (cmd: Cmds.CommandLoginResp) => {
-        //belong to other room , return
-        if (this.item.id !== cmd.data.props.user.room.id) {
-            return;
-        }
-
-        let data = cmd.data;
-        if (data.props.result){
-            let us = data.props.user;
-            let user = this.getUser(us.id);
-            if (!user) {
-                user = this.getUser(us);
-                this.eventEmitter.emit(ERoomEvents.onDispatched_CommandLoginReq, cmd);
-            }
-        }
+    // Network
+    onNetwork_Disconnect = () => {
+        this.eventEmitter.emit(EClientSocketEvents.disconnect);
     }
 
     // User

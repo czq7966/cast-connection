@@ -1,5 +1,6 @@
 import { ICommandClass, ICommand, Command } from "./command";
 import * as Dts from './dts'
+import { IBaseConstructorParams } from "./base";
 
 export interface ICommandType {
     cmdId?: string,
@@ -19,10 +20,10 @@ export class CommandTypes {
 
         CommandTypes.Types[cmdType.cmdId] = cmdType;
     } 
-    static decode(cmdData: Dts.ICommandData): ICommand {
+    static decode(cmdData: Dts.ICommandData, params?: IBaseConstructorParams): ICommand {
         let _decode = (Class: ICommandClass) => {
             if (Class) {
-                let cmd = new Class() as ICommand;    
+                let cmd = new Class(params) as ICommand;    
                 cmd.data.cmdId = cmdData.cmdId
                 cmd.data.type = cmdData.type;
                 cmd.data.sessionId = cmdData.sessionId;
@@ -34,14 +35,12 @@ export class CommandTypes {
         }
     
         let CommandType = CommandTypes.Types[cmdData.cmdId];
-        let Class = CommandType 
-                        ? 
-                        cmdData.type === Dts.ECommandType.req 
-                            ? 
-                            (CommandType.ReqClass || CommandType.RespClass) 
-                            : 
-                            (CommandType.RespClass || CommandType.ReqClass)
-                        : null
+        let Class = CommandType ?
+                        cmdData.type === Dts.ECommandType.req ?                         
+                            CommandType.ReqClass :
+                        cmdData.type === Dts.ECommandType.resp ?                     
+                            CommandType.RespClass : null
+                            : null
                         
         let command = _decode(Class)
         if (command) {

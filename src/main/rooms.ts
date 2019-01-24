@@ -1,28 +1,25 @@
 import { Room } from "./room";
-import { KeyValue } from "./helper";
 import * as Cmds from "./cmds";
+import * as Services from './services'
 import { IDispatcher, Dispatcher } from "./dispatcher";
+import { EClientSocketEvents } from "./declare";
 
 
 export interface IRooms extends Cmds.IBase {
-    items: KeyValue<Room>;
+    items: Cmds.Helper.KeyValue<Room>;
     dispatcher: IDispatcher;  
-}
-
-export enum ERoomsEvents {
-    onDispatched_CommandLoginReq = 'onDispatched_CommandLoginReq',
-    onDispatched_CommandLoginResp = 'onDispatched_CommandLoginResp'    
+    getRoom(room: Cmds.IRoom | string);
 }
 
 export class Rooms extends Cmds.Base {
-    items: KeyValue<Room>;
+    items: Cmds.Helper.KeyValue<Room>;
     dispatcher: IDispatcher;
 
     constructor(instanceId: string, dispatcher?: IDispatcher ) {
         super();
         this.instanceId = instanceId;
         this.dispatcher = dispatcher || Dispatcher.getInstance(instanceId);
-        this.items = new KeyValue();
+        this.items = new Cmds.Helper.KeyValue();
         this.initEvents();
     }
     destroy() {
@@ -35,52 +32,37 @@ export class Rooms extends Cmds.Base {
 
     initEvents() {
         this.dispatcher.eventEmitter.addListener(Cmds.ECommandEvents.onDispatched, this.onDispatched_Command)
-
-        // this.dispatcher.eventEmitter.addListener(Cmds.ECommandEvents.onDispatched, this.onDispatched_CommandLoginReq)
-        // this.dispatcher.eventEmitter.addListener(Cmds.ECommandEvents.onDispatched, this.onDispatched_CommandLoginResp)
+        this.dispatcher.eventEmitter.addListener(EClientSocketEvents.disconnect, this.onNetwork_Disconnect);        
     }
     unInitEvents() {
-        this.dispatcher.eventEmitter.removeListener(Cmds.ECommandEvents.onDispatched, this.onDispatched_Command)
-        // this.dispatcher.eventEmitter.removeListener(Cmds.ECommandEvents.onDispatched, this.onDispatched_CommandLoginReq)
-        // this.dispatcher.eventEmitter.removeListener(Cmds.ECommandEvents.onDispatched, this.onDispatched_CommandLoginResp)
+        this.dispatcher.eventEmitter.removeListener(Cmds.ECommandEvents.onDispatched, this.onDispatched_Command);
+        this.dispatcher.eventEmitter.removeListener(EClientSocketEvents.disconnect, this.onNetwork_Disconnect);  
     }
 
     onDispatched_Command = (cmd: Cmds.ICommand) => {
-        switch(cmd.data.cmdId) {
+        let cmdId = cmd.data.cmdId;
+        let type = cmd.data.type;
+        switch(cmdId) {
             case Cmds.ECommandId.adhoc_login:
-                if (cmd.data.type === Cmds.ECommandType.req)
-                    this.onDispatched_CommandLoginReq(cmd as any);
-                if (cmd.data.type === Cmds.ECommandType.resp)
-                    this.onDispatched_CommandLoginResp(cmd as any);
+                type === Cmds.ECommandType.resp ?
+                    Services.ServiceLogin.Rooms.onDispatched.resp(this, cmd as any) : null
+                break;
+            case Cmds.ECommandId.adhoc_hello:
+                type === Cmds.ECommandType.req ?
+                    Services.ServiceHello.Rooms.onDispatched.req(this, cmd as any) :
+                type === Cmds.ECommandType.resp ?
+                    Services.ServiceHello.Rooms.onDispatched.resp(this, cmd as any) : null
                 break;
             default:
                 break;
         }
-
+        this.eventEmitter.emit(Cmds.ECommandEvents.onDispatched, cmd);
     }
 
-    onDispatched_CommandLoginReq = (cmd: Cmds.CommandLoginReq) => {
-        let data = cmd.data;
-        let rm = data.props.user.room;            
-        let room = this.getRoom(rm.id);
-        if (!room) {
-            room = this.getRoom(rm);
-        }
-        this.eventEmitter.emit(ERoomsEvents.onDispatched_CommandLoginReq, cmd);        
+    // Network
+    onNetwork_Disconnect = () => {
+        this.eventEmitter.emit(EClientSocketEvents.disconnect);
     }
-
-    onDispatched_CommandLoginResp = (cmd: Cmds.CommandLoginResp) => {
-        let data = cmd.data;
-        if (data.props.result){
-            let rm = data.props.user.room;            
-            let room = this.getRoom(rm.id);
-            if (!room) {
-                room = this.getRoom(rm);
-            }
-            this.eventEmitter.emit(ERoomsEvents.onDispatched_CommandLoginResp, cmd);            
-        }
-    }
-
     // Room
     getRoom(room: Cmds.IRoom | string) {
         if (typeof room === 'string') {

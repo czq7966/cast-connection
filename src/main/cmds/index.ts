@@ -1,3 +1,5 @@
-export * from './common/index'
+export * from './common'
 export * from './dts'
 export * from './login'
+export * from './logout'
+export * from './hello'

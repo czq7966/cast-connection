@@ -63,7 +63,6 @@ export class Client {
 
             this.socket.on(Dts.EClientSocketEvents.connect, () => {
                 this.socket.on(Dts.CommandID, () => {
-                    console.log('333333333333333333')
                 })                
                 resolve();
             })
@@ -84,7 +83,7 @@ export class Client {
             Object.keys(events).forEach(key => {
                 let value = events[key];
                 socket.on(value, (...args:any[]) => {
-                    console.log('Client Event:', value, ...args)
+                    // console.log('Client Event:', value, ...args)
                     this.eventEmitter.emit(value, ...args)
                 })
             })

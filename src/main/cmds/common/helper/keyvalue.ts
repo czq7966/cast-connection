@@ -29,7 +29,4 @@ export class KeyValue<T> {
             this.del(key)
         })
     }
-    count(): number {
-        return this.keys().length;
-    }
 }

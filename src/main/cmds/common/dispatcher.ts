@@ -27,10 +27,11 @@ class CCmdDispatcher extends Base {
         this.dispatcher = dispatcher;
     }
     onCommand(cmdData: Dts.ICommandData, dispatcher: IDispatcher, ...args: any[]) {
-        let cmd = CommandTypes.decode(cmdData);
+        let cmd = CommandTypes.decode(cmdData, {instanceId: ''});
         if (cmd) {
             cmd.instanceId = dispatcher.instanceId;
             if (!this.cmdTimeout.respCmd(cmd)) {
+                this.dispatch(cmd, Dts.ECommandEvents.onBeforeDispatched, ...args)
                 this.dispatch(cmd, Dts.ECommandEvents.onDispatched, ...args)
             }
             cmd.destroy();

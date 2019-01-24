@@ -24,7 +24,7 @@ export interface ICommandData {
 
     //Events
     onResp?: Function
-    onTimeout?: Function
+    onRespTimeout?: Function
 
     //extra
     extra?: any

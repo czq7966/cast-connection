@@ -5,8 +5,8 @@ import * as Dts from "./dts";
 
 
 
-export interface ICommandConstructorParams extends IBaseConstructorParams {
-    props?: any
+export interface ICommandConstructorParams<P> extends IBaseConstructorParams {
+    props?: P
 }
 
 export interface ICommand extends IBase {
@@ -22,19 +22,19 @@ export interface ICommandClass extends IBaseClass {
     defaultCommandId: string
 }
 
-export class Command extends Base implements ICommand {
+export class Command<T extends Dts.ICommandData, P extends ICommandConstructorParams<any>> extends Base implements ICommand {
     _eventEmitterEvents : Object;
 
-    data: Dts.ICommandData;
+    data: T;
     extra: any
 
     public static defaultCommandId: string = '';
-    constructor(params?: ICommandConstructorParams) {
+    constructor(params?: P) {
         super(params);
-        params = params || {};
+        params = params || {} as any;
         this.data = {
             cmdId: ((this as any).constructor as ICommandClass).defaultCommandId
-        }
+        } as any;
         this.extra = {}
         this._eventEmitterEvents = {};        
         this.copyProperties(params.props);
@@ -49,23 +49,23 @@ export class Command extends Base implements ICommand {
     }
 
     initEvents(instanceSingle?: boolean) {
-        if (instanceSingle) { //注册单例事件
-            Object.keys(Dts.ECommandEvents).forEach(eventName => {
-                    let event = this[eventName +'_Instance'].bind(this);
-                    this._eventEmitterEvents[eventName +'_Instance'] = event;
-                    if (event) {
+        if (this.instanceId) {
+            if (instanceSingle) { //注册单例事件
+                Object.keys(Dts.ECommandEvents).forEach(eventName => {
+                        let event = this[eventName +'_Instance'].bind(this);
+                        this._eventEmitterEvents[eventName +'_Instance'] = event;
                         this.instanceEventEmitter.addListener(eventName, event);
-                    } 
-                }            
-            )
-        } else { //注册实例事件
-            Object.keys(Dts.ECommandEvents).forEach(eventName => {    
-                if (this.isOverrideEvent(eventName)) {    
-                    let event = this[eventName].bind(this);
-                    this._eventEmitterEvents[eventName] = event;                    
-                    this.getInstance().eventEmitter.addListener(eventName, event);
-                }            
-            })
+                    }            
+                )
+            } else { //注册实例事件
+                Object.keys(Dts.ECommandEvents).forEach(eventName => {    
+                    if (this.isOverrideEvent(eventName)) {    
+                        let event = this[eventName].bind(this);
+                        this._eventEmitterEvents[eventName] = event;                    
+                        this.getInstance().eventEmitter.addListener(eventName, event);  
+                    }            
+                })
+            }
         }
     }     
     
@@ -73,16 +73,14 @@ export class Command extends Base implements ICommand {
         if (this.isInstance()) { //注册单例事件
             Object.keys(Dts.ECommandEvents).forEach(eventName => {
                     let event = this._eventEmitterEvents[eventName + '_Instance'];
-                    if (event) {
-                        this.instanceEventEmitter.removeListener(eventName, event);
-                    } 
+                    event && this.instanceEventEmitter.removeListener(eventName, event);
                 }            
             )
         } else { //注册实例事件
             Object.keys(Dts.ECommandEvents).forEach(eventName => {
                 if (this.isOverrideEvent(eventName)) {
                     let event = this._eventEmitterEvents[eventName];
-                    this.getInstance().eventEmitter.removeListener(eventName, event);
+                    event && this.getInstance().eventEmitter.removeListener(eventName, event);
                 }            
             })
         }
@@ -105,8 +103,13 @@ export class Command extends Base implements ICommand {
         props && (this.data.props = JSON.parse(props as string));
     }
 
-    assignData(data: Dts.ICommandData) {
-        Object.assign(this.data, data);
+    assignData(data: Dts.ICommandData, merge?: boolean) {
+        if (merge) {
+            this.data = Object.assign(this.data, data);
+        } else {
+            this.data = Object.assign({}, data) as any;
+        }
+        
     }
 
     sendCommand(...args: any[]): Promise<any> {     
