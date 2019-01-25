@@ -27,8 +27,6 @@ export class ServiceLogin extends Cmds.Common.Base {
                         console.error('login error', cmdResp.data.props.msg);
                         reject(cmdResp.data)
                     }
-                    cmd.destroy();
-                   
                 },
                 onRespTimeout: (data) => {
                     console.log('onTimeout', data)

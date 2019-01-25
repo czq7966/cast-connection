@@ -46,7 +46,7 @@ class CCmdDispatcher extends Base {
 
     sendCommand(cmd: ICommand, ...args: any[]): Promise<any> {
         return new Promise((resolve, reject) => {
-            this.cmdTimeout.addCmd(cmd);
+            this.cmdTimeout.addCmd(cmd.data);
             this.dispatcher.getInstance<IDispatcher>(cmd.instanceId, true).sendCommand(cmd.data, ...args)
             .then(msg => {                
                 resolve(msg);
