@@ -20,7 +20,7 @@ export class CommandTypes {
 
         CommandTypes.Types[cmdType.cmdId] = cmdType;
     } 
-    static decode(cmdData: Dts.ICommandData, params?: IBaseConstructorParams): ICommand {
+    static decode(cmdData: Dts.ICommandData<any>, params?: IBaseConstructorParams): ICommand {
         let _decode = (Class: ICommandClass) => {
             if (Class) {
                 let cmd = new Class(params) as ICommand;    
@@ -33,7 +33,8 @@ export class CommandTypes {
             } 
             return null;     
         }
-    
+
+        cmdData.type = cmdData.type || Dts.ECommandType.req;
         let CommandType = CommandTypes.Types[cmdData.cmdId];
         let Class = CommandType ?
                         cmdData.type === Dts.ECommandType.req ?                         
@@ -48,7 +49,7 @@ export class CommandTypes {
         }else {        
             command = _decode(Command);
             console.error('CommandTypes 未注册 ' + cmdData.cmdId)
-            console.log(CommandTypes)
+            console.log(cmdData)
             
         }
         return;

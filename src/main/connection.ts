@@ -1,26 +1,25 @@
-import { Signaler } from "./signaler";
-import { Rooms } from "./rooms";
+import * as Network from './network'
 import * as Services from './services'
+import * as Cmds from "./cmds/index";
+import * as Modules from './modules'
 
-import { Dispatcher, IDispatcherConstructorParams } from "./dispatcher";
-import * as Cmds from "./cmds";
 // import { uuid } from "./helper";
 
-export class Connection extends Cmds.Base {    
-    signaler: Signaler;
-    rooms: Rooms;
-    dispatcher: Dispatcher
+export class Connection extends Cmds.Common.Base {    
+    signaler: Network.Signaler;
+    rooms: Modules.Rooms;
+    dispatcher: Services.Dispatcher
     stream: MediaStream;
-    constructor(url: string) {
+    constructor(url: string, instanceId?: string) {
         super()
-        this.instanceId = 'test';
-        this.signaler = new Signaler(url);
-        let params: IDispatcherConstructorParams = {
+        this.signaler = new Network.Signaler(url);
+        this.instanceId = instanceId || Cmds.Common.Helper.uuid();
+        let params: Services.IDispatcherConstructorParams = {
             instanceId: this.instanceId,
             signaler: this.signaler,
         }
-        this.dispatcher = Dispatcher.getInstance(params) 
-        this.rooms = new Rooms(this.instanceId);        
+        this.dispatcher = Services.Dispatcher.getInstance(params) 
+        this.rooms = new Modules.Rooms(this.instanceId);        
         this.initEvents();
     }    
     destroy() {
@@ -40,7 +39,7 @@ export class Connection extends Cmds.Base {
         // this.rooms.eventEmitter.removeListener(ECustomEvents.closeRoom, this.onCloseRoom)
         // this.signaler.eventEmitter.removeListener(Dts.EClientSocketEvents.disconnect, this.onDisconnect)
     }
-    login() {
+    login(): Promise<any> {
         let instanceId = this.instanceId;
         let promise = Services.ServiceLogin.login(instanceId);
         promise.then(() => {
@@ -52,7 +51,7 @@ export class Connection extends Cmds.Base {
         let instanceId = this.instanceId;
         return Services.ServiceLogin.isLogin(instanceId);
     }
-    logout() {
+    logout(): Promise<any> {
         let instanceId = this.instanceId;
         let promise = Services.ServiceLogout.logout(instanceId);
         return promise;        

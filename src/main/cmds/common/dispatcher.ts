@@ -7,7 +7,7 @@ import { ICommandData } from './dts';
 
 
 export interface IDispatcher extends IBase {
-    sendCommand(cmd: ICommandData, ...args: any[]): Promise<any> 
+    sendCommand(cmd: ICommandData<any>, ...args: any[]): Promise<any> 
 }
 
 
@@ -26,7 +26,7 @@ class CCmdDispatcher extends Base {
     setDispatcher(dispatcher: IBaseClass) {
         this.dispatcher = dispatcher;
     }
-    onCommand(cmdData: Dts.ICommandData, dispatcher: IDispatcher, ...args: any[]) {
+    onCommand(cmdData: Dts.ICommandData<any>, dispatcher: IDispatcher, ...args: any[]) {
         let cmd = CommandTypes.decode(cmdData, {instanceId: ''});
         if (cmd) {
             cmd.instanceId = dispatcher.instanceId;

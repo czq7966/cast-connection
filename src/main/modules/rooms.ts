@@ -1,25 +1,23 @@
-import { Room } from "./room";
-import * as Cmds from "./cmds";
-import * as Services from './services'
-import { IDispatcher, Dispatcher } from "./dispatcher";
-import { EClientSocketEvents } from "./declare";
+import { IRoom, Room } from "./room";
+import * as Cmds from "../cmds";
+import * as Services from '../services'
 
 
-export interface IRooms extends Cmds.IBase {
-    items: Cmds.Helper.KeyValue<Room>;
-    dispatcher: IDispatcher;  
+export interface IRooms extends Cmds.Common.IBase {
+    items: Cmds.Common.Helper.KeyValue<IRoom>;
+    dispatcher: Services.IDispatcher;  
     getRoom(room: Cmds.IRoom | string);
 }
 
-export class Rooms extends Cmds.Base {
-    items: Cmds.Helper.KeyValue<Room>;
-    dispatcher: IDispatcher;
+export class Rooms extends Cmds.Common.Base implements IRooms {
+    items: Cmds.Common.Helper.KeyValue<IRoom>;
+    dispatcher: Services.IDispatcher;
 
-    constructor(instanceId: string, dispatcher?: IDispatcher ) {
+    constructor(instanceId: string, dispatcher?:Services. IDispatcher ) {
         super();
         this.instanceId = instanceId;
-        this.dispatcher = dispatcher || Dispatcher.getInstance(instanceId);
-        this.items = new Cmds.Helper.KeyValue();
+        this.dispatcher = dispatcher || Services.Dispatcher.getInstance(instanceId);
+        this.items = new Cmds.Common.Helper.KeyValue();
         this.initEvents();
     }
     destroy() {
@@ -32,14 +30,14 @@ export class Rooms extends Cmds.Base {
 
     initEvents() {
         this.dispatcher.eventEmitter.addListener(Cmds.ECommandEvents.onDispatched, this.onDispatched_Command)
-        this.dispatcher.eventEmitter.addListener(EClientSocketEvents.disconnect, this.onNetwork_Disconnect);        
+        this.dispatcher.eventEmitter.addListener(Cmds.ECommandEvents.onBeforeDispatched, this.onBeforeDispatched_Command)
     }
     unInitEvents() {
         this.dispatcher.eventEmitter.removeListener(Cmds.ECommandEvents.onDispatched, this.onDispatched_Command);
-        this.dispatcher.eventEmitter.removeListener(EClientSocketEvents.disconnect, this.onNetwork_Disconnect);  
+        this.dispatcher.eventEmitter.removeListener(Cmds.ECommandEvents.onBeforeDispatched, this.onBeforeDispatched_Command)
     }
 
-    onDispatched_Command = (cmd: Cmds.ICommand) => {
+    onDispatched_Command = (cmd: Cmds.Common.ICommand) => {
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
         switch(cmdId) {
@@ -59,10 +57,21 @@ export class Rooms extends Cmds.Base {
         this.eventEmitter.emit(Cmds.ECommandEvents.onDispatched, cmd);
     }
 
-    // Network
-    onNetwork_Disconnect = () => {
-        this.eventEmitter.emit(EClientSocketEvents.disconnect);
-    }
+    onBeforeDispatched_Command = (cmd: Cmds.Common.ICommand) => {
+        this.eventEmitter.emit(Cmds.ECommandEvents.onBeforeDispatched, cmd);
+
+        let cmdId = cmd.data.cmdId;
+        let type = cmd.data.type;
+        switch(cmdId) {
+            case Cmds.ECommandId.adhoc_logout:
+                type === Cmds.ECommandType.req ?
+                    Services.ServiceLogout.Rooms.onBeforeDispatched.req(this, cmd as any) : null
+                break;
+            default:
+                break;
+        }        
+    }    
+
     // Room
     getRoom(room: Cmds.IRoom | string) {
         if (typeof room === 'string') {

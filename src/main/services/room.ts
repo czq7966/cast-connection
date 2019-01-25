@@ -2,14 +2,14 @@ import * as Cmds from "../cmds";
 import * as Modules from '../modules'
 import { Debug } from "../cmds/common/helper";
 
-var Tag = "ServiceLogout"
-export class ServiceLogout extends Cmds.Common.Base {
-    static logout(instanceId: string): Promise<any> {
-        let cmd = new Cmds.CommandLogoutReq({instanceId: instanceId});
+var Tag = "ServiceRoom"
+export class ServiceRoom extends Cmds.Common.Base {
+    static open(instanceId: string, room: Cmds.IRoom): Promise<any> {
+        let cmd = new Cmds.CommandRoomOpenReq({instanceId: instanceId});
         let user = Cmds.CommandLoginResp.getInstance<Cmds.CommandLoginResp>(instanceId).data.props.user;
         cmd.data = {
             props: {
-                user: user
+                room: room
             }    
         }
         let promise = cmd.sendCommand();        

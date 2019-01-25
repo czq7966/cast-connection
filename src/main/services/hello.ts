@@ -1,8 +1,8 @@
 import * as Cmds from "../cmds";
-import { IRooms } from "../rooms";
-import { IRoom } from "../room";
+import * as Modules from '../modules'
 
-export class ServiceHello extends Cmds.Base {
+
+export class ServiceHello extends Cmds.Common.Base {
     static sayHello(instanceId: string) {
         let cmd = new Cmds.CommandHelloReq({instanceId: instanceId});
         let user = Cmds.CommandLoginResp.getInstance<Cmds.CommandLoginResp>(instanceId).data.props.user;
@@ -35,11 +35,11 @@ export class ServiceHello extends Cmds.Base {
 
     static Rooms = {
         onDispatched: {
-            req(rooms: IRooms, cmd: Cmds.CommandHelloReq) {
+            req(rooms: Modules.IRooms, cmd: Cmds.CommandHelloReq) {
                 console.log('Rooms_onDispatched_Req', cmd)
                 ServiceHello.respHello(cmd);
             },
-            resp(rooms: IRooms, cmd: Cmds.CommandHelloResp) {
+            resp(rooms: Modules.IRooms, cmd: Cmds.CommandHelloResp) {
                 console.log('Rooms_onDispatched_Resp', cmd)
                 
             }  
@@ -48,12 +48,12 @@ export class ServiceHello extends Cmds.Base {
 
     static Room = {
         onDispatched: {
-            req(room: IRoom, cmd: Cmds.CommandHelloReq) {
+            req(room: Modules.IRoom, cmd: Cmds.CommandHelloReq) {
                 console.log('Room_onDispatched_Req', cmd);
                 let us = cmd.data.props.user;
                 let user = room.getUser(us);
             },
-            resp(room: IRoom, cmd: Cmds.CommandHelloResp) {
+            resp(room: Modules.IRoom, cmd: Cmds.CommandHelloResp) {
                 console.log('Room_onDispatched_Resp', cmd);
                 let us = cmd.data.props.user;
                 let user = room.getUser(us);                

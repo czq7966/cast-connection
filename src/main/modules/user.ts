@@ -1,16 +1,15 @@
-import { Signaler } from "./signaler";
-import { Peer, ERTCPeerEvents } from "./peer";
-import { IBase, Base } from "./base";
+import { Peer, ERTCPeerEvents } from "../peer";
+import { IBase, Base } from "../base";
 import { Room } from "./room";
-import { IUserQuery, ECustomEvents } from "./client";
 import { Streams } from "./streams";
-import * as Cmds from "./cmds";
+import * as Cmds from "../cmds";
+import * as Network from '../network'
 
 export interface IUserParams {
     socketId: string,
     isOwner: boolean,
     isReady?: boolean;
-    signaler?: Signaler;
+    signaler?: Network.Signaler;
     peer?: Peer;
     room?: Room;
     // stream?: MediaStream;
@@ -21,8 +20,8 @@ export interface IUserParams {
 export interface IUser extends IBase , IUserParams {
     initEvents()
     unInitEvents()
-    onMessage(query: IUserQuery)
-    onReady(query: IUserQuery)
+    // onMessage(query: IUserQuery)
+    // onReady(query: IUserQuery)
     stopSharing(): Promise<any>
     imReady()
     sayHello(to?: string)
@@ -33,7 +32,7 @@ export interface IUser extends IBase , IUserParams {
     close()
 }
 
-export class User extends Cmds.Base  {
+export class User extends Cmds.Common.Base  {
     // socketId: string;    
     // isOwner: boolean;
     // isReady: boolean;
@@ -62,6 +61,9 @@ export class User extends Cmds.Base  {
     }
  
     initEvents() {
+        this.room.eventEmitter.addListener(Cmds.ECommandEvents.onDispatched, this.onDispatched_Command);
+        this.room.eventEmitter.addListener(Cmds.ECommandEvents.onBeforeDispatched, this.onBeforeDispatched_Command);
+
         // this.eventEmitter.addListener(ECustomEvents.message, this.onMessage);    
 
         // this.peer.eventEmitter.addListener(ERTCPeerEvents.oniceconnectionstatechange, this.onIceConnectionStateChange);
@@ -71,11 +73,40 @@ export class User extends Cmds.Base  {
 
     }
     unInitEvents() {
+        this.room.eventEmitter.removeListener(Cmds.ECommandEvents.onDispatched, this.onDispatched_Command);
+        this.room.eventEmitter.removeListener(Cmds.ECommandEvents.onBeforeDispatched, this.onBeforeDispatched_Command);
+
         // this.eventEmitter.removeListener(ECustomEvents.message, this.onMessage); 
 
         // this.peer.eventEmitter.removeListener(ERTCPeerEvents.oniceconnectionstatechange, this.onIceConnectionStateChange);
         // this.peer.eventEmitter.removeListener(ERTCPeerEvents.onrecvstream, this.onRecvStream);
     }
+
+    // Command
+    onDispatched_Command = (cmd: Cmds.Common.ICommand) => {
+        let cmdId = cmd.data.cmdId;
+        let type = cmd.data.type;
+        switch(cmdId) {
+
+            default:
+                break;
+        }
+        this.eventEmitter.emit(Cmds.ECommandEvents.onDispatched, cmd);
+    }
+    onBeforeDispatched_Command = (cmd: Cmds.Common.ICommand) => {
+        this.eventEmitter.emit(Cmds.ECommandEvents.onBeforeDispatched, cmd);
+
+        let cmdId = cmd.data.cmdId;
+        let type = cmd.data.type;
+        switch(cmdId) {
+            case Cmds.ECommandId.network_disconnect:
+                console.log('11111111111111')
+
+                break;
+            default:
+                break;
+        }        
+    }     
 
     // close() {
 

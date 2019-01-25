@@ -1,5 +1,5 @@
-import { Base } from "./base";
-import { ERTCPeerEvents } from "./peer";
+import { Base } from "../base";
+import { ERTCPeerEvents } from "../peer";
 
 export class Streams extends Base {
     owner: any;

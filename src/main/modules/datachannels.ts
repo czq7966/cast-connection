@@ -1,5 +1,5 @@
-import { Base } from "./base"
-import { Peer, ERTCPeerEvents } from "./peer";
+import { Base } from "../base"
+import { Peer, ERTCPeerEvents } from "../peer";
 import { DataChannel, EDataChannelLabel } from "./datachannel";
 
 export enum EDataChannelsEvents {

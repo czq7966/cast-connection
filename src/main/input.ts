@@ -1,6 +1,7 @@
+import * as Modules from './modules'
 import { Base } from "./base";
-import { DataChannels, EDataChannelsEvents } from "./datachannels";
-import { DataChannel, EDataChannelLabel, EDataChannelEvents } from "./datachannel";
+// import { DataChannels, EDataChannelsEvents } from "./datachannels";
+// import { DataChannel, EDataChannelLabel, EDataChannelEvents } from "./datachannel";
 import { Gesture } from "./gesture";
 
 export enum EInputEvents {
@@ -94,10 +95,10 @@ export class Input extends Base {
     OS: EInputOS
     platform: EInputPlatform
     touchMode: EInputDevice        
-    datachannel: DataChannel
-    datachannels: DataChannels
+    datachannel: Modules.DataChannel
+    datachannels: Modules.DataChannels
     gesture: Gesture
-    constructor(datachannels: DataChannels) {
+    constructor(datachannels: Modules.DataChannels) {
         super();
         this.OS = EInputOS.window;
         this.platform = EInputPlatform.browser;
@@ -116,24 +117,24 @@ export class Input extends Base {
         super.destroy();
     }
     initEvents() {
-        this.datachannels.eventEmitter.addListener(EDataChannelsEvents.onAddDataChannel, this.onAddDataChannel)
+        this.datachannels.eventEmitter.addListener(Modules.EDataChannelsEvents.onAddDataChannel, this.onAddDataChannel)
     }
     unInitEvents() {
-        this.datachannels.eventEmitter.removeListener(EDataChannelsEvents.onAddDataChannel, this.onAddDataChannel)
+        this.datachannels.eventEmitter.removeListener(Modules.EDataChannelsEvents.onAddDataChannel, this.onAddDataChannel)
     }
-    onAddDataChannel = (datachannel: DataChannel) => {
-        if (datachannel && datachannel.rtcchannel.label === EDataChannelLabel.input) {
+    onAddDataChannel = (datachannel: Modules.DataChannel) => {
+        if (datachannel && datachannel.rtcchannel.label === Modules.EDataChannelLabel.input) {
             this.datachannel = datachannel;
-            this.datachannel.eventEmitter.addListener(EDataChannelEvents.onmessage, this.onDataChannelMessage)                        
-            this.datachannel.eventEmitter.addListener(EDataChannelEvents.onopen, this.onDataChannelOpen)                 
-            this.datachannel.eventEmitter.addListener(EDataChannelEvents.onclose, this.onDataChannelClose) 
+            this.datachannel.eventEmitter.addListener(Modules.EDataChannelEvents.onmessage, this.onDataChannelMessage)                        
+            this.datachannel.eventEmitter.addListener(Modules.EDataChannelEvents.onopen, this.onDataChannelOpen)                 
+            this.datachannel.eventEmitter.addListener(Modules.EDataChannelEvents.onclose, this.onDataChannelClose) 
         }
     }
     unInitDataChannelEvents() {
         if (this.datachannel && this.datachannel.notDestroyed) {
-            this.datachannel.eventEmitter.removeListener(EDataChannelEvents.onmessage, this.onDataChannelMessage);
-            this.datachannel.eventEmitter.removeListener(EDataChannelEvents.onopen, this.onDataChannelOpen)
-            this.datachannel.eventEmitter.removeListener(EDataChannelEvents.onclose, this.onDataChannelClose) 
+            this.datachannel.eventEmitter.removeListener(Modules.EDataChannelEvents.onmessage, this.onDataChannelMessage);
+            this.datachannel.eventEmitter.removeListener(Modules.EDataChannelEvents.onopen, this.onDataChannelOpen)
+            this.datachannel.eventEmitter.removeListener(Modules.EDataChannelEvents.onclose, this.onDataChannelClose) 
         }
     }
     onDataChannelMessage = (ev: MessageEvent) => {        

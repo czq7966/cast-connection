@@ -1,21 +1,19 @@
-import { Signaler } from "./signaler";
-import { Rooms } from "./rooms";
-import { CmdDispatcher } from './cmds/index'
-import * as Dts from "./declare";
-import * as Cmds from './cmds/index'
+import * as Network from '../network'
+import * as Dts from "../declare";
+import * as Cmds from '../cmds/index'
 
 
 
-export interface IDispatcherConstructorParams extends Cmds.IBaseConstructorParams {
-    signaler: Signaler
+export interface IDispatcherConstructorParams extends Cmds.Common.IBaseConstructorParams {
+    signaler: Network.Signaler
 }
 
-export interface IDispatcher extends Cmds.IDispatcher {
-    signaler: Signaler
+export interface IDispatcher extends Cmds.Common.IDispatcher {
+    signaler: Network.Signaler
 }
 
-export class Dispatcher extends Cmds.Base implements IDispatcher {
-    signaler: Signaler
+export class Dispatcher extends Cmds.Common.Base implements IDispatcher {
+    signaler: Network.Signaler
     constructor(params: IDispatcherConstructorParams) {
         super(params);
         this.signaler = params.signaler;
@@ -37,18 +35,22 @@ export class Dispatcher extends Cmds.Base implements IDispatcher {
     }
 
     // Command
-    onCommand = (cmd: Cmds.ICommandData) => {
-        CmdDispatcher.onCommand(cmd, this);
+    onCommand = (cmd: Cmds.ICommandData<any>) => {
+        Cmds.Common.CmdDispatcher.onCommand(cmd, this);
         this.eventEmitter.emit(Dts.CommandID, cmd)
     }
-    sendCommand(cmd: Cmds.ICommandData): Promise<any> {
+    sendCommand(cmd: Cmds.ICommandData<any>): Promise<any> {
         return this.signaler.sendCommand(cmd) 
     }
 
     // Network
     onDisconnect = () => {
-        this.eventEmitter.emit(Dts.EClientSocketEvents.disconnect)
+        // this.eventEmitter.emit(Dts.EClientSocketEvents.disconnect)
+        let data: Cmds.ICommandData<any> = {
+            cmdId: Cmds.ECommandId.network_disconnect
+        }
+        this.onCommand(data);
     }
 }
 
-CmdDispatcher.setDispatcher(Dispatcher as any)
+Cmds.Common.CmdDispatcher.setDispatcher(Dispatcher as any)

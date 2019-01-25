@@ -7,18 +7,18 @@ export class KeyValue<T> {
         this.clear();
         delete this.items;
     }
-    del(key: string) {
+    del(key: string): T {
         let value = this.items[key];
         delete this.items[key]
         return value;
     }
-    add(key: string, value: any) {
+    add(key: string, value: T) {
         this.items[key] = value
     }
     get(key: string): T {
         return this.items[key] as T;
     }
-    exist(key: string) {
+    exist(key: string): boolean {
         return this.get(key) !== undefined
     }
     keys(): string[] {
@@ -28,5 +28,8 @@ export class KeyValue<T> {
         this.keys().forEach(key => {
             this.del(key)
         })
+    }
+    count(): number {
+        return this.keys().length;
     }
 }

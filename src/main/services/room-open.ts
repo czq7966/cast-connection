@@ -2,20 +2,30 @@ import * as Cmds from "../cmds";
 import * as Modules from '../modules'
 import { Debug } from "../cmds/common/helper";
 
-var Tag = "ServiceLogout"
-export class ServiceLogout extends Cmds.Common.Base {
-    static logout(instanceId: string): Promise<any> {
-        let cmd = new Cmds.CommandLogoutReq({instanceId: instanceId});
-        let user = Cmds.CommandLoginResp.getInstance<Cmds.CommandLoginResp>(instanceId).data.props.user;
-        cmd.data = {
-            props: {
-                user: user
-            }    
-        }
-        let promise = cmd.sendCommand();        
-        cmd.destroy();
-        cmd = null;
-        return promise
+var Tag = "ServiceRoomOpen"
+export class ServiceRoomOpen extends Cmds.Common.Base {
+    static open(instanceId: string, room: Cmds.IRoom): Promise<any> {
+        return new Promise((resolve, reject) => {
+            let cmd = new Cmds.CommandRoomOpenReq({instanceId: instanceId});
+            let user = Cmds.CommandLoginResp.getInstance<Cmds.CommandLoginResp>(instanceId).data.props.user;
+            cmd.data = {
+                props: {
+                    room: room
+                },
+                onResp: (cmdResp: Cmds.CommandRoomOpenResp) => {
+                    Cmds.Common.CmdDispatcher.dispatch(cmdResp , Cmds.ECommandEvents.onBeforeDispatched);
+                    Cmds.Common.CmdDispatcher.dispatch(cmdResp , Cmds.ECommandEvents.onDispatched);
+                    resolve(cmd.data);    
+                },
+                onRespTimeout: (data) => {
+                    reject(data)    
+                }
+            }
+            cmd.sendCommand();        
+            cmd.destroy();
+            cmd = null;
+        })
+
     }
 
  

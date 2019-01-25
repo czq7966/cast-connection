@@ -1,13 +1,10 @@
-import { IBase, Base } from "./base";
-import { IUser, User } from "./user";
-import { Signaler } from "./signaler";
-import { ECustomEvents, IUserQuery } from "./client";
-import { ERTCPeerEvents } from "./peer";
+
 import { Streams } from "./streams";
 import { IRooms } from "./rooms";
-import { EClientSocketEvents } from "./declare";
-import * as Cmds from "./cmds";
-import * as Services from './services'
+import * as Cmds from "../cmds";
+import * as Services from '../services'
+import * as Network from '../network'
+import { User, IUser } from "./user";
 
 
 
@@ -19,7 +16,7 @@ export interface IRoomParams {
     roomid: string
     password: string
     max?: number
-    Signaler?: Signaler
+    Signaler?: Network.Signaler
 }
 // export interface IRoom extends IBase, IRoomParams {
 //     users: {[id: string]: IUser}
@@ -32,24 +29,27 @@ export interface IRoomParams {
 //     addSendStream(stream: MediaStream, user?: IUser)
 // }
 
-export interface IRoom extends Cmds.IBase {
+export interface IRoom extends Cmds.Common.IBase {
     item: Cmds.IRoom;
-    users: Cmds.Helper.KeyValue<User>;
+    users: Cmds.Common.Helper.KeyValue<User>;
     getUser(user: Cmds.IUser | string): IUser
+    delUser(id: string)
+    you(): User
+    clearUser()
 
 }
 
-export class Room extends Cmds.Base implements IRoom {
+export class Room extends Cmds.Common.Base implements IRoom {
     item: Cmds.IRoom;
     rooms: IRooms;
-    users: Cmds.Helper.KeyValue<User>;
+    users: Cmds.Common.Helper.KeyValue<User>;
     streams: Streams;
 
     constructor(rooms: IRooms, item: Cmds.IRoom) {
         super();
         this.rooms = rooms;
         this.item = Object.assign({}, item);
-        this.users = new Cmds.Helper.KeyValue();
+        this.users = new Cmds.Common.Helper.KeyValue();
         this.streams = new Streams(this);             
         this.initEvents();
     }
@@ -65,8 +65,9 @@ export class Room extends Cmds.Base implements IRoom {
     }
 
     initEvents() {
-        this.rooms.eventEmitter.addListener(Cmds.ECommandEvents.onDispatched, this.onDispatched_Command)
-        this.rooms.eventEmitter.addListener(EClientSocketEvents.disconnect, this.onNetwork_Disconnect);     
+        this.rooms.eventEmitter.addListener(Cmds.ECommandEvents.onDispatched, this.onDispatched_Command);
+        this.rooms.eventEmitter.addListener(Cmds.ECommandEvents.onBeforeDispatched, this.onBeforeDispatched_Command);
+
 
         // this.eventEmitter.addListener(ECustomEvents.joinRoom, this.onJoinRoom);
         // this.eventEmitter.addListener(ECustomEvents.leaveRoom, this.onLeaveRoom);
@@ -78,7 +79,7 @@ export class Room extends Cmds.Base implements IRoom {
     }
     unInitEvents() {
         this.rooms.eventEmitter.removeListener(Cmds.ECommandEvents.onDispatched, this.onDispatched_Command)
-        this.rooms.eventEmitter.removeListener(EClientSocketEvents.disconnect, this.onNetwork_Disconnect);     
+        this.rooms.eventEmitter.removeListener(Cmds.ECommandEvents.onBeforeDispatched, this.onBeforeDispatched_Command)
 
 
         // this.eventEmitter.removeListener(ECustomEvents.joinRoom, this.onJoinRoom)
@@ -91,7 +92,7 @@ export class Room extends Cmds.Base implements IRoom {
     }
 
     // Command
-    onDispatched_Command = (cmd: Cmds.ICommand) => {
+    onDispatched_Command = (cmd: Cmds.Common.ICommand) => {
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
         switch(cmdId) {
@@ -113,13 +114,31 @@ export class Room extends Cmds.Base implements IRoom {
         }
         this.eventEmitter.emit(Cmds.ECommandEvents.onDispatched, cmd);
     }
+    onBeforeDispatched_Command = (cmd: Cmds.Common.ICommand) => {
+        this.eventEmitter.emit(Cmds.ECommandEvents.onBeforeDispatched, cmd);
 
-    // Network
-    onNetwork_Disconnect = () => {
-        this.eventEmitter.emit(EClientSocketEvents.disconnect);
-    }
+        let cmdId = cmd.data.cmdId;
+        let type = cmd.data.type;
+        switch(cmdId) {
+            case Cmds.ECommandId.adhoc_logout:
+                    Services.ServiceLogout.Room.onBeforeDispatched.req(this, cmd as any);
+                break;
+            case Cmds.ECommandId.network_disconnect: 
+                    Services.ServiceNetwork.Disconnect.Room.onBeforeDispatched.req(this, cmd as any);
+                break;
+            default:
+                break;
+        }        
+    }    
+
 
     // User
+    you(): User {
+        let currUser = Cmds.CommandLoginResp.getInstance<Cmds.CommandLoginResp>(this.rooms.dispatcher.instanceId).data.props.user;
+        if (currUser) {
+            return this.getUser(currUser.id)
+        }
+    }
     getUser(user: Cmds.IUser | string) {
         if (typeof user === 'string') {
             return this.users.get(user);
@@ -134,6 +153,15 @@ export class Room extends Cmds.Base implements IRoom {
             }
         }
     }    
+    delUser(id: string) {
+        let user = this.users.del(id);
+        user && user.destroy();        
+    }
+    clearUser() {
+        this.users.keys().forEach(key => {
+            this.delUser(key)
+        });
+    }
     // onJoinRoom = (query: IUserQuery) => {
     //     if (!this.users[query.from]) {
     //         let user = new User({

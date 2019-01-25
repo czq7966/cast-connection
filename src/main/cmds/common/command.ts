@@ -10,11 +10,11 @@ export interface ICommandConstructorParams<P> extends IBaseConstructorParams {
 }
 
 export interface ICommand extends IBase {
-    data: Dts.ICommandData;
+    data: Dts.ICommandData<any>;
     extra: any
     isOverrideEvent(eventName: string): boolean
     copyProperties(props: Object | string)
-    assignData(data: Dts.ICommandData)
+    assignData(data: Dts.ICommandData<any>)
     sendCommand(): Promise<any>
 };
 
@@ -22,13 +22,13 @@ export interface ICommandClass extends IBaseClass {
     defaultCommandId: string
 }
 
-export class Command<T extends Dts.ICommandData, P extends ICommandConstructorParams<any>> extends Base implements ICommand {
+export class Command<T extends Dts.ICommandData<any>, P extends ICommandConstructorParams<any>> extends Base implements ICommand {
     _eventEmitterEvents : Object;
 
     data: T;
     extra: any
 
-    public static defaultCommandId: string = '';
+    static defaultCommandId: string = '';
     constructor(params?: P) {
         super(params);
         params = params || {} as any;
@@ -103,7 +103,7 @@ export class Command<T extends Dts.ICommandData, P extends ICommandConstructorPa
         props && (this.data.props = JSON.parse(props as string));
     }
 
-    assignData(data: Dts.ICommandData, merge?: boolean) {
+    assignData(data: Dts.ICommandData<any>, merge?: boolean) {
         if (merge) {
             this.data = Object.assign(this.data, data);
         } else {

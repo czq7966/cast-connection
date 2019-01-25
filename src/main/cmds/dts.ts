@@ -1,15 +1,35 @@
-import * as Common from './common'
+import * as Common from './common/index'
 
 export * from './common/dts'
 
 export var CommandID = 'command'
 
 export enum ECommandId {
+    network_connect = 'network_connect',
+    network_connect_error = 'network_connect_error',
+    network_connect_timeout = 'network_connect_timeout',
+    network_connecting = 'network_connecting',
+    network_disconnect = 'network_disconnect',
+    network_error = 'network_error',
+    network_reconnect = 'network_reconnect',
+    network_reconnect_attempt = 'network_reconnect_attempt',
+    network_reconnect_failed = 'network_reconnect_failed',
+    network_reconnect_error = 'network_reconnect_error',
+    network_reconnecting = 'network_reconnecting',
+    network_ping = 'network_ping',
+    network_pong = 'network_pong',
+ 
+
     none = 'none',
-    // command = 'command',
     adhoc_login = 'adhoc_login',
     adhoc_logout = 'adhoc_logout',
     adhoc_hello = 'adhoc_hello',
+
+    room_open = 'room_open',
+    room_join = 'room_join',
+    room_hello = 'room_hello',
+    room_join_or_open = 'room_join_or_open',
+
     stream_room_open = 'stream_room_open',
     stream_room_join = 'stream_room_join',
     stream_room_join_or_open = 'stream_room_join_or_open',
@@ -48,14 +68,9 @@ export interface IRoom {
     id: string
 }
 
-//
 // Command Login Req Props
 export interface ICommandLoginReqDataProps {
     user: IUser
-}
-
-export interface ICommandLoginReqData extends Common.ICommandData {
-    props?: ICommandLoginReqDataProps;
 }
 
 // Command Login Resp Props
@@ -65,28 +80,14 @@ export interface ICommandLoginRespDataProps {
     user?: IUser
 }
 
-export interface ICommandLoginRespData extends Common.ICommandData {
-    props?: ICommandLoginRespDataProps;
-}
-
-//
-// Command Logout Req Props
+//  Command Logout Req Props
 export interface ICommandLogoutReqDataProps {
     user: IUser
 }
 
-export interface ICommandLogoutReqData extends Common.ICommandData {
-    props?: ICommandLogoutReqDataProps;
-}
-
-//
-// Command Hello Req Props
+//  Command Hello Req Props
 export interface ICommandHelloReqDataProps {
     user: IUser
-}
-
-export interface ICommandHelloReqData extends Common.ICommandData {
-    props?: ICommandHelloReqDataProps;
 }
 
 // Command Hello Resp Props
@@ -94,9 +95,26 @@ export interface ICommandHelloRespDataProps {
     user?: IUser
 }
 
-export interface ICommandHelloRespData extends Common.ICommandData {
-    props?: ICommandHelloRespDataProps;
+//  Command Room Open Req Props
+export interface ICommandRoomOpenReqDataProps {
+    room?: IRoom
 }
 
+// Command Room Open Resp Props
+export interface ICommandRoomOpenRespDataProps {
+    result: boolean
+    msg?: string
+    room?: IRoom
+}
 
+// Command Room Join Req Props
+export interface ICommandRoomJoinReqDataProps {
+    room?: IRoom
+}
 
+// Command Room Open Resp Props
+export interface ICommandRoomJoinRespDataProps {
+    result: boolean
+    msg?: string
+    room?: IRoom
+}

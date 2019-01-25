@@ -1,11 +1,9 @@
-import { ESignalerMessageType, ISignalerMessage } from "./signaler";
+import * as Network from './network'
+import * as Modules from './modules'
 import { Base } from "./base";
-import { IUser } from "./user";
 import { sdpHelper } from "./helper/sdp";
 import { Config, ECodecs, EPlatform } from "./config";
-import { Streams } from "./streams";
 import { WebRTC } from "./webrtc";
-import { DataChannels } from "./datachannels";
 import { Input } from "./input";
 
 export enum ERTCPeerEvents {
@@ -31,17 +29,17 @@ export enum EPeerEvents {
 
 export class Peer extends Base {
     config: Config;
-    user: IUser
-    streams: Streams;
-    datachannels: DataChannels;
+    user: Modules.IUser
+    streams: Modules.Streams;
+    datachannels: Modules.DataChannels;
     input: Input;
     private _rtcevents;
     private _rtc: RTCPeerConnection    
-    constructor(user: IUser) {
+    constructor(user: Modules.IUser) {
         super()
         this.config = new Config();
-        this.streams = new Streams(this);
-        this.datachannels = new DataChannels(this);
+        this.streams = new Modules.Streams(this);
+        this.datachannels = new Modules.DataChannels(this);
         this.input = new Input(this.datachannels);
         this._rtcevents = {};
         this.user = user;        
@@ -69,10 +67,10 @@ export class Peer extends Base {
     }    
     initEvents() {        
         // 信令事件
-        this.eventEmitter.addListener(ESignalerMessageType.offer, this.onOffer)
-        this.eventEmitter.addListener(ESignalerMessageType.answer, this.onAnswer)
-        this.eventEmitter.addListener(ESignalerMessageType.candidate, this.onCandidate)
-        this.eventEmitter.addListener(ESignalerMessageType.icecomplete, this.onIceComplete)
+        this.eventEmitter.addListener(Network.ESignalerMessageType.offer, this.onOffer)
+        this.eventEmitter.addListener(Network.ESignalerMessageType.answer, this.onAnswer)
+        this.eventEmitter.addListener(Network.ESignalerMessageType.candidate, this.onCandidate)
+        this.eventEmitter.addListener(Network.ESignalerMessageType.icecomplete, this.onIceComplete)
 
         this.eventEmitter.addListener(ERTCPeerEvents.ontrack, this.onTrack)
         this.eventEmitter.addListener(ERTCPeerEvents.onstream, this.onStream)        
@@ -126,10 +124,10 @@ export class Peer extends Base {
     }
     unInitEvents() {
         this.unInitRTCEvents(this._rtc);
-        this.eventEmitter.removeListener(ESignalerMessageType.offer, this.onOffer)
-        this.eventEmitter.removeListener(ESignalerMessageType.answer, this.onAnswer)
-        this.eventEmitter.removeListener(ESignalerMessageType.candidate, this.onCandidate)
-        this.eventEmitter.removeListener(ESignalerMessageType.icecomplete, this.onIceComplete)   
+        this.eventEmitter.removeListener(Network.ESignalerMessageType.offer, this.onOffer)
+        this.eventEmitter.removeListener(Network.ESignalerMessageType.answer, this.onAnswer)
+        this.eventEmitter.removeListener(Network.ESignalerMessageType.candidate, this.onCandidate)
+        this.eventEmitter.removeListener(Network.ESignalerMessageType.icecomplete, this.onIceComplete)   
 
         this.eventEmitter.removeListener(ERTCPeerEvents.ontrack, this.onTrack)
         this.eventEmitter.removeListener(ERTCPeerEvents.onstream, this.onStream)        
@@ -237,8 +235,8 @@ export class Peer extends Base {
     }    
     sendOffer(sdp?: RTCSessionDescriptionInit): Promise<any> {
         sdp = sdp || this.rtc().localDescription.toJSON();
-        let msg: ISignalerMessage = {
-            type: ESignalerMessageType.offer,
+        let msg: Network.ISignalerMessage = {
+            type: Network.ESignalerMessageType.offer,
             data: sdp
         }
         return this.user.sendMessage(msg)
@@ -310,8 +308,8 @@ export class Peer extends Base {
 
     sendAnswer(sdp?: RTCSessionDescriptionInit): Promise<any> {
         sdp = sdp || this.rtc().localDescription.toJSON();
-        let msg: ISignalerMessage = {
-            type: ESignalerMessageType.answer,
+        let msg: Network.ISignalerMessage = {
+            type: Network.ESignalerMessageType.answer,
             data: sdp
         }
         return this.user.sendMessage(msg)
@@ -319,14 +317,14 @@ export class Peer extends Base {
 
     onIceCandidate = (ev: RTCPeerConnectionIceEvent): Promise<any> => {
         if (ev.candidate) {
-            let msg: ISignalerMessage = {
-                type: ESignalerMessageType.candidate,
+            let msg: Network.ISignalerMessage = {
+                type: Network.ESignalerMessageType.candidate,
                 data: ev.candidate.toJSON()
             }            
             return this.user.sendMessage(msg)
         } else {
-            let msg: ISignalerMessage = {
-                type: ESignalerMessageType.icecomplete,
+            let msg: Network.ISignalerMessage = {
+                type: Network.ESignalerMessageType.icecomplete,
             }
             return this.user.sendMessage(msg)
         }

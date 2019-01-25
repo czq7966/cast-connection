@@ -11,7 +11,7 @@ export interface IAddressData {
 }
 
 // 指令包
-export interface ICommandData {
+export interface ICommandData<T> {
     //Address
     from?: IAddressData
     to?: IAddressData
@@ -19,7 +19,7 @@ export interface ICommandData {
     //Content
     type?: ECommandType
     cmdId?: string
-    props?: any
+    props?: T
     sessionId?: string
 
     //Events

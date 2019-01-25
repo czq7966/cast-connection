@@ -2,11 +2,15 @@ import * as Dts from './dts';
 import * as Common from './common/index'
 
 
-export class CommandLoginReq extends Common.Command<Dts.ICommandLoginReqData, Common.ICommandConstructorParams<Dts.ICommandLoginReqDataProps>>  {
+export class CommandLoginReq extends Common.Command<
+            Dts.ICommandData<Dts.ICommandLoginReqDataProps>, 
+            Common.ICommandConstructorParams<Dts.ICommandLoginReqDataProps> > {
 
 }
 
-export class CommandLoginResp extends Common.Command<Dts.ICommandLoginRespData, Common.ICommandConstructorParams<Dts.ICommandLoginRespDataProps>>  {
+export class CommandLoginResp extends Common.Command<
+            Dts.ICommandData<Dts.ICommandLoginRespDataProps>, 
+            Common.ICommandConstructorParams<Dts.ICommandLoginRespDataProps> > {
   
 }
 
