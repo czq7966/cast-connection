@@ -31,18 +31,17 @@ export interface IRoomParams {
 
 export interface IRoom extends Cmds.Common.IBase {
     item: Cmds.IRoom;
-    users: Cmds.Common.Helper.KeyValue<User>;
+    users: Cmds.Common.Helper.KeyValue<IUser>;
     getUser(user: Cmds.IUser | string): IUser
     delUser(id: string)
-    you(): User
+    me(): IUser
     clearUser()
-
 }
 
 export class Room extends Cmds.Common.Base implements IRoom {
     item: Cmds.IRoom;
     rooms: IRooms;
-    users: Cmds.Common.Helper.KeyValue<User>;
+    users: Cmds.Common.Helper.KeyValue<IUser>;
     streams: Streams;
 
     constructor(rooms: IRooms, item: Cmds.IRoom) {
@@ -106,16 +105,28 @@ export class Room extends Cmds.Common.Base implements IRoom {
                 type === Cmds.ECommandType.resp ?
                     Services.ServiceHello.Room.onDispatched.resp(this, cmd as any) : null;
                 break;
-            case Cmds.ECommandId.adhoc_logout:
+            case Cmds.ECommandId.room_open:
+                type === Cmds.ECommandType.resp ?
+                    Services.ServiceRoomOpen.Room.onDispatched.resp(this, cmd as any) : null
+                break;
+            case Cmds.ECommandId.room_join:
+                type === Cmds.ECommandType.resp ?
+                    Services.ServiceRoomJoin.Room.onDispatched.resp(this, cmd as any) : null                    
+                break;
+            case Cmds.ECommandId.room_hello:
                 type === Cmds.ECommandType.req ?
-                    Services.ServiceLogout.Room.onDispatched.req(this, cmd as any) : null
+                    Services.ServiceRoomHello.Room.onDispatched.req(this, cmd as any) :
+                type === Cmds.ECommandType.resp ?
+                    Services.ServiceRoomHello.Room.onDispatched.resp(this, cmd as any) : null;
+                break;                
             default:
                 break;
         }
-        this.eventEmitter.emit(Cmds.ECommandEvents.onDispatched, cmd);
+        cmd.preventDefault !== true && this.eventEmitter.emit(Cmds.ECommandEvents.onDispatched, cmd);
     }
     onBeforeDispatched_Command = (cmd: Cmds.Common.ICommand) => {
         this.eventEmitter.emit(Cmds.ECommandEvents.onBeforeDispatched, cmd);
+        if (cmd.preventDefault === true) return;
 
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
@@ -126,6 +137,18 @@ export class Room extends Cmds.Common.Base implements IRoom {
             case Cmds.ECommandId.network_disconnect: 
                     Services.ServiceNetwork.Disconnect.Room.onBeforeDispatched.req(this, cmd as any);
                 break;
+            case Cmds.ECommandId.room_close:
+                type === Cmds.ECommandType.req ?
+                    Services.ServiceRoomClose.Room.onBeforeDispatched.req(this, cmd as any) :
+                type === Cmds.ECommandType.resp ?
+                    Services.ServiceRoomClose.Room.onBeforeDispatched.resp(this, cmd as any) : null     
+                break;   
+            case Cmds.ECommandId.room_leave:
+                type === Cmds.ECommandType.req ?
+                    Services.ServiceRoomLeave.Room.onBeforeDispatched.req(this, cmd as any) :
+                type === Cmds.ECommandType.resp ?
+                    Services.ServiceRoomLeave.Room.onBeforeDispatched.resp(this, cmd as any) : null    
+                break;                              
             default:
                 break;
         }        
@@ -133,7 +156,7 @@ export class Room extends Cmds.Common.Base implements IRoom {
 
 
     // User
-    you(): User {
+    me(): IUser {
         let currUser = Cmds.CommandLoginResp.getInstance<Cmds.CommandLoginResp>(this.rooms.dispatcher.instanceId).data.props.user;
         if (currUser) {
             return this.getUser(currUser.id)
@@ -144,15 +167,18 @@ export class Room extends Cmds.Common.Base implements IRoom {
             return this.users.get(user);
         } else {
             if (user && user.id) {
-                let us =this.getUser(user.id);
-                if (!us) {
-                    us = new User(this, us);
-                    this.users.add(user.id, us);
+                let usObj =this.getUser(user.id);
+                if (!usObj) {
+                    usObj = new User(this, user);
+                    this.users.add(user.id, usObj);
                 }
-                return us;
+                return usObj;
             }
         }
     }    
+    removeUser(id: string): IUser {
+        return this.users.del(id)
+    }
     delUser(id: string) {
         let user = this.users.del(id);
         user && user.destroy();        

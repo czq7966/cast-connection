@@ -5,20 +5,25 @@ import * as Modules from './modules'
 
 // import { uuid } from "./helper";
 
+export interface IConnectionConstructorParams extends Cmds.Common.IBaseConstructorParams {
+    url: string
+}
 export class Connection extends Cmds.Common.Base {    
     signaler: Network.Signaler;
     rooms: Modules.Rooms;
     dispatcher: Services.Dispatcher
     stream: MediaStream;
-    constructor(url: string, instanceId?: string) {
-        super()
-        this.signaler = new Network.Signaler(url);
-        this.instanceId = instanceId || Cmds.Common.Helper.uuid();
-        let params: Services.IDispatcherConstructorParams = {
+    constructor(params: IConnectionConstructorParams) {
+        super(params);
+        this.instanceId = this.instanceId || Cmds.Common.Helper.uuid();
+
+        this.signaler = new Network.Signaler(params.url);
+        
+        let pms: Services.IDispatcherConstructorParams = {
             instanceId: this.instanceId,
             signaler: this.signaler,
         }
-        this.dispatcher = Services.Dispatcher.getInstance(params) 
+        this.dispatcher = Services.Dispatcher.getInstance(pms) 
         this.rooms = new Modules.Rooms(this.instanceId);        
         this.initEvents();
     }    
@@ -41,10 +46,11 @@ export class Connection extends Cmds.Common.Base {
     }
     login(): Promise<any> {
         let instanceId = this.instanceId;
-        let promise = Services.ServiceLogin.login(instanceId);
-        promise.then(() => {
-            Services.ServiceHello.sayHello(instanceId);
-        })
+        let promise = Services.ServiceLogin.login(instanceId, {id: Cmds.Common.Helper.uuid()});
+        // promise.then(() => {
+        //     let currUser = Service
+        //     Services.ServiceHello.sayHello(instanceId);
+        // })
         return promise;
     }    
     isLogin() {

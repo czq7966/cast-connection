@@ -4,7 +4,9 @@ import { Room } from "./room";
 import { Streams } from "./streams";
 import * as Cmds from "../cmds";
 import * as Network from '../network'
+import { Debug } from "../cmds/common/helper";
 
+var Tag = "ModuleUser"
 export interface IUserParams {
     socketId: string,
     isOwner: boolean,
@@ -30,6 +32,10 @@ export interface IUser extends IBase , IUserParams {
     doICE()
     sendMessage(msg: any)
     close()
+
+    item: Cmds.IUser;
+    room: Room;
+    streams: Streams;    
 }
 
 export class User extends Cmds.Common.Base  {
@@ -100,8 +106,7 @@ export class User extends Cmds.Common.Base  {
         let type = cmd.data.type;
         switch(cmdId) {
             case Cmds.ECommandId.network_disconnect:
-                console.log('11111111111111')
-
+                Debug.log(Tag, 'onBeforeDispatched', cmdId)
                 break;
             default:
                 break;

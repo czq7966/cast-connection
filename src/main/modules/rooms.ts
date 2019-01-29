@@ -6,7 +6,11 @@ import * as Services from '../services'
 export interface IRooms extends Cmds.Common.IBase {
     items: Cmds.Common.Helper.KeyValue<IRoom>;
     dispatcher: Services.IDispatcher;  
-    getRoom(room: Cmds.IRoom | string);
+    getRoom(room: Cmds.IRoom | string): IRoom;
+    removeRoom(roomid: string): IRoom;
+    delRoom(roomid: string);
+    existRoom(roomid: string): boolean
+    clearRoom();
 }
 
 export class Rooms extends Cmds.Common.Base implements IRooms {
@@ -38,6 +42,7 @@ export class Rooms extends Cmds.Common.Base implements IRooms {
     }
 
     onDispatched_Command = (cmd: Cmds.Common.ICommand) => {
+        cmd.preventDefault = false;
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
         switch(cmdId) {
@@ -45,28 +50,54 @@ export class Rooms extends Cmds.Common.Base implements IRooms {
                 type === Cmds.ECommandType.resp ?
                     Services.ServiceLogin.Rooms.onDispatched.resp(this, cmd as any) : null
                 break;
-            case Cmds.ECommandId.adhoc_hello:
-                type === Cmds.ECommandType.req ?
-                    Services.ServiceHello.Rooms.onDispatched.req(this, cmd as any) :
+            // case Cmds.ECommandId.adhoc_hello:
+            //     type === Cmds.ECommandType.req ?
+            //         Services.ServiceHello.Rooms.onDispatched.req(this, cmd as any) :
+            //     type === Cmds.ECommandType.resp ?
+            //         Services.ServiceHello.Rooms.onDispatched.resp(this, cmd as any) : null
+            //     break;
+            case Cmds.ECommandId.room_open: 
                 type === Cmds.ECommandType.resp ?
-                    Services.ServiceHello.Rooms.onDispatched.resp(this, cmd as any) : null
+                    Services.ServiceRoomOpen.Rooms.onDispatched.resp(this, cmd as any) : null
+                break;
+            case Cmds.ECommandId.room_join: 
+                type === Cmds.ECommandType.resp ?
+                    Services.ServiceRoomJoin.Rooms.onDispatched.resp(this, cmd as any) : null                    
                 break;
             default:
                 break;
         }
-        this.eventEmitter.emit(Cmds.ECommandEvents.onDispatched, cmd);
+        !!cmd.preventDefault !== true && this.eventEmitter.emit(Cmds.ECommandEvents.onDispatched, cmd);
     }
 
     onBeforeDispatched_Command = (cmd: Cmds.Common.ICommand) => {
+        cmd.preventDefault = false;
         this.eventEmitter.emit(Cmds.ECommandEvents.onBeforeDispatched, cmd);
+        if (!!cmd.preventDefault === true) return;
 
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
+
         switch(cmdId) {
             case Cmds.ECommandId.adhoc_logout:
                 type === Cmds.ECommandType.req ?
                     Services.ServiceLogout.Rooms.onBeforeDispatched.req(this, cmd as any) : null
                 break;
+            case Cmds.ECommandId.network_disconnect: 
+                Services.ServiceNetwork.Disconnect.Rooms.onBeforeDispatched.req(this, cmd as any);
+                break;     
+            case Cmds.ECommandId.room_close:
+                type === Cmds.ECommandType.req ?
+                    Services.ServiceRoomClose.Rooms.onBeforeDispatched.req(this, cmd as any) :
+                type === Cmds.ECommandType.resp ?
+                    Services.ServiceRoomClose.Rooms.onBeforeDispatched.resp(this, cmd as any) : null    
+                break;   
+            case Cmds.ECommandId.room_leave:
+                type === Cmds.ECommandType.req ?
+                    Services.ServiceRoomLeave.Rooms.onBeforeDispatched.req(this, cmd as any) :
+                type === Cmds.ECommandType.resp ?
+                    Services.ServiceRoomLeave.Rooms.onBeforeDispatched.resp(this, cmd as any) : null    
+                break;                                             
             default:
                 break;
         }        
@@ -86,8 +117,25 @@ export class Rooms extends Cmds.Common.Base implements IRooms {
                 return rm;
             }
         }
-
     }
+    delRoom(roomid: string){
+        let room = this.items.del(roomid);
+        if (room) {
+            room.destroy();
+            room = null;
+        }
+    }
+    removeRoom(roomid: string): IRoom {
+        return this.items.del(roomid); 
+    }
+    existRoom(roomid: string): boolean {
+        return this.items.exist(roomid);
+    }
+    clearRoom() {
+        this.items.keys().forEach(key => {
+            this.delRoom(key)
+        });
+    }    
 
 
     // userCount(): number {

@@ -3,17 +3,19 @@ import * as Modules from '../modules'
 import { Debug } from "../cmds/common/helper";
 import { ServiceUser } from "./user";
 
-var Tag = "ServiceLogout"
-export class ServiceLogout extends Cmds.Common.Base {
-    static logout(instanceId: string): Promise<any> {
-        return new Promise((resolve, reject) => { 
-            let cmd = new Cmds.CommandLogoutReq({instanceId: instanceId});
+var Tag = "ServiceRoomLeave"
+export class ServiceRoomLeave extends Cmds.Common.Base {
+    static leave(instanceId: string, room: Cmds.IRoom): Promise<any> {
+        return new Promise((resolve, reject) => {
+            let cmd = new Cmds.CommandRoomLeaveReq({instanceId: instanceId}); 
             let currUser = ServiceUser.CurrentUser(instanceId);   
+            let user = Object.assign({}, currUser);
+            user.room = room;           
             cmd.data = {
                 props: {
-                    user: currUser
+                    user: user
                 },
-                onResp: (cmdResp: Cmds.CommandLoginResp) => {
+                onResp: (cmdResp: Cmds.CommandRoomLeaveResp) => {
                     Cmds.Common.CmdDispatcher.dispatch(cmdResp , Cmds.ECommandEvents.onBeforeDispatched);
                     Cmds.Common.CmdDispatcher.dispatch(cmdResp , Cmds.ECommandEvents.onDispatched);
                     if (cmdResp.data.props.result) {
@@ -22,16 +24,17 @@ export class ServiceLogout extends Cmds.Common.Base {
                         reject(cmdResp.data)
                     } 
                 },
-                onRespTimeout: (data: Cmds.ICommandData<Cmds.ICommandLogoutRespDataProps>) => {
+                onRespTimeout: (data: Cmds.ICommandData<Cmds.ICommandRoomLeaveRespDataProps>) => {
                     data.props.result = false;
                     data.props.msg = 'time out!';                    
                     reject(data);    
-                }   
+                }
             }
             cmd.sendCommand();        
             cmd.destroy();
             cmd = null;
         })
+
     }
 
  
@@ -53,33 +56,37 @@ export class ServiceLogout extends Cmds.Common.Base {
                 if (room && room.users.count() == 0) {                    
                     rooms.delRoom(room.item.id)
                 }                
-            } 
-        }
+            }          
+        }        
     }
 
     static Room = {
         onBeforeDispatched: {
-            req(room: Modules.IRoom, cmd: Cmds.CommandLogoutReq) {
-                console.log(Tag, 'Room', room.item.id, 'onBeforeDispatched', 'Req', cmd.data)
-                let user = cmd.data.props.user;
-                let me = room.me();
-                if (me && user.id === me.item.id) {
-                    room.clearUser()
-                } else {
-                    room.delUser(user.id)
-                }
-            },
-            resp(room: Modules.IRoom, cmd: Cmds.CommandLogoutResp) {
-                console.log(Tag, 'Room', room.item.id, 'onBeforeDispatched', 'Resp', cmd.data)
-                let user = cmd.data.props.user;
-                let me = room.me();
-                if (me && user.id === me.item.id) {
-                    room.clearUser()
-                } else {
-                    room.delUser(user.id)
+            req(room: Modules.IRoom, cmd: Cmds.CommandRoomLeaveReq) {
+                console.log(Tag, 'Room', room.item.id ,'onBeforeDispatched', 'Req', cmd.data);
+                let data = cmd.data;
+                if (room.item.id === data.props.user.room.id) {                    
+                    let me = room.me();                    
+                    if (me && me.item.id === data.props.user.id) {
+                        room.clearUser();
+                    } else {
+                        room.delUser(data.props.user.id);
+                    }
                 }
             },            
-        }
+            resp(room: Modules.IRoom, cmd: Cmds.CommandRoomLeaveResp) {
+                console.log(Tag, 'Room', room.item.id , 'onBeforeDispatched', 'Resp', cmd.data)
+                let data = cmd.data;
+                if (data.props.result && room.item.id === data.props.user.room.id) {                    
+                    let me = room.me();                    
+                    if (me && me.item.id === data.props.user.id) {
+                        room.clearUser();
+                    } else {
+                        room.delUser(data.props.user.id);
+                    }
+                } 
+            }            
+        }  
     }    
 
 

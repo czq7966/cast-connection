@@ -16,6 +16,8 @@ export interface IBase {
 }
 
 export interface IBaseClass extends IClass {
+    instances : {[name: string]: Base} 
+    instanceDefauleName: string
     getInstance<T extends Base>(params?: IBaseConstructorParams | string, create?: boolean): T
 }
 
@@ -24,7 +26,7 @@ export interface IBaseConstructorParams {
     instanceSingle?: boolean
 }
 
-
+var InstancesName = 'instances';
 export class Base {
     notDestroyed: boolean
     eventEmitter: EventEmitter
@@ -34,10 +36,10 @@ export class Base {
     instanceEventEmitter: EventEmitter;
     
     
-    private static instances : {[name: string]: Base} = {};
+    public static instances : {[name: string]: Base} = {};
     public static instanceDefauleName: string = 'default'
     public static getInstance<T extends Base>(params?: IBaseConstructorParams | string, create: boolean = true): T {
-        !this.hasOwnProperty('instances') && (this.instances = {});  
+        !this.hasOwnProperty(InstancesName) && (this.instances = {});  
         if (typeof params === 'string') {
             params = { instanceId: params }
         } else {
@@ -60,6 +62,10 @@ export class Base {
    
     }
     destroy() {
+        if (this.isInstance() ) {
+            let constructor = this.constructor as any as IBaseClass;
+            delete constructor.instances[this.instanceId];
+        }
         this.eventEmitter.removeAllListeners();
         this.instanceEventEmitter.removeAllListeners();        
         delete this.eventEmitter;
@@ -74,6 +80,11 @@ export class Base {
         return (this.constructor as any as IBaseClass).getInstance(params, create);
     }  
     isInstance(): boolean {
-        return this === this.getInstance(this.instanceId, false);
+        let constructor = this.constructor as any as IBaseClass;
+        if (constructor.hasOwnProperty(InstancesName)) {
+            return this === this.getInstance(this.instanceId, false);
+        } else {
+            return false
+        }        
     }             
 }

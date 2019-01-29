@@ -10,6 +10,7 @@ export enum ECommandId {
     network_connect_timeout = 'network_connect_timeout',
     network_connecting = 'network_connecting',
     network_disconnect = 'network_disconnect',
+    network_disconnecting = 'network_disconnecting',
     network_error = 'network_error',
     network_reconnect = 'network_reconnect',
     network_reconnect_attempt = 'network_reconnect_attempt',
@@ -26,7 +27,9 @@ export enum ECommandId {
     adhoc_hello = 'adhoc_hello',
 
     room_open = 'room_open',
+    room_close = 'room_close',
     room_join = 'room_join',
+    room_leave = 'room_leave',
     room_hello = 'room_hello',
     room_join_or_open = 'room_join_or_open',
 
@@ -50,17 +53,17 @@ export enum ERoomPrefix {
 // 用户数据
 export interface IUser {
     id: string,
-    room?: IRoom,
     nick?: string
     label?: number //1: Receiver, 2: Sender, 4: Agency    
     sid?: string
-    rooms?: IRoom[]
+    room?: IRoom
 }
 export enum EUserLabel {
     none = 0b0,
     agency = 0b1,
     streamReceiver = 0b01,
     streamSender = 0b001,
+    room
 }
 
 //群组数据
@@ -70,7 +73,7 @@ export interface IRoom {
 
 // Command Login Req Props
 export interface ICommandLoginReqDataProps {
-    user: IUser
+    user: IUser,
 }
 
 // Command Login Resp Props
@@ -82,7 +85,13 @@ export interface ICommandLoginRespDataProps {
 
 //  Command Logout Req Props
 export interface ICommandLogoutReqDataProps {
-    user: IUser
+    user: IUser,
+}
+//  Command Logout Resp Props
+export interface ICommandLogoutRespDataProps {
+    result: boolean
+    msg?: string
+    user?: IUser
 }
 
 //  Command Hello Req Props
@@ -97,24 +106,56 @@ export interface ICommandHelloRespDataProps {
 
 //  Command Room Open Req Props
 export interface ICommandRoomOpenReqDataProps {
-    room?: IRoom
+    user?: IUser
 }
 
 // Command Room Open Resp Props
 export interface ICommandRoomOpenRespDataProps {
     result: boolean
     msg?: string
-    room?: IRoom
+    user?: IUser
 }
 
 // Command Room Join Req Props
 export interface ICommandRoomJoinReqDataProps {
-    room?: IRoom
+    user?: IUser
 }
 
 // Command Room Open Resp Props
 export interface ICommandRoomJoinRespDataProps {
     result: boolean
     msg?: string
-    room?: IRoom
+    user?: IUser
+}
+// Command Room Close Req Props
+export interface ICommandRoomCloseReqDataProps {
+    user?: IUser
+}
+
+// Command Room Open Resp Props
+export interface ICommandRoomCloseRespDataProps {
+    result: boolean
+    msg?: string
+    user?: IUser
+}
+// Command Room Leave Req Props
+export interface ICommandRoomLeaveReqDataProps {
+    user?: IUser
+}
+
+// Command Room Leave Resp Props
+export interface ICommandRoomLeaveRespDataProps {
+    result: boolean
+    msg?: string
+    user?: IUser
+}
+
+// Command Room Hello Req Props
+export interface ICommandRoomHelloReqDataProps {
+    user?: IUser
+}
+
+// Command Room Hello Resp Props
+export interface ICommandRoomHelloRespDataProps {
+    user?: IUser
 }

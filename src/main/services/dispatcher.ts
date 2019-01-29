@@ -36,6 +36,7 @@ export class Dispatcher extends Cmds.Common.Base implements IDispatcher {
 
     // Command
     onCommand = (cmd: Cmds.ICommandData<any>) => {
+        console.warn('OnCommand', cmd)
         Cmds.Common.CmdDispatcher.onCommand(cmd, this);
         this.eventEmitter.emit(Dts.CommandID, cmd)
     }

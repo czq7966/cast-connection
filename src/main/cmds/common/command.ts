@@ -12,6 +12,7 @@ export interface ICommandConstructorParams<P> extends IBaseConstructorParams {
 export interface ICommand extends IBase {
     data: Dts.ICommandData<any>;
     extra: any
+    preventDefault: boolean
     isOverrideEvent(eventName: string): boolean
     copyProperties(props: Object | string)
     assignData(data: Dts.ICommandData<any>)
@@ -22,14 +23,15 @@ export interface ICommandClass extends IBaseClass {
     defaultCommandId: string
 }
 
-export class Command<T extends Dts.ICommandData<any>, P extends ICommandConstructorParams<any>> extends Base implements ICommand {
+export class Command<T extends any> extends Base implements ICommand {
     _eventEmitterEvents : Object;
 
-    data: T;
-    extra: any
+    data: Dts.ICommandData<T>;
+    extra: any;
+    preventDefault: boolean;
 
     static defaultCommandId: string = '';
-    constructor(params?: P) {
+    constructor(params?: ICommandConstructorParams<T>) {
         super(params);
         params = params || {} as any;
         this.data = {

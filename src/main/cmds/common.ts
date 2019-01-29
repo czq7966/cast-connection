@@ -2,7 +2,7 @@ import * as Dts from './dts';
 import * as Common from './common/index'
 
 
-export class CommandCommon extends Common.Command<Dts.ICommandData<any>, Common.ICommandConstructorParams<any>>  {
+export class CommandCommon extends Common.Command<any>  {
 }
 
 
