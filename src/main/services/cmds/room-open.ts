@@ -1,36 +1,35 @@
-import * as Cmds from "../cmds";
-import * as Modules from '../modules'
-import { Debug } from "../cmds/common/helper";
-import { ServiceUser } from "./user";
-import { ServiceRoomHello } from "./room-hello";
+import * as Cmds from "../../cmds";
+import * as Modules from '../../modules'
+import { User } from "./user";
 
-var Tag = "ServiceRoomJoin"
-export class ServiceRoomJoin extends Cmds.Common.Base {
-    static join(instanceId: string, room: Cmds.IRoom): Promise<any> {
+var Tag = "Service-Cmds-RoomOpen"
+export class RoomOpen extends Cmds.Common.Base {
+    static open(instanceId: string, room: Cmds.IRoom): Promise<any> {
         return new Promise((resolve, reject) => {
-            let cmd = new Cmds.CommandRoomJoinReq({instanceId: instanceId});    
-            let currUser = ServiceUser.CurrentUser(instanceId); 
+            let cmd = new Cmds.CommandRoomOpenReq({instanceId: instanceId});
+            let currUser = User.CurrentUser(instanceId);  
             let user = Object.assign({}, currUser);
             user.room = room;
             cmd.data = {
                 props: {
-                    user: user
+                    user: user                    
                 },
-                onResp: (cmdResp: Cmds.CommandRoomJoinResp) => {
+                onResp: (cmdResp: Cmds.CommandRoomOpenResp) => {
                     let data = cmdResp.data;
+                    data.props.user.state = Cmds.Common.Helper.StateMachine.set(data.props.user.state, Cmds.EUserState.roomOwner);
                     Cmds.Common.CmdDispatcher.dispatch(cmdResp , Cmds.ECommandEvents.onBeforeDispatched);
                     Cmds.Common.CmdDispatcher.dispatch(cmdResp , Cmds.ECommandEvents.onDispatched);
-                    ServiceRoomHello.sayHello(instanceId, data.props.user);
                     if (cmdResp.data.props.result) {
                         resolve(cmdResp.data);    
                     } else {
                         reject(cmdResp.data)
-                    } 
+                    }
+                    
                 },
-                onRespTimeout: (data: Cmds.ICommandData<Cmds.ICommandRoomJoinRespDataProps>) => {
+                onRespTimeout: (data: Cmds.ICommandData<Cmds.ICommandRoomOpenRespDataProps>) => {
                     data.props.result = false;
-                    data.props.msg = 'time out!';                    
-                    reject(data);    
+                    data.props.msg = 'time out!'
+                    reject(data)    
                 }
             }
             cmd.sendCommand();        
@@ -44,9 +43,9 @@ export class ServiceRoomJoin extends Cmds.Common.Base {
 
     static Rooms = {
         onDispatched: {
-            resp(rooms: Modules.IRooms, cmd: Cmds.CommandRoomJoinResp) {
+            resp(rooms: Modules.IRooms, cmd: Cmds.CommandRoomOpenResp) {
                 console.log(Tag, 'Rooms', 'onDispatched', 'Resp', cmd.data)
-                let data = cmd.data;
+                let data = cmd.data;                
                 if (data.props.result) {
                     if (!rooms.existRoom(data.props.user.room.id)) {
                         let room = rooms.getRoom(data.props.user.room)
@@ -58,11 +57,11 @@ export class ServiceRoomJoin extends Cmds.Common.Base {
 
     static Room = {
         onDispatched: {
-            resp(room: Modules.IRoom, cmd: Cmds.CommandRoomJoinResp) {
-                console.log(Tag, 'Room' , room.item.id , 'onDispatched', 'Resp', cmd.data);
+            resp(room: Modules.IRoom, cmd: Cmds.CommandRoomOpenResp) {
+                console.log(Tag, 'Room', room.item.id , 'onDispatched', 'Resp', cmd.data)
                 let data = cmd.data;                
-                if (data.props.result && room.item.id === data.props.user.room.id) {                    
-                    let user = data.props.user;
+                if (data.props.result && room.item.id === data.props.user.room.id) {
+                    let user = data.props.user
                     let us = Object.assign({}, user);
                     us.room = room.item;
                     if (!room.getUser(us.id)) {

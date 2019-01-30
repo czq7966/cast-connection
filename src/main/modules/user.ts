@@ -1,9 +1,9 @@
-import { Peer, ERTCPeerEvents } from "../peer";
-import { IBase, Base } from "../base";
-import { Room } from "./room";
-import { Streams } from "./streams";
 import * as Cmds from "../cmds";
 import * as Network from '../network'
+import { Peer, ERTCPeerEvents } from "../peer";
+import { IBase, Base } from "../base";
+import { Room, IRoom } from "./room";
+import { Streams } from "./streams";
 import { Debug } from "../cmds/common/helper";
 
 var Tag = "ModuleUser"
@@ -13,14 +13,14 @@ export interface IUserParams {
     isReady?: boolean;
     signaler?: Network.Signaler;
     peer?: Peer;
-    room?: Room;
+    room?: IRoom;
     // stream?: MediaStream;
     streams?: Streams;
     video?: HTMLVideoElement;
 }
 
 export interface IUser extends IBase , IUserParams {
-    initEvents()
+    // initEvents()
     unInitEvents()
     // onMessage(query: IUserQuery)
     // onReady(query: IUserQuery)
@@ -34,7 +34,7 @@ export interface IUser extends IBase , IUserParams {
     close()
 
     item: Cmds.IUser;
-    room: Room;
+    room: IRoom;
     streams: Streams;    
 }
 
@@ -45,10 +45,10 @@ export class User extends Cmds.Common.Base  {
     // signaler: Signaler;
     item: Cmds.IUser;
     // peer: Peer;
-    room: Room;
+    room: IRoom;
     streams: Streams;
-    constructor(room: Room, user: Cmds.IUser) {
-        super();
+    constructor(room: IRoom, user: Cmds.IUser) {
+        super(room.instanceId);
         this.item = Object.assign({}, user);
         this.room = room;
         this.streams = new Streams(this);

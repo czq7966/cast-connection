@@ -1,11 +1,6 @@
+import * as Modules from './modules/index'
+import * as Cmds from './cmds/index'
+export { Modules }
+export { Cmds }
+
 export * from './dispatcher'
-export * from './user'
-export * from './hello'
-export * from './login'
-export * from './logout'
-export * from './network'
-export * from './room-open'
-export * from './room-join'
-export * from './room-close'
-export * from './room-leave'
-export * from './room-hello'

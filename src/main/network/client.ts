@@ -32,6 +32,8 @@ export class Client {
         }
         return new Promise((resolve, reject) => {
             delete this.socket;
+            url = url || this.url || "";
+            url = url[url.length - 1] !== '/' ? url : url.substr(0, url.length - 1);            
             this.url = url || this.url;
             this.socket = io(this.url, {
                 autoConnect: false,
@@ -41,15 +43,14 @@ export class Client {
             this.initEvents(this.socket);
 
             this.socket.on(Dts.EClientSocketEvents.connect, () => {
-                this.socket.on(Dts.CommandID, () => {
-                })                
                 resolve();
             })
             this.socket.on(Dts.EClientSocketEvents.connect_error, (error) => {
                 reject(error);
-            })     
-
-
+            })   
+            this.socket.once(Dts.EClientSocketEvents.error, (error) => {
+                reject(error);
+            })        
             this.socket.connect();
         })      
     }
@@ -63,7 +64,10 @@ export class Client {
                 let value = events[key];
                 socket.on(value, (...args:any[]) => {
                     // console.log('Client Event:', value, ...args)
-                    this.eventEmitter.emit(value, ...args)
+                    if (value === Dts.EClientSocketEvents.error) {
+                        this.eventEmitter.emit(Dts.EClientSocketEvents.message_error, ...args)
+                    } else 
+                        this.eventEmitter.emit(value, ...args)
                 })
             })
         })

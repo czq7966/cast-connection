@@ -1,9 +1,9 @@
-import * as Cmds from "../cmds";
-import * as Modules from '../modules'
-import { Debug } from "../cmds/common/helper";
+import * as Cmds from "../../cmds";
+import * as Modules from '../../modules'
 
-var Tag = "ServiceNetwork"
-export class ServiceNetwork extends Cmds.Common.Base {
+
+var Tag = "Service-Cmds-Network"
+export class Network extends Cmds.Common.Base {
 
     static Disconnect = {
         Rooms: {

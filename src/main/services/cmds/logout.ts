@@ -1,14 +1,13 @@
-import * as Cmds from "../cmds";
-import * as Modules from '../modules'
-import { Debug } from "../cmds/common/helper";
-import { ServiceUser } from "./user";
+import * as Cmds from "../../cmds";
+import * as Modules from '../../modules'
+import { User } from "./user";
 
-var Tag = "ServiceLogout"
-export class ServiceLogout extends Cmds.Common.Base {
+var Tag = "Service-Cmds-Logout"
+export class Logout extends Cmds.Common.Base {
     static logout(instanceId: string): Promise<any> {
         return new Promise((resolve, reject) => { 
             let cmd = new Cmds.CommandLogoutReq({instanceId: instanceId});
-            let currUser = ServiceUser.CurrentUser(instanceId);   
+            let currUser = User.CurrentUser(instanceId);   
             cmd.data = {
                 props: {
                     user: currUser

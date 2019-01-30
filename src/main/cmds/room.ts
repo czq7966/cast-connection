@@ -72,3 +72,17 @@ Common.CommandTypes.RegistCommandType({
     ReqClass: CommandRoomHelloReq,
     RespClass: CommandRoomHelloResp
 })
+
+export class CommandStreamRoomHelloReq extends CommandRoomHelloReq {
+    
+}
+
+export class CommandStreamRoomHelloResp extends CommandRoomHelloResp {    
+}
+
+Common.CommandTypes.RegistCommandType({
+        cmdId: Dts.ECommandId.stream_room_hello,
+        name: '握手',
+        ReqClass: CommandStreamRoomHelloReq,
+        RespClass: CommandStreamRoomHelloResp
+    })

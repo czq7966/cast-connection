@@ -27,3 +27,15 @@ export function uuid(len?: number, radix?: number): string {
     return uuid.join('');
 }
 
+export function uuid32(radix?: number): string {
+  return uuid(32, radix)
+}
+export function uuid24(radix?: number): string {
+  return uuid(24, radix)
+}
+export function uuid16(radix?: number): string {
+  return uuid(16, radix)
+}
+export function uuid8(radix?: number): string {
+  return uuid(8, radix)
+}

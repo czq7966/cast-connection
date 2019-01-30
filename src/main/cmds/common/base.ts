@@ -51,7 +51,10 @@ export class Base {
         return this.instances[id] ? this.instances[id] : create ? this.instances[id] = new (this as any)(params) : null;
     }    
     
-    constructor(params?: IBaseConstructorParams) {
+    constructor(params?: IBaseConstructorParams | string) {
+        if (typeof params === 'string') {
+            params = { instanceId: params }
+        }
         params = params || {}        
         this.notDestroyed = true;
         this.instanceId = params.instanceId === '' ? params.instanceId : (params.instanceId  || Base.instanceDefauleName);

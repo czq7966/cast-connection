@@ -36,6 +36,8 @@ export enum ECommandId {
     stream_room_open = 'stream_room_open',
     stream_room_join = 'stream_room_join',
     stream_room_join_or_open = 'stream_room_join_or_open',
+    stream_room_hello = 'stream_room_hello',
+
     stream_webrtc_offer = 'stream_webrtc_offer',
     stream_webrtc_answer = 'stream_webrtc_answer',
     stream_webrtc_candidate = 'stream_webrtc_candidate',
@@ -53,17 +55,18 @@ export enum ERoomPrefix {
 // 用户数据
 export interface IUser {
     id: string,
+    sid?: string    
     nick?: string
-    label?: number //1: Receiver, 2: Sender, 4: Agency    
-    sid?: string
+    state?: number //1: Receiver, 2: Sender, 4: Agency    
     room?: IRoom
 }
-export enum EUserLabel {
-    none = 0b0,
-    agency = 0b1,
-    streamReceiver = 0b01,
-    streamSender = 0b001,
-    room
+export enum EUserState {
+    none =                      0b0,
+    roomOwner =                 0b1,
+    streamReceiver =            0b10,
+    streamSender =              0b100,
+    stream_room_opened =        0b1000,
+    stream_room_sending =       0b10000,
 }
 
 //群组数据

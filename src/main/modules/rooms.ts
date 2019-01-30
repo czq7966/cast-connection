@@ -18,8 +18,7 @@ export class Rooms extends Cmds.Common.Base implements IRooms {
     dispatcher: Services.IDispatcher;
 
     constructor(instanceId: string, dispatcher?:Services. IDispatcher ) {
-        super();
-        this.instanceId = instanceId;
+        super(instanceId);
         this.dispatcher = dispatcher || Services.Dispatcher.getInstance(instanceId);
         this.items = new Cmds.Common.Helper.KeyValue();
         this.initEvents();
@@ -48,21 +47,21 @@ export class Rooms extends Cmds.Common.Base implements IRooms {
         switch(cmdId) {
             case Cmds.ECommandId.adhoc_login:
                 type === Cmds.ECommandType.resp ?
-                    Services.ServiceLogin.Rooms.onDispatched.resp(this, cmd as any) : null
+                    Services.Cmds.Login.Rooms.onDispatched.resp(this, cmd as any) : null
                 break;
             // case Cmds.ECommandId.adhoc_hello:
             //     type === Cmds.ECommandType.req ?
-            //         Services.ServiceHello.Rooms.onDispatched.req(this, cmd as any) :
+            //         Services.Cmds.Hello.Rooms.onDispatched.req(this, cmd as any) :
             //     type === Cmds.ECommandType.resp ?
-            //         Services.ServiceHello.Rooms.onDispatched.resp(this, cmd as any) : null
+            //         Services.Cmds.Hello.Rooms.onDispatched.resp(this, cmd as any) : null
             //     break;
             case Cmds.ECommandId.room_open: 
                 type === Cmds.ECommandType.resp ?
-                    Services.ServiceRoomOpen.Rooms.onDispatched.resp(this, cmd as any) : null
+                    Services.Cmds.RoomOpen.Rooms.onDispatched.resp(this, cmd as any) : null
                 break;
             case Cmds.ECommandId.room_join: 
                 type === Cmds.ECommandType.resp ?
-                    Services.ServiceRoomJoin.Rooms.onDispatched.resp(this, cmd as any) : null                    
+                    Services.Cmds.RoomJoin.Rooms.onDispatched.resp(this, cmd as any) : null                    
                 break;
             default:
                 break;
@@ -81,22 +80,22 @@ export class Rooms extends Cmds.Common.Base implements IRooms {
         switch(cmdId) {
             case Cmds.ECommandId.adhoc_logout:
                 type === Cmds.ECommandType.req ?
-                    Services.ServiceLogout.Rooms.onBeforeDispatched.req(this, cmd as any) : null
+                    Services.Cmds.Logout.Rooms.onBeforeDispatched.req(this, cmd as any) : null
                 break;
             case Cmds.ECommandId.network_disconnect: 
-                Services.ServiceNetwork.Disconnect.Rooms.onBeforeDispatched.req(this, cmd as any);
+                Services.Cmds.Network.Disconnect.Rooms.onBeforeDispatched.req(this, cmd as any);
                 break;     
             case Cmds.ECommandId.room_close:
                 type === Cmds.ECommandType.req ?
-                    Services.ServiceRoomClose.Rooms.onBeforeDispatched.req(this, cmd as any) :
+                    Services.Cmds.RoomClose.Rooms.onBeforeDispatched.req(this, cmd as any) :
                 type === Cmds.ECommandType.resp ?
-                    Services.ServiceRoomClose.Rooms.onBeforeDispatched.resp(this, cmd as any) : null    
+                    Services.Cmds.RoomClose.Rooms.onBeforeDispatched.resp(this, cmd as any) : null    
                 break;   
             case Cmds.ECommandId.room_leave:
                 type === Cmds.ECommandType.req ?
-                    Services.ServiceRoomLeave.Rooms.onBeforeDispatched.req(this, cmd as any) :
+                    Services.Cmds.RoomLeave.Rooms.onBeforeDispatched.req(this, cmd as any) :
                 type === Cmds.ECommandType.resp ?
-                    Services.ServiceRoomLeave.Rooms.onBeforeDispatched.resp(this, cmd as any) : null    
+                    Services.Cmds.RoomLeave.Rooms.onBeforeDispatched.resp(this, cmd as any) : null    
                 break;                                             
             default:
                 break;

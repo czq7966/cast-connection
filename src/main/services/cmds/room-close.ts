@@ -1,14 +1,13 @@
-import * as Cmds from "../cmds";
-import * as Modules from '../modules'
-import { Debug } from "../cmds/common/helper";
-import { ServiceUser } from "./user";
+import * as Cmds from "../../cmds";
+import * as Modules from '../../modules'
+import { User } from "./user";
 
-var Tag = "ServiceRoomClose"
-export class ServiceRoomClose extends Cmds.Common.Base {
+var Tag = "Service-Cmds-RoomClose"
+export class RoomClose extends Cmds.Common.Base {
     static close(instanceId: string, room: Cmds.IRoom): Promise<any> {
         return new Promise((resolve, reject) => {
             let cmd = new Cmds.CommandRoomCloseReq({instanceId: instanceId});   
-            let currUser = ServiceUser.CurrentUser(instanceId);   
+            let currUser = User.CurrentUser(instanceId);   
             let user = Object.assign({}, currUser);
             user.room = room;           
             cmd.data = {

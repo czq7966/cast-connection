@@ -1,9 +1,9 @@
-import * as Cmds from "../cmds";
-import * as Modules from '../modules'
-import { Services } from "../dts";
+import * as Cmds from "../../cmds";
+import * as Modules from '../../modules'
+import { Hello } from "./hello";
 
-var Tag = 'ServiceLogin'
-export class ServiceLogin extends Cmds.Common.Base {
+var Tag = 'Service-Cmds-Login'
+export class Login extends Cmds.Common.Base {
     static isLogin(instanceId: string): boolean {
         let data = Cmds.CommandLoginResp.getInstance<Cmds.CommandLoginResp>(instanceId).data;
         return !!(data.props && data.props.user)
@@ -20,7 +20,7 @@ export class ServiceLogin extends Cmds.Common.Base {
                     if (data.props.result) {
                         let instance = cmdResp.getInstance<Cmds.CommandLoginResp>();                        
                         instance.assignData(data);
-                        Services.ServiceHello.sayHello(instanceId, data.props.user);
+                        Hello.hello(instanceId, data.props.user);
                         Cmds.Common.CmdDispatcher.dispatch(cmdResp , Cmds.ECommandEvents.onBeforeDispatched);
                         Cmds.Common.CmdDispatcher.dispatch(cmdResp , Cmds.ECommandEvents.onDispatched);
                         resolve(data);
