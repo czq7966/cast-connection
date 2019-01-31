@@ -32,10 +32,11 @@
 //     } as IWebRTC;
 // }
 
-var WebRTC: any = {};
-function AssignWebRTC(rnWebRTC) {
-    Object.keys(rnWebRTC).forEach(key => { WebRTC[key] = rnWebRTC[key] });    
-}
+// var WebRTC: any = {};
+// function AssignWebRTC(rnWebRTC) {
+//     Object.keys(rnWebRTC).forEach(key => { WebRTC[key] = rnWebRTC[key] });    
+// }
 
-export { WebRTC, AssignWebRTC}
+// export { WebRTC, AssignWebRTC}
+export * from './modules/webrtc'
 

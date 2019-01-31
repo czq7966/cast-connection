@@ -14,10 +14,10 @@ export class StreamRoomOpen extends Cmds.Common.Base {
         room = room || {id: User.getStreamRoomId(currUser)};
         let promise = RoomOpen.open(instanceId, room);
         promise.then(() => {
-            currUser.state = Cmds.Common.Helper.StateMachine.set(currUser.state, Cmds.EUserState.stream_room_opened);
-            let reqCmd = new Cmds.CommandHelloReq({instanceId: instanceId});
-            reqCmd.data.from = {type: 'room', id: currUser.room.id};
-            Hello.respHello(reqCmd, currUser);
+            let mRoom = ServiceModules.Rooms.getRoom(instanceId, currUser.room.id);
+            let mUser = mRoom.getUser(currUser.id);
+            mUser.states.set(Cmds.EUserState.stream_room_opened);
+            User.syncHello(instanceId, mUser.item);
         })
         return promise;
     }

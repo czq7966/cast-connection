@@ -1,6 +1,7 @@
 import * as Cmds from "../../cmds";
 import * as Modules from '../../modules'
 import { User } from "./user";
+import { RoomLeave } from "./room-leave";
 
 var Tag = "Service-Cmds-Logout"
 export class Logout extends Cmds.Common.Base {
@@ -39,19 +40,21 @@ export class Logout extends Cmds.Common.Base {
         onBeforeDispatched: {
             req(rooms: Modules.IRooms, cmd: Cmds.CommandRoomLeaveReq) {
                 console.log(Tag, 'Rooms', 'onBeforeDispatched', 'Req', cmd.data);
-                let data = cmd.data;                
-                let room = rooms.getRoom(data.props.user.room.id);
-                if (room && room.users.count() == 0) {                    
-                    rooms.delRoom(room.item.id)
-                }    
+                RoomLeave.Rooms.onBeforeDispatched.req(rooms, cmd);
+                // let data = cmd.data;                
+                // let room = rooms.getRoom(data.props.user.room.id);
+                // if (room && room.users.count() == 0) {                    
+                //     rooms.delRoom(room.item.id)
+                // }    
             },            
             resp(rooms: Modules.IRooms, cmd: Cmds.CommandRoomLeaveResp) {
                 console.log(Tag, 'Rooms', 'onBeforeDispatched', 'Resp', cmd.data);
-                let data = cmd.data;                
-                let room = rooms.getRoom(data.props.user.room.id);
-                if (room && room.users.count() == 0) {                    
-                    rooms.delRoom(room.item.id)
-                }                
+                RoomLeave.Rooms.onBeforeDispatched.resp(rooms, cmd);
+                // let data = cmd.data;                
+                // let room = rooms.getRoom(data.props.user.room.id);
+                // if (room && room.users.count() == 0) {                    
+                //     rooms.delRoom(room.item.id)
+                // }                
             } 
         }
     }

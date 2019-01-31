@@ -239,7 +239,8 @@ export class Peer extends Base {
             type: Network.ESignalerMessageType.offer,
             data: sdp
         }
-        return this.user.sendMessage(msg)
+        // return this.user.sendMessage(msg)
+        return
     }
  
     createAnswer(): Promise<any> {        
@@ -312,7 +313,8 @@ export class Peer extends Base {
             type: Network.ESignalerMessageType.answer,
             data: sdp
         }
-        return this.user.sendMessage(msg)
+        // return this.user.sendMessage(msg)
+        return
     }
 
     onIceCandidate = (ev: RTCPeerConnectionIceEvent): Promise<any> => {
@@ -321,12 +323,14 @@ export class Peer extends Base {
                 type: Network.ESignalerMessageType.candidate,
                 data: ev.candidate.toJSON()
             }            
-            return this.user.sendMessage(msg)
+            // return this.user.sendMessage(msg)
+            return
         } else {
             let msg: Network.ISignalerMessage = {
                 type: Network.ESignalerMessageType.icecomplete,
             }
-            return this.user.sendMessage(msg)
+            // return this.user.sendMessage(msg)
+            return
         }
     }
 
@@ -414,14 +418,14 @@ export class Peer extends Base {
         }
     }
     onCandidate_browser = (data: any) => {
-        console.log('add candidate', data, this.user.socketId)
+        // console.log('add candidate', data, this.user.socketId)
         this.rtc().addIceCandidate(data)
         .catch(err => {
             console.log('add Ic eCandidate error:', err)
         })
     }    
     onCandidate_reactnative = (data: any) => {
-        console.log('add candidate', data, this.user.socketId)
+        // console.log('add candidate', data, this.user.socketId)
         this.rtc().addIceCandidate(new WebRTC.RTCIceCandidate(data))
         .catch(err => {
             console.log('add IceCandidate error:', err)

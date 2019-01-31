@@ -25,8 +25,8 @@ export interface IOpusAttributes {
     maxptime?: string
 }
 
-class SdpHelper {
-    preferCodec(sdp: string, codecName: string) {
+export class SdpHelper {
+    static preferCodec(sdp: string, codecName: string) {
         var info = this.splitLines(sdp);
 
         if (!info.videoCodecNumbers) {
@@ -50,7 +50,7 @@ class SdpHelper {
         return sdp;
     }
 
-    preferCodecHelper(sdp: string, codec: string, info: ISdpInfo, ignore?: boolean) {
+    static preferCodecHelper(sdp: string, codec: string, info: ISdpInfo, ignore?: boolean) {
         var preferCodecNumber = '';
 
         if (codec === 'vp8') {
@@ -95,7 +95,7 @@ class SdpHelper {
     }
 
 
-    splitLines(sdp: string) {
+    static splitLines(sdp: string) {
         var info: ISdpInfo  = {};
         sdp.split('\n').forEach(line => {
             if (line.indexOf('m=video') === 0) {
@@ -124,7 +124,7 @@ class SdpHelper {
         return info;
     }
 
-    removeVPX(sdp: string) {
+    static removeVPX(sdp: string) {
         var info = this.splitLines(sdp);
 
         // last parameter below means: ignore these codecs
@@ -134,7 +134,7 @@ class SdpHelper {
         return sdp;
     }
 
-    disableNACK(sdp: string) {
+    static disableNACK(sdp: string) {
         if (!sdp || typeof sdp !== 'string') {
             throw 'Invalid arguments.';
         }
@@ -147,7 +147,7 @@ class SdpHelper {
         return sdp;
     }   
 
-    prioritize(codecMimeType: string, peer: RTCPeerConnection) {
+    static prioritize(codecMimeType: string, peer: RTCPeerConnection) {
         if (!peer || !peer.getSenders || !peer.getSenders().length) {
             return;
         }
@@ -168,7 +168,7 @@ class SdpHelper {
         });
     }    
 
-    removeNonG722(sdp: string) {
+    static removeNonG722(sdp: string) {
         return sdp.replace(/m=audio ([0-9]+) RTP\/SAVPF ([0-9 ]*)/g, 'm=audio $1 RTP\/SAVPF 9');
     }
 
@@ -215,13 +215,13 @@ class SdpHelper {
 
     // Find the line in sdpLines that starts with |prefix|, and, if specified,
     // contains |substr| (case-insensitive search).
-    findLine(sdpLines: Array<string>, prefix: string, substr?: string) {
+    static findLine(sdpLines: Array<string>, prefix: string, substr?: string) {
         return this.findLineInRange(sdpLines, 0, -1, prefix, substr);
     }
 
     // Find the line in sdpLines[startLine...endLine - 1] that starts with |prefix|
     // and, if specified, contains |substr| (case-insensitive search).
-    findLineInRange(sdpLines: Array<string>, startLine: number, endLine: number, prefix: string, substr?: string) {
+    static findLineInRange(sdpLines: Array<string>, startLine: number, endLine: number, prefix: string, substr?: string) {
         var realEndLine = endLine !== -1 ? endLine : sdpLines.length;
         for (var i = startLine; i < realEndLine; ++i) {
             if (sdpLines[i].indexOf(prefix) === 0) {
@@ -235,19 +235,19 @@ class SdpHelper {
     }    
 
     // Gets the codec payload type from an a=rtpmap:X line.
-    getCodecPayloadType(sdpLine: string) {
+    static getCodecPayloadType(sdpLine: string) {
         var pattern = new RegExp('a=rtpmap:(\\d+) \\w+\\/\\d+');
         var result = sdpLine.match(pattern);
         return (result && result.length === 2) ? result[1] : null;
     }    
 
-    setBandwidth(sdp: string, value: number) {
+    static setBandwidth(sdp: string, value: number) {
         sdp = sdp.replace(/b=AS([^\r\n]+\r\n)/g, '');
         sdp = sdp.replace(/a=mid:video\r\n/g, 'a=mid:video\r\nb=AS:' + value + '\r\n');
         return sdp;
     }    
 
-    setVideoBitrates(sdp: string, params?: IVideoBitrate) {
+    static setVideoBitrates(sdp: string, params?: IVideoBitrate) {
         params = params || {};
         if (params.start) {
             sdp = this.setBandwidth(sdp, params.start)
@@ -290,7 +290,7 @@ class SdpHelper {
         return sdp;
     }
 
-    setOpusAttributes(sdp: string, params: IOpusAttributes) {
+    static setOpusAttributes(sdp: string, params: IOpusAttributes) {
         params = params || {};
 
         var sdpLines = sdp.split('\r\n');
@@ -346,5 +346,5 @@ class SdpHelper {
     }
 }
 
-var sdpHelper = new SdpHelper()
-export { sdpHelper }
+// var sdpHelper = new SdpHelper()
+// export { sdpHelper }

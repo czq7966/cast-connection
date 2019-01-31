@@ -16,15 +16,14 @@ export class RoomOpen extends Cmds.Common.Base {
                 },
                 onResp: (cmdResp: Cmds.CommandRoomOpenResp) => {
                     let data = cmdResp.data;
-                    data.props.user.state = Cmds.Common.Helper.StateMachine.set(data.props.user.state, Cmds.EUserState.roomOwner);
+                    data.props.user.states = Cmds.Common.Helper.StateMachine.set(data.props.user.states, Cmds.EUserState.roomOwner);
                     Cmds.Common.CmdDispatcher.dispatch(cmdResp , Cmds.ECommandEvents.onBeforeDispatched);
                     Cmds.Common.CmdDispatcher.dispatch(cmdResp , Cmds.ECommandEvents.onDispatched);
                     if (cmdResp.data.props.result) {
                         resolve(cmdResp.data);    
                     } else {
                         reject(cmdResp.data)
-                    }
-                    
+                    }                    
                 },
                 onRespTimeout: (data: Cmds.ICommandData<Cmds.ICommandRoomOpenRespDataProps>) => {
                     data.props.result = false;
@@ -47,9 +46,7 @@ export class RoomOpen extends Cmds.Common.Base {
                 console.log(Tag, 'Rooms', 'onDispatched', 'Resp', cmd.data)
                 let data = cmd.data;                
                 if (data.props.result) {
-                    if (!rooms.existRoom(data.props.user.room.id)) {
-                        let room = rooms.getRoom(data.props.user.room)
-                    }
+                    rooms.getRoom(data.props.user.room)
                 }
             }
         }
@@ -64,10 +61,7 @@ export class RoomOpen extends Cmds.Common.Base {
                     let user = data.props.user
                     let us = Object.assign({}, user);
                     us.room = room.item;
-                    if (!room.getUser(us.id)) {
-                        room.getUser(us);
-                        console.log(room.users)
-                    }
+                    room.getUser(us);
                 }
             }  
         }

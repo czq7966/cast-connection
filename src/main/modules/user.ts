@@ -1,57 +1,65 @@
 import * as Cmds from "../cmds";
 import * as Network from '../network'
-import { Peer, ERTCPeerEvents } from "../peer";
+import * as Services from '../services'
+// import { Peer, ERTCPeerEvents } from "../peer";
 import { IBase, Base } from "../base";
 import { Room, IRoom } from "./room";
 import { Streams } from "./streams";
 import { Debug } from "../cmds/common/helper";
+import { Peer, IPeer } from "./peer";
 
 var Tag = "ModuleUser"
 export interface IUserParams {
-    socketId: string,
-    isOwner: boolean,
-    isReady?: boolean;
-    signaler?: Network.Signaler;
-    peer?: Peer;
-    room?: IRoom;
-    // stream?: MediaStream;
-    streams?: Streams;
-    video?: HTMLVideoElement;
+    // socketId: string,
+    // isOwner: boolean,
+    // isReady?: boolean;
+    // signaler?: Network.Signaler;
+    // peer?: Peer;
+    // room?: IRoom;
+    // // stream?: MediaStream;
+    // streams?: Streams;
+    // video?: HTMLVideoElement;
 }
 
 export interface IUser extends IBase , IUserParams {
     // initEvents()
-    unInitEvents()
+    // unInitEvents()
     // onMessage(query: IUserQuery)
     // onReady(query: IUserQuery)
-    stopSharing(): Promise<any>
-    imReady()
-    sayHello(to?: string)
-    addSendStream(stream: MediaStream)
-    addSendStreams(streams: Array<MediaStream>)
-    doICE()
-    sendMessage(msg: any)
-    close()
+    // stopSharing(): Promise<any>
+    // imReady()
+    // sayHello(to?: string)
+    // addSendStream(stream: MediaStream)
+    // addSendStreams(streams: Array<MediaStream>)
+    // doICE()
+    // sendMessage(msg: any)
+    // close()
 
     item: Cmds.IUser;
+    states: Cmds.Common.Helper.StateMachine<Cmds.EUserState>;
     room: IRoom;
+    peer: IPeer;
     streams: Streams;    
+    getPeer(): IPeer
 }
 
-export class User extends Cmds.Common.Base  {
+export class User extends Cmds.Common.Base implements IUser  {
     // socketId: string;    
     // isOwner: boolean;
     // isReady: boolean;
     // signaler: Signaler;
     item: Cmds.IUser;
-    // peer: Peer;
+    peer: IPeer;
     room: IRoom;
     streams: Streams;
+    states: Cmds.Common.Helper.StateMachine<Cmds.EUserState>;
     constructor(room: IRoom, user: Cmds.IUser) {
         super(room.instanceId);
+        this.states = new Cmds.Common.Helper.StateMachine<Cmds.EUserState>();      
         this.item = Object.assign({}, user);
         this.room = room;
-        this.streams = new Streams(this);
+        this.streams = new Streams(this);        
+        this.states.states = this.item.states;
 
         // this.peer = new Peer(this);
         // this.room = user.room;
@@ -59,16 +67,19 @@ export class User extends Cmds.Common.Base  {
     }
     destroy() {        
         this.unInitEvents();
+        this.delPeer();        
         this.streams.destroy();
         delete this.streams;
         delete this.room;
         delete this.item;
+        delete this.peer;
         super.destroy();
     }
  
     initEvents() {
+        this.states.onChange.add(this.onStatesChange)
         this.room.eventEmitter.addListener(Cmds.ECommandEvents.onDispatched, this.onDispatched_Command);
-        this.room.eventEmitter.addListener(Cmds.ECommandEvents.onBeforeDispatched, this.onBeforeDispatched_Command);
+        this.room.eventEmitter.addListener(Cmds.ECommandEvents.onBeforeDispatched, this.onBeforeDispatched_Command);        
 
         // this.eventEmitter.addListener(ECustomEvents.message, this.onMessage);    
 
@@ -79,6 +90,7 @@ export class User extends Cmds.Common.Base  {
 
     }
     unInitEvents() {
+        this.states.onChange.remove(this.onStatesChange);
         this.room.eventEmitter.removeListener(Cmds.ECommandEvents.onDispatched, this.onDispatched_Command);
         this.room.eventEmitter.removeListener(Cmds.ECommandEvents.onBeforeDispatched, this.onBeforeDispatched_Command);
 
@@ -88,19 +100,30 @@ export class User extends Cmds.Common.Base  {
         // this.peer.eventEmitter.removeListener(ERTCPeerEvents.onrecvstream, this.onRecvStream);
     }
 
+    onStatesChange = (chgStates: Cmds.EUserState, oldStates: Cmds.EUserState, newStates: Cmds.EUserState) => {
+        this.item.states = newStates;
+    }
+
     // Command
     onDispatched_Command = (cmd: Cmds.Common.ICommand) => {
+        cmd.preventDefault = false;
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
         switch(cmdId) {
-
+            case Cmds.ECommandId.stream_webrtc_sdp:
+                type === Cmds.ECommandType.req ?
+                    Services.Cmds.StreamWebrtcSdp.User.onDispatched.req(this, cmd as any ) :
+                type === Cmds.ECommandType.resp ?
+                    Services.Cmds.StreamWebrtcSdp.User.onDispatched.resp(this, cmd as any) : null    
+                break;  
             default:
                 break;
         }
-        this.eventEmitter.emit(Cmds.ECommandEvents.onDispatched, cmd);
+        !!cmd.preventDefault !== true && this.eventEmitter.emit(Cmds.ECommandEvents.onDispatched, cmd);
     }
     onBeforeDispatched_Command = (cmd: Cmds.Common.ICommand) => {
         this.eventEmitter.emit(Cmds.ECommandEvents.onBeforeDispatched, cmd);
+        if (!!cmd.preventDefault === true) return;
 
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
@@ -112,6 +135,17 @@ export class User extends Cmds.Common.Base  {
                 break;
         }        
     }     
+
+    getPeer(): IPeer {
+        if (!this.peer) {
+            this.peer = new Peer(this)
+        }
+        return this.peer;
+    }
+    delPeer() {
+        this.peer && this.peer.destroy();
+        delete this.peer;
+    }
 
     // close() {
 

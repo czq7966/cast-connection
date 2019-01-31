@@ -11,7 +11,6 @@ import { StreamRoomHello } from "./stream-room-hello";
 var Tag = "Service-Cmds-StreamRoomJoin"
 export class StreamRoomJoin extends Cmds.Common.Base {
     static join(instanceId: string, room: Cmds.IRoom): Promise<any> {
-        room = room;
         let promise = RoomJoin.join(instanceId, room);
         promise.then((data: Cmds.ICommandData<Cmds.ICommandRoomJoinRespDataProps>) => {            
             let mRoom = ServiceModules.Rooms.getRoom(instanceId, data.props.user.room.id);

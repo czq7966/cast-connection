@@ -2,6 +2,7 @@ import * as Common from './common/index'
 
 export * from './common/dts'
 
+export var Command_stream_webrtc_on_prefix = 'stream_webrtc_on';
 export var CommandID = 'command'
 
 export enum ECommandId {
@@ -40,8 +41,27 @@ export enum ECommandId {
 
     stream_webrtc_offer = 'stream_webrtc_offer',
     stream_webrtc_answer = 'stream_webrtc_answer',
+    stream_webrtc_sdp = 'stream_webrtc_sdp',    
     stream_webrtc_candidate = 'stream_webrtc_candidate',
-    stream_webrtc_ready = 'stream_webrtc_ready'
+    stream_webrtc_ready = 'stream_webrtc_ready',
+
+    stream_webrtc_onconnectionstatechange = 'stream_webrtc_onconnectionstatechange',
+    stream_webrtc_ondatachannel = 'stream_webrtc_ondatachannel',
+    stream_webrtc_onicecandidate = 'stream_webrtc_onicecandidate',
+    stream_webrtc_onicecandidateerror = 'stream_webrtc_onicecandidateerror',
+    stream_webrtc_oniceconnectionstatechange = 'stream_webrtc_oniceconnectionstatechange',
+    stream_webrtc_onicegatheringstatechange = 'stream_webrtc_onicegatheringstatechange',
+    stream_webrtc_onnegotiationneeded = 'stream_webrtc_onnegotiationneeded',
+    stream_webrtc_onsignalingstatechange = 'stream_webrtc_onsignalingstatechange',
+    stream_webrtc_onstatsended = 'stream_webrtc_onstatsended',
+    stream_webrtc_ontrack = 'stream_webrtc_ontrack',
+    stream_webrtc_onstream = 'stream_webrtc_onstream',
+    stream_webrtc_onaddstream = 'stream_webrtc_onaddstream',
+    stream_webrtc_onrecvstream = 'stream_webrtc_on_recvstream',
+    stream_webrtc_onrecvstreaminactive = 'stream_webrtc_on_recvstreaminactive',
+    stream_webrtc_onsendstreaminactive = 'stream_webrtc_on_sendstreaminactive',
+    stream_webrtc_ongetconfig = 'stream_webrtc_on_getconfig'    
+
 }
 
 
@@ -57,8 +77,9 @@ export interface IUser {
     id: string,
     sid?: string    
     nick?: string
-    state?: number //1: Receiver, 2: Sender, 4: Agency    
+    states?: number //1: Receiver, 2: Sender, 4: Agency    
     room?: IRoom
+    extra?: any
 }
 export enum EUserState {
     none =                      0b0,
@@ -74,91 +95,48 @@ export interface IRoom {
     id: string
 }
 
-// Command Login Req Props
-export interface ICommandLoginReqDataProps {
-    user: IUser,
+export interface ICommandReqDataProps {
+    user?: IUser 
 }
-
-// Command Login Resp Props
-export interface ICommandLoginRespDataProps {
+export interface ICommandRespDataProps {
     result: boolean
     msg?: string
-    user?: IUser
-}
-
-//  Command Logout Req Props
-export interface ICommandLogoutReqDataProps {
-    user: IUser,
-}
-//  Command Logout Resp Props
-export interface ICommandLogoutRespDataProps {
-    result: boolean
-    msg?: string
-    user?: IUser
-}
-
-//  Command Hello Req Props
-export interface ICommandHelloReqDataProps {
-    user: IUser
-}
-
-// Command Hello Resp Props
-export interface ICommandHelloRespDataProps {
     user?: IUser
 }
 
 //  Command Room Open Req Props
-export interface ICommandRoomOpenReqDataProps {
-    user?: IUser
-}
-
+export interface ICommandRoomOpenReqDataProps extends ICommandReqDataProps{}
 // Command Room Open Resp Props
-export interface ICommandRoomOpenRespDataProps {
-    result: boolean
-    msg?: string
-    user?: IUser
-}
-
-// Command Room Join Req Props
-export interface ICommandRoomJoinReqDataProps {
-    user?: IUser
-}
-
-// Command Room Open Resp Props
-export interface ICommandRoomJoinRespDataProps {
-    result: boolean
-    msg?: string
-    user?: IUser
-}
+export interface ICommandRoomOpenRespDataProps  extends ICommandRespDataProps{}
 // Command Room Close Req Props
-export interface ICommandRoomCloseReqDataProps {
-    user?: IUser
-}
-
+export interface ICommandRoomCloseReqDataProps extends ICommandReqDataProps{}
 // Command Room Open Resp Props
-export interface ICommandRoomCloseRespDataProps {
-    result: boolean
-    msg?: string
-    user?: IUser
-}
+export interface ICommandRoomCloseRespDataProps extends ICommandRespDataProps{}
+// Command Room Join Req Props
+export interface ICommandRoomJoinReqDataProps extends ICommandReqDataProps{}
+// Command Room Open Resp Props
+export interface ICommandRoomJoinRespDataProps extends ICommandRespDataProps{}
 // Command Room Leave Req Props
-export interface ICommandRoomLeaveReqDataProps {
-    user?: IUser
-}
-
+export interface ICommandRoomLeaveReqDataProps extends ICommandReqDataProps{}
 // Command Room Leave Resp Props
-export interface ICommandRoomLeaveRespDataProps {
-    result: boolean
-    msg?: string
-    user?: IUser
-}
-
+export interface ICommandRoomLeaveRespDataProps extends ICommandRespDataProps{}
 // Command Room Hello Req Props
-export interface ICommandRoomHelloReqDataProps {
-    user?: IUser
-}
-
+export interface ICommandRoomHelloReqDataProps extends ICommandReqDataProps{}
 // Command Room Hello Resp Props
-export interface ICommandRoomHelloRespDataProps {
-    user?: IUser
-}
+export interface ICommandRoomHelloRespDataProps extends ICommandRespDataProps{}
+
+
+
+// Command Login Req Props
+export interface ICommandLoginReqDataProps extends ICommandRoomJoinReqDataProps {}
+// Command Login Resp Props
+export interface ICommandLoginRespDataProps extends ICommandRoomJoinRespDataProps {}
+//  Command Logout Req Props
+export interface ICommandLogoutReqDataProps extends ICommandRoomLeaveReqDataProps {}
+//  Command Logout Resp Props
+export interface ICommandLogoutRespDataProps extends ICommandRoomLeaveRespDataProps {}
+//  Command Hello Req Props
+export interface ICommandHelloReqDataProps extends ICommandRoomHelloReqDataProps {}
+// Command Hello Resp Props
+export interface ICommandHelloRespDataProps extends ICommandRoomHelloRespDataProps {}
+

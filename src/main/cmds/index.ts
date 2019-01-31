@@ -6,4 +6,5 @@ export * from './login'
 export * from './logout'
 export * from './hello'
 export * from './room'
+export * from './webrtc'
 

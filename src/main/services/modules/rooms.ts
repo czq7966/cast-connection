@@ -10,9 +10,11 @@ export class Rooms{
     static getRoom(instanceId: string, roomid: string): Modules.IRoom {
         return Connection.getConnection(instanceId).rooms.getRoom(roomid)
     }
-    static getLoginRoom(instanceId: string, roomid: string): Modules.IRoom {
+    static getLoginRoom(instanceId: string): Modules.IRoom {
         let currUser = ServiceCmds.User.CurrentUser(instanceId);
-        return this.getRoom(instanceId, currUser.room.id)
+        if (currUser) {
+            return this.getRoom(instanceId, currUser.room.id)
+        }
     }
 
 }

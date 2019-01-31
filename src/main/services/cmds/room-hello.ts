@@ -1,5 +1,6 @@
 import * as Cmds from "../../cmds";
 import * as Modules from '../../modules'
+import * as ServiceModules from '../modules'
 
 var Tag = "Service-Cmds-RoomHello"
 export class RoomHello extends Cmds.Common.Base {
@@ -44,9 +45,9 @@ export class RoomHello extends Cmds.Common.Base {
                 console.log(Tag, 'Room', room.item.id , 'onDispatched', 'Req', cmd.data)
                 let data = cmd.data;
                 if (room.item.id === data.props.user.room.id) {
-                    let us = data.props.user;
-                    let user = room.getUser(us);
-                    Object.assign(user.item, us);                    
+                    let user = data.props.user;
+                    let mUser = room.getUser(user);
+                    ServiceModules.User.update(mUser, user)
                     let me = room.me().item;
                     RoomHello.respHello(cmd, me, respCmd);
                 }                  
@@ -55,9 +56,9 @@ export class RoomHello extends Cmds.Common.Base {
                 console.log(Tag, 'Room', room.item.id , 'onDispatched', 'Resp', cmd.data)
                 let data = cmd.data;
                 if (room.item.id === data.props.user.room.id) {
-                    let us = data.props.user;
-                    let user = room.getUser(us);         
-                    Object.assign(user.item, us);
+                    let user = data.props.user;
+                    let mUser = room.getUser(user);
+                    ServiceModules.User.update(mUser, user)
                 }                  
             }            
         }  

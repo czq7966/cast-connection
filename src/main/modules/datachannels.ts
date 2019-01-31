@@ -1,5 +1,5 @@
 import { Base } from "../base"
-import { Peer, ERTCPeerEvents } from "../peer";
+import { Peer, ERTCPeerEvents } from "./peer";
 import { DataChannel, EDataChannelLabel } from "./datachannel";
 
 export enum EDataChannelsEvents {
@@ -67,7 +67,7 @@ export class DataChannels extends Base {
         if (this.peer && label) {
             let channel = this.getChannel(label);
             if (!channel) {
-                let rtcchannel = this.peer.rtc().createDataChannel(label);
+                let rtcchannel = this.peer.getRtc().createDataChannel(label);
                 channel = new DataChannel(this, rtcchannel);
                 this.addDataChannel(channel);
             }

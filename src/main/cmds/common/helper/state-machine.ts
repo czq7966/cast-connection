@@ -39,10 +39,10 @@ export class StateMachine<T extends number> {
         delete this.onChange;
         delete this.states;
     }
-    set(states: T, target?: T): T {
+    set(states: T, target?: T, replace?: boolean): T {
         target = target !== null && target !== undefined ? target : this.states;
         let oldStates = target;
-        let newStates = oldStates | states ;
+        let newStates = replace ? states : oldStates | states ;
         this.states = newStates as T;
         let chgStates = oldStates ^ newStates;
         if (chgStates !== 0) {

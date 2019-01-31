@@ -85,4 +85,4 @@ Common.CommandTypes.RegistCommandType({
         name: '握手',
         ReqClass: CommandStreamRoomHelloReq,
         RespClass: CommandStreamRoomHelloResp
-    })
+})

@@ -1,6 +1,7 @@
 import * as Cmds from "../../cmds";
 import * as Modules from '../../modules'
 import { Hello } from "./hello";
+import { RoomJoin } from "./room-join";
 
 var Tag = 'Service-Cmds-Login'
 export class Login extends Cmds.Common.Base {
@@ -46,16 +47,18 @@ export class Login extends Cmds.Common.Base {
     static Rooms = {
         onDispatched: {
             resp(rooms: Modules.IRooms, cmd: Cmds.CommandLoginResp) {
-                console.log(Tag, 'Rooms', 'onDispatched', 'Resp', cmd.data)
-                let data = cmd.data;
-                if (data.props.result){
-                    let us = data.props.user;
-                    let room = rooms.getRoom(us.room.id);
-                    if (!room) {
-                        room = rooms.getRoom({id: us.room.id});
-                        console.log(rooms)
-                    }
-                }
+                console.log(Tag, 'Rooms', 'onDispatched', 'Resp', cmd.data);
+                RoomJoin.Rooms.onDispatched.resp(rooms, cmd);
+
+                // let data = cmd.data;
+                // if (data.props.result){
+                //     let us = data.props.user;
+                //     let room = rooms.getRoom(us.room.id);
+                //     if (!room) {
+                //         room = rooms.getRoom({id: us.room.id});
+                //         console.log(rooms)
+                //     }
+                // }
             }
         }
     }
@@ -63,19 +66,18 @@ export class Login extends Cmds.Common.Base {
         onDispatched: {
             resp(room: Modules.IRoom, cmd: Cmds.CommandLoginResp) {
                 console.log(Tag, 'Room', room.item.id , 'onDispatched', 'Resp', cmd.data)
-                //other room , return
-                if (room.item.id !== cmd.data.props.user.room.id) {
-                    return;
-                }
-        
-                let data = cmd.data;
-                if (data.props.result){
-                    let us = data.props.user;
-                    let user = room.getUser(us.id);
-                    if (!user) {
-                        user = room.getUser(us);
-                    }
-                }
+                RoomJoin.Room.onDispatched.resp(room, cmd);
+                // if (room.item.id === cmd.data.props.user.room.id) {
+                //     RoomJoin.Room.onDispatched.resp(room, cmd);
+                //     // let data = cmd.data;
+                //     // if (data.props.result){
+                //     //     let us = data.props.user;
+                //     //     let user = room.getUser(us.id);
+                //     //     if (!user) {
+                //     //         user = room.getUser(us);
+                //     //     }
+                //     // }
+                // }
             }
         }
     }    

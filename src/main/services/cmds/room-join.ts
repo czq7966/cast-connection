@@ -18,11 +18,10 @@ export class RoomJoin extends Cmds.Common.Base {
                     let data = cmdResp.data;
                     Cmds.Common.CmdDispatcher.dispatch(cmdResp , Cmds.ECommandEvents.onBeforeDispatched);
                     Cmds.Common.CmdDispatcher.dispatch(cmdResp , Cmds.ECommandEvents.onDispatched);
-                    // ServiceRoomHello.sayHello(instanceId, data.props.user);
-                    if (cmdResp.data.props.result) {
-                        resolve(cmdResp.data);    
+                    if (data.props.result) {
+                        resolve(data);    
                     } else {
-                        reject(cmdResp.data)
+                        reject(data)
                     } 
                 },
                 onRespTimeout: (data: Cmds.ICommandData<Cmds.ICommandRoomJoinRespDataProps>) => {
@@ -46,9 +45,7 @@ export class RoomJoin extends Cmds.Common.Base {
                 console.log(Tag, 'Rooms', 'onDispatched', 'Resp', cmd.data)
                 let data = cmd.data;
                 if (data.props.result) {
-                    if (!rooms.existRoom(data.props.user.room.id)) {
-                        let room = rooms.getRoom(data.props.user.room)
-                    }
+                    rooms.getRoom(data.props.user.room)
                 }
             }
         }
@@ -63,10 +60,7 @@ export class RoomJoin extends Cmds.Common.Base {
                     let user = data.props.user;
                     let us = Object.assign({}, user);
                     us.room = room.item;
-                    if (!room.getUser(us.id)) {
-                        room.getUser(us);
-                        console.log(room.users)
-                    }
+                    room.getUser(us);
                 }
             }  
         }

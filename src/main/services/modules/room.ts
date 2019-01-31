@@ -18,14 +18,14 @@ export class Room{
         let user: Modules.IUser
         room.users.keys().some(key => {
             let _user = room.users.get(key);
-            if (Cmds.Common.Helper.StateMachine.isset(user.item.state, Cmds.EUserState.roomOwner)) {
+            if (Cmds.Common.Helper.StateMachine.isset(user.item.states, Cmds.EUserState.roomOwner)) {
                 user = _user;
                 return true;
             }
         })
         return user;        
     }
-    static getUser(room:  Modules.IRoom, user: Cmds.IUser | string) {
+    static getUser(room:  Modules.IRoom, user: Cmds.IUser | string): Modules.IUser {
         if (typeof user === 'string') {
             return room.users.get(user);
         } else {

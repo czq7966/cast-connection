@@ -95,6 +95,7 @@ export class Room extends Cmds.Common.Base implements IRoom {
 
     // Command
     onDispatched_Command = (cmd: Cmds.Common.ICommand) => {
+        cmd.preventDefault = false;
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
         switch(cmdId) {
@@ -131,7 +132,7 @@ export class Room extends Cmds.Common.Base implements IRoom {
             default:
                 break;
         }
-        cmd.preventDefault !== true && this.eventEmitter.emit(Cmds.ECommandEvents.onDispatched, cmd);
+        !!cmd.preventDefault !== true && this.eventEmitter.emit(Cmds.ECommandEvents.onDispatched, cmd);
     }
     onBeforeDispatched_Command = (cmd: Cmds.Common.ICommand) => {
         this.eventEmitter.emit(Cmds.ECommandEvents.onBeforeDispatched, cmd);
@@ -175,7 +176,7 @@ export class Room extends Cmds.Common.Base implements IRoom {
         let user: IUser
         this.users.keys().some(key => {
             let _user = this.users.get(key);
-            if (Cmds.Common.Helper.StateMachine.isset(user.item.state, Cmds.EUserState.roomOwner)) {
+            if (Cmds.Common.Helper.StateMachine.isset(user.item.states, Cmds.EUserState.roomOwner)) {
                 user = _user;
                 return true;
             }

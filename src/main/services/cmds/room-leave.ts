@@ -14,13 +14,14 @@ export class RoomLeave extends Cmds.Common.Base {
                 props: {
                     user: user
                 },
-                onResp: (cmdResp: Cmds.CommandRoomLeaveResp) => {
-                    Cmds.Common.CmdDispatcher.dispatch(cmdResp , Cmds.ECommandEvents.onBeforeDispatched);
-                    Cmds.Common.CmdDispatcher.dispatch(cmdResp , Cmds.ECommandEvents.onDispatched);
-                    if (cmdResp.data.props.result) {
-                        resolve(cmdResp.data);    
+                onResp: (respCmd: Cmds.CommandRoomLeaveResp) => {
+                    let data = respCmd.data;
+                    Cmds.Common.CmdDispatcher.dispatch(respCmd , Cmds.ECommandEvents.onBeforeDispatched);
+                    Cmds.Common.CmdDispatcher.dispatch(respCmd , Cmds.ECommandEvents.onDispatched);
+                    if (data.props.result) {
+                        resolve(data);    
                     } else {
-                        reject(cmdResp.data)
+                        reject(data)
                     } 
                 },
                 onRespTimeout: (data: Cmds.ICommandData<Cmds.ICommandRoomLeaveRespDataProps>) => {

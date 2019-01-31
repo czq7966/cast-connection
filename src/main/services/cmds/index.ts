@@ -14,3 +14,7 @@ export * from './stream-room-join'
 export * from './stream-room-close'
 export * from './stream-room-leave'
 export * from './stream-room-hello'
+
+export * from './stream-webtrc-sdp'
+export * from './stream-webtrc-candidate'
+export * from './stream-webtrc-events'
