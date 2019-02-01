@@ -14,6 +14,7 @@ enum CmdTimeoutSubfix {
 export class CmdTimeout extends Base {
     timers: Helper.KeyValue<Dts.ICommandData<any>>
     timeoutHandlers: Helper.KeyValue<number>
+    isServer: boolean
     constructor() {
         super();
         this.timers = new Helper.KeyValue();
@@ -27,19 +28,22 @@ export class CmdTimeout extends Base {
         super.destroy();
     }
     respCmd(cmd: ICommand): boolean {
-        if (cmd.data.type === Dts.ECommandType.resp && cmd.data.sessionId) {
+        if (cmd.data.type === Dts.ECommandType.resp && cmd.data.sessionId ) {
             let sid = cmd.data.sessionId;
             this.delCmd(sid, false, true);
             // let result = this.eventEmitter.listeners(sid +  CmdTimeoutSubfix.onResp).length > 0;
             this.eventEmitter.emit(sid + CmdTimeoutSubfix.onResp, cmd);
+            if (this.isServer && (cmd.data.to.type || 'server') !== 'server') {
+                return false                
+            }
             return true;
         }        
         return false;        
     }
     addCmd(cmd: Dts.ICommandData<any>) {
         if (cmd.type !== Dts.ECommandType.resp && (cmd.onResp || cmd.onRespTimeout) ) {
+            console.log(cmd, cmd.onResp)
             cmd.sessionId = cmd.sessionId || Helper.uuid();
-            console.log('addCmd', cmd.sessionId)
             let sid = cmd.sessionId;
             let hander = setTimeout(() => {
                 this.delCmd(sid, true, false);

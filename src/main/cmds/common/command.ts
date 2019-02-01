@@ -1,5 +1,5 @@
 import { Base, IBaseConstructorParams, IBase, IBaseClass } from "./base";
-import { CmdDispatcher } from "./dispatcher";
+import { Dispatcher } from "./dispatcher";
 import * as Dts from "./dts";
 
 
@@ -53,14 +53,14 @@ export class Command<T extends any> extends Base implements ICommand {
     initEvents(instanceSingle?: boolean) {
         if (this.instanceId) {
             if (instanceSingle) { //注册单例事件
-                Object.keys(Dts.ECommandEvents).forEach(eventName => {
+                Object.keys(Dts.ECommandDispatchEvents).forEach(eventName => {
                         let event = this[eventName +'_Instance'].bind(this);
                         this._eventEmitterEvents[eventName +'_Instance'] = event;
                         this.instanceEventEmitter.addListener(eventName, event);
                     }            
                 )
             } else { //注册实例事件
-                Object.keys(Dts.ECommandEvents).forEach(eventName => {    
+                Object.keys(Dts.ECommandDispatchEvents).forEach(eventName => {    
                     if (this.isOverrideEvent(eventName)) {    
                         let event = this[eventName].bind(this);
                         this._eventEmitterEvents[eventName] = event;                    
@@ -73,13 +73,13 @@ export class Command<T extends any> extends Base implements ICommand {
     
     unInitEvents() {
         if (this.isInstance()) { //注册单例事件
-            Object.keys(Dts.ECommandEvents).forEach(eventName => {
+            Object.keys(Dts.ECommandDispatchEvents).forEach(eventName => {
                     let event = this._eventEmitterEvents[eventName + '_Instance'];
                     event && this.instanceEventEmitter.removeListener(eventName, event);
                 }            
             )
         } else { //注册实例事件
-            Object.keys(Dts.ECommandEvents).forEach(eventName => {
+            Object.keys(Dts.ECommandDispatchEvents).forEach(eventName => {
                 if (this.isOverrideEvent(eventName)) {
                     let event = this._eventEmitterEvents[eventName];
                     event && this.getInstance().eventEmitter.removeListener(eventName, event);
@@ -89,10 +89,10 @@ export class Command<T extends any> extends Base implements ICommand {
     }       
         
     onDispatched_Instance(...args: any[]) {
-        this.eventEmitter.emit(Dts.ECommandEvents.onDispatched, ...args)
+        this.eventEmitter.emit(Dts.ECommandDispatchEvents.onDispatched, ...args)
     }
     onBeforeDispatched_Instance(...args: any[]) {
-        this.eventEmitter.emit(Dts.ECommandEvents.onBeforeDispatched, ...args)
+        this.eventEmitter.emit(Dts.ECommandDispatchEvents.onBeforeDispatched, ...args)
     }    
     
     isOverrideEvent(eventName: string): boolean {
@@ -119,7 +119,7 @@ export class Command<T extends any> extends Base implements ICommand {
         this.data.to.type = this.data.to.type || 'server';
         this.data.to.id = this.data.to.id || '';
         this.data.cmdId = this.data.cmdId || ((this as any).constructor as ICommandClass).defaultCommandId;
-        return CmdDispatcher.sendCommand(this, ...args);
+        return Dispatcher.sendCommand(this, ...args);
     }
   
 }

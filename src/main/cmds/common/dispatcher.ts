@@ -11,40 +11,32 @@ export interface IDispatcher extends IBase {
 }
 
 
-class CCmdDispatcher extends Base {  
-    dispatcher: IBaseClass
-    cmdTimeout: CmdTimeout
-    constructor() {
-        super();
-        this.cmdTimeout = new CmdTimeout();
-    }
-    destroy() {
-        this.cmdTimeout.destroy();
-        delete this.cmdTimeout;
-        super.destroy();
-    }
-    setDispatcher(dispatcher: IBaseClass) {
+export class Dispatcher extends Base {  
+    static dispatcher: IBaseClass
+    static cmdTimeout: CmdTimeout = new CmdTimeout()
+    static setDispatcher(dispatcher: IBaseClass, isServer: boolean) {
         this.dispatcher = dispatcher;
+        this.cmdTimeout.isServer = isServer;
     }
-    onCommand(cmdData: Dts.ICommandData<any>, dispatcher: IDispatcher, ...args: any[]) {
+    static onCommand(cmdData: Dts.ICommandData<any>, dispatcher: IDispatcher, ...args: any[]) {
         let cmd = CommandTypes.decode(cmdData, {instanceId: ''});
         if (cmd) {
             cmd.instanceId = dispatcher.instanceId;
             if (!this.cmdTimeout.respCmd(cmd)) {
-                this.dispatch(cmd, Dts.ECommandEvents.onBeforeDispatched, ...args)
-                this.dispatch(cmd, Dts.ECommandEvents.onDispatched, ...args)
-            }
+                this.dispatch(cmd, Dts.ECommandDispatchEvents.onBeforeDispatched, ...args)
+                this.dispatch(cmd, Dts.ECommandDispatchEvents.onDispatched, ...args)
+            } 
             cmd.destroy();
             cmd = null;
         }
     }
 
-    dispatch(cmd: ICommand, event: Dts.ECommandEvents, ...args: any[]) {
+    static dispatch(cmd: ICommand, event: Dts.ECommandDispatchEvents, ...args: any[]) {
         cmd.getInstance().instanceEventEmitter.emit(event, cmd, ...args);
         this.dispatcher.getInstance<IDispatcher>(cmd.instanceId).eventEmitter.emit(event, cmd, ...args);
     }      
 
-    sendCommand(cmd: ICommand, ...args: any[]): Promise<any> {
+    static sendCommand(cmd: ICommand, ...args: any[]): Promise<any> {
         return new Promise((resolve, reject) => {
             this.cmdTimeout.addCmd(cmd.data);
             this.dispatcher.getInstance<IDispatcher>(cmd.instanceId, true).sendCommand(cmd.data, ...args)
@@ -58,8 +50,6 @@ class CCmdDispatcher extends Base {
         })
     }
 }
-
-export var CmdDispatcher = new CCmdDispatcher();
 
 
 

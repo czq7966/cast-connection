@@ -38,10 +38,15 @@ export class Dispatcher extends Cmds.Common.Base implements IDispatcher {
     // Command
     onCommand = (cmd: Cmds.ICommandData<any>) => {
         console.warn('OnCommand', cmd)
-        Cmds.Common.CmdDispatcher.onCommand(cmd, this);
-        this.eventEmitter.emit(Dts.CommandID, cmd)
+        this.eventEmitter.emit(Dts.ECommandEvents.onBeforeCommand, cmd);
+        this.eventEmitter.emit(Dts.ECommandEvents.onCommand, cmd);
+        if (cmd.preventDispatch !== true) {
+            Cmds.Common.Dispatcher.onCommand(cmd, this);
+            this.eventEmitter.emit(Dts.CommandID, cmd)
+        }
     }
     sendCommand(cmd: Cmds.ICommandData<any>): Promise<any> {
+        console.warn('SendCommand', cmd)
         return this.signaler.sendCommand(cmd) 
     }
 
@@ -55,4 +60,4 @@ export class Dispatcher extends Cmds.Common.Base implements IDispatcher {
     }
 }
 
-Cmds.Common.CmdDispatcher.setDispatcher(Dispatcher as any)
+Cmds.Common.Dispatcher.setDispatcher(Dispatcher as any, false)

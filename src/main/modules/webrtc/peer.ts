@@ -1,15 +1,14 @@
-import * as Cmds from "../cmds";
-import * as Services from '../services'
-import { IUser } from "./user";
-import { Config } from "./config";
+import * as Cmds from "../../cmds";
+import * as Services from '../../services'
+import { IUser } from "./../user";
+import { Config } from "./../config";
 import { Streams } from "./streams";
 import { DataChannels } from "./datachannels";
 import { Input } from "./input";
 import { EPlatform } from "../config";
 import { WebRTC } from "./webrtc";
-import { removeAllListeners } from "cluster";
 
-enum ERTCPeerEvents {
+export enum ERTCPeerEvents {
     onconnectionstatechange = 'connectionstatechange',
     ondatachannel = 'datachannel',
     onicecandidate = 'icecandidate',
@@ -42,7 +41,7 @@ export interface IPeer extends Cmds.Common.IBase {
 
 
 var Tag = "ModulePeer"
-export class Peer extends Cmds.Common.Base implements IPeer  {
+export class Peer extends Cmds.Common.CommandDispatcher implements IPeer  {
     config: Config;
     user: IUser
     streams: Streams;
@@ -80,15 +79,73 @@ export class Peer extends Cmds.Common.Base implements IPeer  {
         super.destroy();
     }
     initEvents() {
-        this.user.eventEmitter.addListener(Cmds.ECommandEvents.onDispatched, this.onDispatched_Command);
-        this.user.eventEmitter.addListener(Cmds.ECommandEvents.onBeforeDispatched, this.onBeforeDispatched_Command);
-     
+        this.user.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched);
+        this.user.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched);
+        this.user.room.rooms.dispatcher.eventEmitter.addListener(Cmds.ECommandEvents.onCommand, this.Command_onCommand)
+        this.user.room.rooms.dispatcher.eventEmitter.addListener(Cmds.ECommandEvents.onBeforeCommand, this.Command_onBeforeCommand)
+
     }
     unInitEvents() {
-        this.user.eventEmitter.removeListener(Cmds.ECommandEvents.onDispatched, this.onDispatched_Command)
-        this.user.eventEmitter.removeListener(Cmds.ECommandEvents.onBeforeDispatched, this.onBeforeDispatched_Command)
+        this.user.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched)
+        this.user.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched)
+        this.user.room.rooms.dispatcher.eventEmitter.removeListener(Cmds.ECommandEvents.onCommand, this.Command_onCommand)        
+        this.user.room.rooms.dispatcher.eventEmitter.removeListener(Cmds.ECommandEvents.onBeforeCommand, this.Command_onBeforeCommand)
     }   
     
+    onCommand_Command = (data: Cmds.ICommandData<Cmds.ICommandReqDataProps>) => {
+        let cmdId = data.cmdId;
+        let type = data.type;
+        switch(cmdId) {              
+            default:
+                break;
+        }
+    }
+
+    onCommand_BeforeCommand = (data: Cmds.ICommandData<Cmds.ICommandReqDataProps>) => {
+        let cmdId = data.cmdId;
+        if (cmdId.indexOf(Cmds.Command_stream_webrtc_on_prefix) === 0) {
+            Services.Cmds.StreamWebrtcEvents.Peer.onBeforeCommand.req(this, data)
+        }
+    }
+
+    // Command
+    onCommand_Dispatched = (cmd: Cmds.Common.ICommand) => {
+        cmd.preventDefault = false;
+        let cmdId = cmd.data.cmdId;
+        let type = cmd.data.type;
+        switch(cmdId) {
+            case Cmds.ECommandId.stream_webrtc_sdp:
+                type === Cmds.ECommandType.req ?
+                    Services.Cmds.StreamWebrtcSdp.Peer.onDispatched.req(this, cmd as any ) :
+                type === Cmds.ECommandType.resp ?
+                    Services.Cmds.StreamWebrtcSdp.Peer.onDispatched.resp(this, cmd as any) : null    
+                break;  
+            case Cmds.ECommandId.stream_webrtc_candidate:
+                Services.Cmds.StreamWebrtcCandidate.Peer.onDispatched.req(this, cmd as any );
+                break;                 
+            default:
+                break;
+        }
+        !!cmd.preventDefault !== true && this.eventEmitter.emit(Cmds.ECommandDispatchEvents.onDispatched, cmd);
+    }
+    onCommandBeforeDispatched = (cmd: Cmds.Common.ICommand) => {
+        this.eventEmitter.emit(Cmds.ECommandDispatchEvents.onBeforeDispatched, cmd);
+        if (!!cmd.preventDefault === true) return;
+
+        let cmdId = cmd.data.cmdId;
+        let type = cmd.data.type;
+        switch(cmdId) {
+            case Cmds.ECommandId.network_disconnect:
+                break;
+            default:
+                break;
+        }        
+
+        if (cmdId.indexOf(Cmds.Command_stream_webrtc_on_prefix) === 0) {
+            // Services.Cmds.StreamWebrtcEvents.Peer.onBeforeDispatched.req(this, cmd as any)
+        }
+    }    
+
     initRTCEvents(rtc: RTCPeerConnection) {
         rtc &&
         [ERTCPeerEvents].forEach(events => {
@@ -96,11 +153,11 @@ export class Peer extends Cmds.Common.Base implements IPeer  {
                 let value = events[key];
                 let event = (...args: any[]) => {
                     // console.log('PeerEvent:', value, ...args)
-                    // this.eventEmitter.emit(value, ...args)
                     let user = Object.assign({}, this.user.item);
                     user.extra = args;
+                    let cmdId = Cmds.Command_stream_webrtc_on_prefix + value; 
                     let data: Cmds.ICommandData<Cmds.ICommandReqDataProps> = {
-                        cmdId: Cmds.Command_stream_webrtc_on_prefix + value,
+                        cmdId: cmdId,
                         props: {
                             user: user
                         }
@@ -118,47 +175,8 @@ export class Peer extends Cmds.Common.Base implements IPeer  {
             let value = this._rtcevents[key];
             rtc.removeEventListener(key, value)
         })
-    } 
+    }     
 
-
-    // Command
-    onDispatched_Command = (cmd: Cmds.Common.ICommand) => {
-        cmd.preventDefault = false;
-        let cmdId = cmd.data.cmdId;
-        let type = cmd.data.type;
-        switch(cmdId) {
-            case Cmds.ECommandId.stream_webrtc_sdp:
-                type === Cmds.ECommandType.req ?
-                    Services.Cmds.StreamWebrtcSdp.Peer.onDispatched.req(this, cmd as any ) :
-                type === Cmds.ECommandType.resp ?
-                    Services.Cmds.StreamWebrtcSdp.Peer.onDispatched.resp(this, cmd as any) : null    
-                break;  
-            case Cmds.ECommandId.stream_webrtc_candidate:
-                Services.Cmds.StreamWebrtcCandidate.Peer.onDispatched.req(this, cmd as any );
-                break;                 
-            default:
-                break;
-        }
-        !!cmd.preventDefault !== true && this.eventEmitter.emit(Cmds.ECommandEvents.onDispatched, cmd);
-    }
-    onBeforeDispatched_Command = (cmd: Cmds.Common.ICommand) => {
-        this.eventEmitter.emit(Cmds.ECommandEvents.onBeforeDispatched, cmd);
-        if (!!cmd.preventDefault === true) return;
-
-        let cmdId = cmd.data.cmdId;
-        let type = cmd.data.type;
-        switch(cmdId) {
-            case Cmds.ECommandId.network_disconnect:
-                break;
-            default:
-                break;
-        }        
-
-        if (cmdId.indexOf(Cmds.Command_stream_webrtc_on_prefix) === 0) {
-            Services.Cmds.StreamWebrtcEvents.Peer.onBeforeDispatched.req(this, cmd as any)
-        }
-    }    
-    
     getConfig(): Config {
         return this.config;
     }    

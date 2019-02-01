@@ -1,9 +1,10 @@
 import * as Common from './common/index'
-
 export * from './common/dts'
 
 export var Command_stream_webrtc_on_prefix = 'stream_webrtc_on';
-export var CommandID = 'command'
+export var CommandID = Common.ECommandEvents.CommandID;
+
+
 
 export enum ECommandId {
     network_connect = 'network_connect',
@@ -44,6 +45,8 @@ export enum ECommandId {
     stream_webrtc_sdp = 'stream_webrtc_sdp',    
     stream_webrtc_candidate = 'stream_webrtc_candidate',
     stream_webrtc_ready = 'stream_webrtc_ready',
+
+    stream_webrtc_sendstream = 'stream_webrtc_sendstream',
 
     stream_webrtc_onconnectionstatechange = 'stream_webrtc_onconnectionstatechange',
     stream_webrtc_ondatachannel = 'stream_webrtc_ondatachannel',

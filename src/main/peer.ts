@@ -1,7 +1,7 @@
 import * as Network from './network'
 import * as Modules from './modules'
 import { Base } from "./base";
-import { sdpHelper } from "./helper/sdp";
+import { SdpHelper } from "./helper/sdp";
 import { Config, ECodecs, EPlatform } from "./config";
 import { WebRTC } from "./webrtc";
 import { Input } from "./input";
@@ -30,16 +30,16 @@ export enum EPeerEvents {
 export class Peer extends Base {
     config: Config;
     user: Modules.IUser
-    streams: Modules.Streams;
-    datachannels: Modules.DataChannels;
+    streams: Modules.Webrtc.Streams;
+    datachannels: Modules.Webrtc.DataChannels;
     input: Input;
     private _rtcevents;
     private _rtc: RTCPeerConnection    
     constructor(user: Modules.IUser) {
         super()
         this.config = new Config();
-        this.streams = new Modules.Streams(this);
-        this.datachannels = new Modules.DataChannels(this);
+        this.streams = new Modules.Webrtc.Streams(this as any);
+        this.datachannels = new Modules.Webrtc.DataChannels(this as any);
         this.input = new Input(this.datachannels);
         this._rtcevents = {};
         this.user = user;        
@@ -181,11 +181,11 @@ export class Peer extends Base {
         }
     }
     addSendStream(stream: MediaStream): boolean {    
-        if (stream && !this.streams.getSendStream(stream.id)) {
-            this.streams.addSendStream(stream);
-            (this.rtc() as any).addStream(stream)
-            return true;
-        }
+        // if (stream && !this.streams.getSendStream(stream.id)) {
+        //     this.streams.addSendStream(stream);
+        //     (this.rtc() as any).addStream(stream)
+        //     return true;
+        // }
         return false;
     }
 
@@ -206,10 +206,10 @@ export class Peer extends Base {
                 let codec = this.config.codec || ECodecs.default;
                 let bandwidth = this.config.bandwidth || 0;
                 if (codec !== ECodecs.default) {
-                    sdp.sdp = sdpHelper.preferCodec(sdp.sdp, codec);
+                    sdp.sdp = SdpHelper.preferCodec(sdp.sdp, codec);
                 }
                 if (bandwidth > 0) {                     
-                    sdp.sdp = sdpHelper.setVideoBitrates(sdp.sdp, {start: bandwidth, min:bandwidth, max: bandwidth})
+                    sdp.sdp = SdpHelper.setVideoBitrates(sdp.sdp, {start: bandwidth, min:bandwidth, max: bandwidth})
                 }
                 // sdp.sdp = sdpHelper.disableNACK(sdp.sdp);
                 this.rtc().setLocalDescription(sdp)
@@ -335,7 +335,8 @@ export class Peer extends Base {
     }
 
     stopSharing(): Promise<any> {
-        return this.streams.stopSendStreams();
+        // return this.streams.stopSendStreams();
+        return
     }
 
     //网络事件
@@ -437,16 +438,16 @@ export class Peer extends Base {
     onTrack = (ev: RTCTrackEvent) => {
         let streams = ev.streams;
         streams.forEach(stream => {            
-            this.streams.addRecvStream(stream)
+            // this.streams.addRecvStream(stream)
         })
     }
     onStream = (ev: any) => {
         let stream = ev.stream as MediaStream;
-        this.streams.addRecvStream(stream);
+        // this.streams.addRecvStream(stream);
     }
     onAddStream = (ev: Event) => {
         let stream = ev['stream'] as MediaStream;
-        this.streams.addRecvStream(stream);    
+        // this.streams.addRecvStream(stream);    
     }    
     onRecvStream = (stream: MediaStream) => {
         this.eventEmitter.emit(ERTCPeerEvents.onrecvstream, stream, this);

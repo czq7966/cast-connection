@@ -95,10 +95,10 @@ export class Input extends Base {
     OS: EInputOS
     platform: EInputPlatform
     touchMode: EInputDevice        
-    datachannel: Modules.DataChannel
-    datachannels: Modules.DataChannels
+    datachannel: Modules.Webrtc.DataChannel
+    datachannels: Modules.Webrtc.DataChannels
     gesture: Gesture
-    constructor(datachannels: Modules.DataChannels) {
+    constructor(datachannels: Modules.Webrtc.DataChannels) {
         super();
         this.OS = EInputOS.window;
         this.platform = EInputPlatform.browser;
@@ -117,24 +117,24 @@ export class Input extends Base {
         super.destroy();
     }
     initEvents() {
-        this.datachannels.eventEmitter.addListener(Modules.EDataChannelsEvents.onAddDataChannel, this.onAddDataChannel)
+        this.datachannels.eventEmitter.addListener(Modules.Webrtc.EDataChannelsEvents.onAddDataChannel, this.onAddDataChannel)
     }
     unInitEvents() {
-        this.datachannels.eventEmitter.removeListener(Modules.EDataChannelsEvents.onAddDataChannel, this.onAddDataChannel)
+        this.datachannels.eventEmitter.removeListener(Modules.Webrtc.EDataChannelsEvents.onAddDataChannel, this.onAddDataChannel)
     }
-    onAddDataChannel = (datachannel: Modules.DataChannel) => {
-        if (datachannel && datachannel.rtcchannel.label === Modules.EDataChannelLabel.input) {
+    onAddDataChannel = (datachannel: Modules.Webrtc.DataChannel) => {
+        if (datachannel && datachannel.rtcchannel.label === Modules.Webrtc.EDataChannelLabel.input) {
             this.datachannel = datachannel;
-            this.datachannel.eventEmitter.addListener(Modules.EDataChannelEvents.onmessage, this.onDataChannelMessage)                        
-            this.datachannel.eventEmitter.addListener(Modules.EDataChannelEvents.onopen, this.onDataChannelOpen)                 
-            this.datachannel.eventEmitter.addListener(Modules.EDataChannelEvents.onclose, this.onDataChannelClose) 
+            this.datachannel.eventEmitter.addListener(Modules.Webrtc.EDataChannelEvents.onmessage, this.onDataChannelMessage)                        
+            this.datachannel.eventEmitter.addListener(Modules.Webrtc.EDataChannelEvents.onopen, this.onDataChannelOpen)                 
+            this.datachannel.eventEmitter.addListener(Modules.Webrtc.EDataChannelEvents.onclose, this.onDataChannelClose) 
         }
     }
     unInitDataChannelEvents() {
         if (this.datachannel && this.datachannel.notDestroyed) {
-            this.datachannel.eventEmitter.removeListener(Modules.EDataChannelEvents.onmessage, this.onDataChannelMessage);
-            this.datachannel.eventEmitter.removeListener(Modules.EDataChannelEvents.onopen, this.onDataChannelOpen)
-            this.datachannel.eventEmitter.removeListener(Modules.EDataChannelEvents.onclose, this.onDataChannelClose) 
+            this.datachannel.eventEmitter.removeListener(Modules.Webrtc.EDataChannelEvents.onmessage, this.onDataChannelMessage);
+            this.datachannel.eventEmitter.removeListener(Modules.Webrtc.EDataChannelEvents.onopen, this.onDataChannelOpen)
+            this.datachannel.eventEmitter.removeListener(Modules.Webrtc.EDataChannelEvents.onclose, this.onDataChannelClose) 
         }
     }
     onDataChannelMessage = (ev: MessageEvent) => {        

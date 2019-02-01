@@ -1,12 +1,12 @@
 import * as Cmds from "../cmds";
 import * as Network from '../network'
 import * as Services from '../services'
+import * as Webrtc from './webrtc'
 // import { Peer, ERTCPeerEvents } from "../peer";
 import { IBase, Base } from "../base";
 import { Room, IRoom } from "./room";
-import { Streams } from "./streams";
 import { Debug } from "../cmds/common/helper";
-import { Peer, IPeer } from "./peer";
+
 
 var Tag = "ModuleUser"
 export interface IUserParams {
@@ -38,27 +38,24 @@ export interface IUser extends IBase , IUserParams {
     item: Cmds.IUser;
     states: Cmds.Common.Helper.StateMachine<Cmds.EUserState>;
     room: IRoom;
-    peer: IPeer;
-    streams: Streams;    
-    getPeer(): IPeer
+    peer: Webrtc.IPeer;
+    getPeer(): Webrtc.IPeer
 }
 
-export class User extends Cmds.Common.Base implements IUser  {
+export class User extends Cmds.Common.CommandDispatcher implements IUser  {
     // socketId: string;    
     // isOwner: boolean;
     // isReady: boolean;
     // signaler: Signaler;
     item: Cmds.IUser;
-    peer: IPeer;
+    peer: Webrtc.IPeer;
     room: IRoom;
-    streams: Streams;
     states: Cmds.Common.Helper.StateMachine<Cmds.EUserState>;
     constructor(room: IRoom, user: Cmds.IUser) {
         super(room.instanceId);
         this.states = new Cmds.Common.Helper.StateMachine<Cmds.EUserState>();      
         this.item = Object.assign({}, user);
         this.room = room;
-        this.streams = new Streams(this);        
         this.states.states = this.item.states;
 
         // this.peer = new Peer(this);
@@ -68,8 +65,6 @@ export class User extends Cmds.Common.Base implements IUser  {
     destroy() {        
         this.unInitEvents();
         this.delPeer();        
-        this.streams.destroy();
-        delete this.streams;
         delete this.room;
         delete this.item;
         delete this.peer;
@@ -78,8 +73,8 @@ export class User extends Cmds.Common.Base implements IUser  {
  
     initEvents() {
         this.states.onChange.add(this.onStatesChange)
-        this.room.eventEmitter.addListener(Cmds.ECommandEvents.onDispatched, this.onDispatched_Command);
-        this.room.eventEmitter.addListener(Cmds.ECommandEvents.onBeforeDispatched, this.onBeforeDispatched_Command);        
+        this.room.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched);
+        this.room.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched);        
 
         // this.eventEmitter.addListener(ECustomEvents.message, this.onMessage);    
 
@@ -91,8 +86,8 @@ export class User extends Cmds.Common.Base implements IUser  {
     }
     unInitEvents() {
         this.states.onChange.remove(this.onStatesChange);
-        this.room.eventEmitter.removeListener(Cmds.ECommandEvents.onDispatched, this.onDispatched_Command);
-        this.room.eventEmitter.removeListener(Cmds.ECommandEvents.onBeforeDispatched, this.onBeforeDispatched_Command);
+        this.room.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched);
+        this.room.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched);
 
         // this.eventEmitter.removeListener(ECustomEvents.message, this.onMessage); 
 
@@ -105,8 +100,7 @@ export class User extends Cmds.Common.Base implements IUser  {
     }
 
     // Command
-    onDispatched_Command = (cmd: Cmds.Common.ICommand) => {
-        cmd.preventDefault = false;
+    onCommand_Dispatched = (cmd: Cmds.Common.ICommand) => {
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
         switch(cmdId) {
@@ -119,12 +113,8 @@ export class User extends Cmds.Common.Base implements IUser  {
             default:
                 break;
         }
-        !!cmd.preventDefault !== true && this.eventEmitter.emit(Cmds.ECommandEvents.onDispatched, cmd);
     }
-    onBeforeDispatched_Command = (cmd: Cmds.Common.ICommand) => {
-        this.eventEmitter.emit(Cmds.ECommandEvents.onBeforeDispatched, cmd);
-        if (!!cmd.preventDefault === true) return;
-
+    onCommand_BeforeDispatched = (cmd: Cmds.Common.ICommand) => {
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
         switch(cmdId) {
@@ -136,9 +126,9 @@ export class User extends Cmds.Common.Base implements IUser  {
         }        
     }     
 
-    getPeer(): IPeer {
+    getPeer(): Webrtc.IPeer {
         if (!this.peer) {
-            this.peer = new Peer(this)
+            this.peer = new Webrtc.Peer(this)
         }
         return this.peer;
     }

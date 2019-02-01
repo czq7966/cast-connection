@@ -1,5 +1,4 @@
 
-import { Streams } from "./streams";
 import { IRooms } from "./rooms";
 import * as Cmds from "../cmds";
 import * as Services from '../services'
@@ -33,7 +32,6 @@ export interface IRoom extends Cmds.Common.IBase {
     item: Cmds.IRoom;
     rooms: IRooms;
     users: Cmds.Common.Helper.KeyValue<IUser>;
-    streams: Streams;
     getUser(user: Cmds.IUser | string): IUser
     delUser(id: string)
     clearUser()    
@@ -41,34 +39,30 @@ export interface IRoom extends Cmds.Common.IBase {
     owner(): IUser
 }
 
-export class Room extends Cmds.Common.Base implements IRoom {
+export class Room extends Cmds.Common.CommandDispatcher implements IRoom {
     item: Cmds.IRoom;
     rooms: IRooms;
     users: Cmds.Common.Helper.KeyValue<IUser>;
-    streams: Streams;
 
     constructor(rooms: IRooms, item: Cmds.IRoom) {
         super(rooms.instanceId);
         this.rooms = rooms;
         this.item = Object.assign({}, item);
         this.users = new Cmds.Common.Helper.KeyValue();
-        this.streams = new Streams(this);             
         this.initEvents();
     }
     destroy() {                
         this.unInitEvents();   
         this.users.clear();
         this.users.destroy();
-        this.streams.destroy();
         delete this.item;
         delete this.users;
-        delete this.streams;
         super.destroy();
     }
 
     initEvents() {
-        this.rooms.eventEmitter.addListener(Cmds.ECommandEvents.onDispatched, this.onDispatched_Command);
-        this.rooms.eventEmitter.addListener(Cmds.ECommandEvents.onBeforeDispatched, this.onBeforeDispatched_Command);
+        this.rooms.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched);
+        this.rooms.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched);
 
 
         // this.eventEmitter.addListener(ECustomEvents.joinRoom, this.onJoinRoom);
@@ -80,8 +74,8 @@ export class Room extends Cmds.Common.Base implements IRoom {
         // this.eventEmitter.addListener(ERTCPeerEvents.onrecvstream, this.onRecvStream);        
     }
     unInitEvents() {
-        this.rooms.eventEmitter.removeListener(Cmds.ECommandEvents.onDispatched, this.onDispatched_Command)
-        this.rooms.eventEmitter.removeListener(Cmds.ECommandEvents.onBeforeDispatched, this.onBeforeDispatched_Command)
+        this.rooms.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched)
+        this.rooms.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched)
 
 
         // this.eventEmitter.removeListener(ECustomEvents.joinRoom, this.onJoinRoom)
@@ -94,8 +88,7 @@ export class Room extends Cmds.Common.Base implements IRoom {
     }
 
     // Command
-    onDispatched_Command = (cmd: Cmds.Common.ICommand) => {
-        cmd.preventDefault = false;
+    onCommand_Dispatched = (cmd: Cmds.Common.ICommand) => {
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
         switch(cmdId) {
@@ -132,12 +125,8 @@ export class Room extends Cmds.Common.Base implements IRoom {
             default:
                 break;
         }
-        !!cmd.preventDefault !== true && this.eventEmitter.emit(Cmds.ECommandEvents.onDispatched, cmd);
     }
-    onBeforeDispatched_Command = (cmd: Cmds.Common.ICommand) => {
-        this.eventEmitter.emit(Cmds.ECommandEvents.onBeforeDispatched, cmd);
-        if (cmd.preventDefault === true) return;
-
+    onCommand_BeforeDispatched = (cmd: Cmds.Common.ICommand) => {
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
         switch(cmdId) {

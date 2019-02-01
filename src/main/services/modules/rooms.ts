@@ -16,5 +16,4 @@ export class Rooms{
             return this.getRoom(instanceId, currUser.room.id)
         }
     }
-
 }

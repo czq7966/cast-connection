@@ -16,8 +16,8 @@ export class RoomLeave extends Cmds.Common.Base {
                 },
                 onResp: (respCmd: Cmds.CommandRoomLeaveResp) => {
                     let data = respCmd.data;
-                    Cmds.Common.CmdDispatcher.dispatch(respCmd , Cmds.ECommandEvents.onBeforeDispatched);
-                    Cmds.Common.CmdDispatcher.dispatch(respCmd , Cmds.ECommandEvents.onDispatched);
+                    Cmds.Common.Dispatcher.dispatch(respCmd , Cmds.ECommandDispatchEvents.onBeforeDispatched);
+                    Cmds.Common.Dispatcher.dispatch(respCmd , Cmds.ECommandDispatchEvents.onDispatched);
                     if (data.props.result) {
                         resolve(data);    
                     } else {

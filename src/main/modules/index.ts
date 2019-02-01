@@ -1,11 +1,7 @@
+import * as Webrtc from './webrtc/index'
+export { Webrtc}
 export * from './connection'
 export * from './rooms'
 export * from './room'
 export * from './user'
-export * from './peer'
-export * from './datachannel'
-export * from './datachannels'
-export * from './streams'
-
 export * from './config'
-export * from './webrtc'

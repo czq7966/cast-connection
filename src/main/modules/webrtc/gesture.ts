@@ -1,4 +1,4 @@
-import { Base } from "./base";
+import { Base } from "../base";
 import { IInputEvent, EInputOS, EInputPlatform, Input, IInputPoint, IMouseEvent, ITouchEvent, EInputDeviceTouchType, EInputDeviceMouseType, EInputDevice } from "./input";
 
 export class Gesture extends Base {

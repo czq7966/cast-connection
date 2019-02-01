@@ -13,4 +13,8 @@ export class User{
         }
         mUser.states.set(user.states, null, true);
     }
+    static getStreamRoom(mUser: Modules.IUser): Modules.IRoom {
+        let roomid = ServiceCmds.User.getStreamRoomId(mUser.item);
+        return mUser.room.rooms.getRoom(roomid);
+    }
 }

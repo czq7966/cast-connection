@@ -14,5 +14,4 @@ export * from './config'
 export * from './connection'
 export * from './input'
 export * from './peer'
-export * from './webrtc'
 

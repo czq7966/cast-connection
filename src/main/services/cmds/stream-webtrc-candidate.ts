@@ -25,14 +25,18 @@ export class StreamWebrtcCandidate {
     
     static Peer = {
         onDispatched: {
-            req(peer: Modules.IPeer, cmd: Cmds.CommandStreamWebrtcCandidateReq) {
+            req(peer: Modules.Webrtc.IPeer, cmd: Cmds.CommandStreamWebrtcCandidateReq) {
                 let data = cmd.data;
                 let mUser = peer.user;
                 let user = data.props.user;
                 if (mUser.item.id === user.id && mUser.item.room.id === user.room.id) {
                     console.log(Tag, 'Peer', mUser.item.room.id , 'onDispatched', 'Req', cmd.data);                    
                     let candidate = user.extra;
-                    ServiceModules.Peer.setCandidate(peer, candidate);
+                    if (candidate) {
+                        ServiceModules.Webrtc.Peer.setCandidate(peer, candidate);
+                    } else {
+                        console.log(Tag, 'Peer', mUser.item.room.id , 'onDispatched', 'Req', 'ice candidate complete');                    
+                    }                    
                 }                  
             }                  
         },        

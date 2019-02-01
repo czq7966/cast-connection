@@ -17,8 +17,8 @@ export class StreamWebrtcSdp {
                 onResp: (cmdResp: Cmds.CommandStreamWebrtcSdpResp) => {                
                     let data = cmdResp.data;
                     if (data.props.result) {
-                        Cmds.Common.CmdDispatcher.dispatch(cmdResp , Cmds.ECommandEvents.onBeforeDispatched);
-                        Cmds.Common.CmdDispatcher.dispatch(cmdResp , Cmds.ECommandEvents.onDispatched);
+                        Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onBeforeDispatched);
+                        Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
                         resolve(data);
                     } else {
                         console.error('login error', cmdResp.data.props.msg);
@@ -46,6 +46,7 @@ export class StreamWebrtcSdp {
         user.extra = sdp;
         let respData = Object.assign({}, data, {
             type: Cmds.ECommandType.resp,
+            from: null,
             to: data.from,
             props: {
                 result: msg ? false : true,
@@ -63,7 +64,7 @@ export class StreamWebrtcSdp {
     static offer(mUser: Modules.IUser): Promise<any> {
         return new Promise((resolve, reject) => {
             let peer = mUser.getPeer();
-            ServiceModules.Peer.createOffer(peer)
+            ServiceModules.Webrtc.Peer.createOffer(peer)
             .then(sdp => {
                 this.req(mUser.instanceId, mUser.item, sdp)
                 .then(data => {
@@ -82,7 +83,8 @@ export class StreamWebrtcSdp {
         return new Promise((resolve, reject) => {
             let peer = mUser.getPeer();
             let user = mUser.item;
-            ServiceModules.Peer.createAnswer(peer)
+            let reqData = reqCmd.data;
+            ServiceModules.Webrtc.Peer.createAnswer(peer)
             .then(sdp => {
                 this.resp(reqCmd, user, sdp)
                 .then(data => {
@@ -117,30 +119,38 @@ export class StreamWebrtcSdp {
     } 
     static Peer = {
         onDispatched: {
-            req(peer: Modules.IPeer, cmd: Cmds.CommandStreamWebrtcSdpReq) {
+            req(peer: Modules.Webrtc.IPeer, cmd: Cmds.CommandStreamWebrtcSdpReq) {
                 let data = cmd.data;
                 let mUser = peer.user;
                 let user = data.props.user;
                 if (mUser.item.id === user.id && mUser.item.room.id === user.room.id) {
                     console.log(Tag, 'Peer', mUser.item.room.id , 'onDispatched', 'Req', cmd.data);                    
                     let sdp = user.extra;
-                    ServiceModules.Peer.setOffer(peer, sdp)
+                    ServiceModules.Webrtc.Peer.setOffer(peer, sdp)
                     .then(() => {
+                        cmd = new Cmds.CommandStreamWebrtcSdpReq({instanceId: peer.instanceId});
+                        cmd.assignData(data);
                         StreamWebrtcSdp.answer(mUser, cmd)
+                        .then(() => {
+                            cmd.destroy()
+                        })
+                        .catch(err => {
+                            cmd.destroy()
+                        })
                     })
                     .catch(err => {
                         StreamWebrtcSdp.resp(cmd, user, null, err)
                     })
                 }                  
             },
-            resp(peer: Modules.IPeer, cmd: Cmds.CommandStreamWebrtcSdpResp) {
+            resp(peer: Modules.Webrtc.IPeer, cmd: Cmds.CommandStreamWebrtcSdpResp) {
                 let data = cmd.data;
                 let mUser = peer.user;
                 let user = data.props.user;
                 if (mUser.item.id === user.id && mUser.item.room.id === user.room.id) {
                     console.log(Tag, 'Peer', mUser.item.room.id , 'onDispatched', 'Resp', cmd.data);
                     let sdp = user.extra;
-                    ServiceModules.Peer.setAnswer(peer, sdp);
+                    ServiceModules.Webrtc.Peer.setAnswer(peer, sdp);
                 }                   
             }                      
         },        

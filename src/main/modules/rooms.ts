@@ -13,7 +13,7 @@ export interface IRooms extends Cmds.Common.IBase {
     clearRoom();
 }
 
-export class Rooms extends Cmds.Common.Base implements IRooms {
+export class Rooms extends Cmds.Common.CommandDispatcher implements IRooms {
     items: Cmds.Common.Helper.KeyValue<IRoom>;
     dispatcher: Services.IDispatcher;
 
@@ -32,16 +32,15 @@ export class Rooms extends Cmds.Common.Base implements IRooms {
     }
 
     initEvents() {
-        this.dispatcher.eventEmitter.addListener(Cmds.ECommandEvents.onDispatched, this.onDispatched_Command)
-        this.dispatcher.eventEmitter.addListener(Cmds.ECommandEvents.onBeforeDispatched, this.onBeforeDispatched_Command)
+        this.dispatcher.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched)
+        this.dispatcher.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched)
     }
     unInitEvents() {
-        this.dispatcher.eventEmitter.removeListener(Cmds.ECommandEvents.onDispatched, this.onDispatched_Command);
-        this.dispatcher.eventEmitter.removeListener(Cmds.ECommandEvents.onBeforeDispatched, this.onBeforeDispatched_Command)
+        this.dispatcher.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched);
+        this.dispatcher.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched)
     }
 
-    onDispatched_Command = (cmd: Cmds.Common.ICommand) => {
-        cmd.preventDefault = false;
+    onCommand_Dispatched = (cmd: Cmds.Common.ICommand) => {
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
         switch(cmdId) {
@@ -66,13 +65,12 @@ export class Rooms extends Cmds.Common.Base implements IRooms {
             default:
                 break;
         }
-        !!cmd.preventDefault !== true && this.eventEmitter.emit(Cmds.ECommandEvents.onDispatched, cmd);
     }
 
-    onBeforeDispatched_Command = (cmd: Cmds.Common.ICommand) => {
-        cmd.preventDefault = false;
-        this.eventEmitter.emit(Cmds.ECommandEvents.onBeforeDispatched, cmd);
-        if (!!cmd.preventDefault === true) return;
+    onCommand_BeforeDispatched = (cmd: Cmds.Common.ICommand) => {
+        // cmd.preventDefault = false;
+        // this.eventEmitter.emit(Cmds.ECommandDispatchEvents.onBeforeDispatched, cmd);
+        // if (!!cmd.preventDefault === true) return;
 
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;

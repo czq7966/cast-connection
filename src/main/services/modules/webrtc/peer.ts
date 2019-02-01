@@ -1,13 +1,13 @@
 import * as Cmds from "../../cmds";
-import * as Modules from '../../modules'
-import * as Helper from '../../helper/index'
-import * as ServiceCmds from '../cmds/index'
-import { Config, EPlatform } from "../../config";
+import * as Modules from '../../../modules'
+import * as Helper from '../../../helper/index'
+import * as ServiceCmds from '../../cmds/index'
+import { Config, EPlatform } from "../../../config";
 
 
 var Tag = "Service-Module-Peer"
 export class Peer{
-    static createOffer(peer: Modules.IPeer): Promise<any> {        
+    static createOffer(peer: Modules.Webrtc.IPeer): Promise<any> {        
         return new Promise((resolve, reject) => {
             peer.getRtc().createOffer({
                 offerToReceiveAudio: true,
@@ -36,7 +36,7 @@ export class Peer{
             })
         })
     }  
-    static createAnswer(peer: Modules.IPeer): Promise<any> {        
+    static createAnswer(peer: Modules.Webrtc.IPeer): Promise<any> {        
         switch(Config.platform) {
             case EPlatform.reactnative :
                 return this.createAnswer_reactnative(peer);
@@ -46,7 +46,7 @@ export class Peer{
                 break            
         }
     }  
-    static createAnswer_reactnative(peer: Modules.IPeer): Promise<any> {
+    static createAnswer_reactnative(peer: Modules.Webrtc.IPeer): Promise<any> {
         return new Promise((resolve, reject) => {
             peer.getRtc().createAnswer({
                 offerToReceiveAudio: true,
@@ -66,7 +66,7 @@ export class Peer{
             })
         })
     }  
-    static createAnswer_browser(peer: Modules.IPeer): Promise<any> {
+    static createAnswer_browser(peer: Modules.Webrtc.IPeer): Promise<any> {
         return new Promise((resolve, reject) => {
             let rtc = peer.getRtc() as any;
             let createAnswerSuccess = (sdp) => {
@@ -89,7 +89,7 @@ export class Peer{
     }    
     
     
-    static setOffer(peer: Modules.IPeer, data: any): Promise<any> {
+    static setOffer(peer: Modules.Webrtc.IPeer, data: any): Promise<any> {
         switch(Config.platform) {
             case EPlatform.reactnative :
                 return this.setOffer_reactnative(peer, data);
@@ -99,7 +99,7 @@ export class Peer{
                 break            
         }
     }   
-    static setOffer_browser(peer: Modules.IPeer, data: any): Promise<any> {
+    static setOffer_browser(peer: Modules.Webrtc.IPeer, data: any): Promise<any> {
         return new Promise((resolve, reject) => {
             console.log(Tag, 'setOffer_browser')
             let rtc = peer.getRtc() as any;
@@ -114,10 +114,10 @@ export class Peer{
             rtc.setRemoteDescription(data, setRemoteDescriptionSuccess, setRemoteDescriptionFailed)
         })
     } 
-    static setOffer_reactnative(peer: Modules.IPeer, data: any): Promise<any> {
+    static setOffer_reactnative(peer: Modules.Webrtc.IPeer, data: any): Promise<any> {
         return new Promise((resolve, reject) => {
             console.log(Tag, 'setOffer_reactnative');
-            peer.getRtc().setRemoteDescription(new Modules.WebRTC.RTCSessionDescription(data))
+            peer.getRtc().setRemoteDescription(new Modules.Webrtc.WebRTC.RTCSessionDescription(data))
             .then(() => {
                 resolve()        
             })
@@ -128,7 +128,7 @@ export class Peer{
         })
     }       
 
-    static setAnswer(peer: Modules.IPeer, data: any): Promise<any>  {
+    static setAnswer(peer: Modules.Webrtc.IPeer, data: any): Promise<any>  {
         switch(Config.platform) {
             case EPlatform.reactnative :
                 return this.setAnswer_reactnative(peer, data);
@@ -138,7 +138,7 @@ export class Peer{
                 break            
         }
     }   
-    static setAnswer_browser(peer: Modules.IPeer, data: any): Promise<any> {
+    static setAnswer_browser(peer: Modules.Webrtc.IPeer, data: any): Promise<any> {
         return new Promise((resolve, reject) => {
             console.log(Tag, 'setAnswer_browser')
             let rtc = peer.getRtc() as any;
@@ -153,10 +153,10 @@ export class Peer{
         })
 
     }    
-    static setAnswer_reactnative(peer: Modules.IPeer, data: any): Promise<any> {
+    static setAnswer_reactnative(peer: Modules.Webrtc.IPeer, data: any): Promise<any> {
         return new Promise((resolve, reject) => {
             console.log(Tag, 'setAnswer_reactnative')
-            peer.getRtc().setRemoteDescription(new Modules.WebRTC.RTCSessionDescription(data))
+            peer.getRtc().setRemoteDescription(new Modules.Webrtc.WebRTC.RTCSessionDescription(data))
             .then(() => {
                 resolve()
             })
@@ -168,7 +168,7 @@ export class Peer{
 
     }       
     
-    static setCandidate(peer: Modules.IPeer,data: any) {
+    static setCandidate(peer: Modules.Webrtc.IPeer,data: any) {
         switch(Config.platform) {
             case EPlatform.reactnative :
                 return this.setCandidate_reactnative(peer, data);
@@ -178,14 +178,14 @@ export class Peer{
                 break            
         }
     }
-    static setCandidate_browser(peer: Modules.IPeer, data: any) {
+    static setCandidate_browser(peer: Modules.Webrtc.IPeer, data: any) {
         peer.getRtc().addIceCandidate(data)
         .catch(err => {
             console.log('add Ic eCandidate error:', err)
         })
     }    
-    static setCandidate_reactnative(peer: Modules.IPeer, data: any) {
-        peer.getRtc().addIceCandidate(new Modules.WebRTC.RTCIceCandidate(data))
+    static setCandidate_reactnative(peer: Modules.Webrtc.IPeer, data: any) {
+        peer.getRtc().addIceCandidate(new Modules.Webrtc.WebRTC.RTCIceCandidate(data))
         .catch(err => {
             console.log('add IceCandidate error:', err)
         })

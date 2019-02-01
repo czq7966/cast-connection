@@ -14,8 +14,8 @@ export class Logout extends Cmds.Common.Base {
                     user: currUser
                 },
                 onResp: (cmdResp: Cmds.CommandLoginResp) => {
-                    Cmds.Common.CmdDispatcher.dispatch(cmdResp , Cmds.ECommandEvents.onBeforeDispatched);
-                    Cmds.Common.CmdDispatcher.dispatch(cmdResp , Cmds.ECommandEvents.onDispatched);
+                    Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onBeforeDispatched);
+                    Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
                     if (cmdResp.data.props.result) {
                         resolve(cmdResp.data);    
                     } else {
