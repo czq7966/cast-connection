@@ -26,7 +26,8 @@ export class StreamWebrtcEvents {
                             StreamWebrtcEvents.onCommand_addstream(peer, args[0]);
                             break;   
                         case Cmds.ECommandId.stream_webrtc_onrecvstream:
-                            // StreamWebrtcEvents.onCommand_recvstream(peer, args[0]);
+                            let stream = user.extra;
+                            StreamWebrtcEvents.onCommand_recvstream(peer, stream);
                             break;
 
                         case Cmds.ECommandId.stream_webrtc_onicecandidate:
@@ -56,17 +57,23 @@ export class StreamWebrtcEvents {
     static onCommand_track(peer: Modules.Webrtc.IPeer, ev: RTCTrackEvent) {
         let streams = ev.streams;
         streams.forEach(stream => {    
+            !peer.streams.recvs.exist(stream.id) &&
             this.dispatchEventCommand(peer, stream, Cmds.ECommandId.stream_webrtc_onrecvstream);
         })
     }
     static onCommand_stream (peer: Modules.Webrtc.IPeer,ev: any)  {
         let stream = ev.stream as MediaStream;
+        !peer.streams.recvs.exist(stream.id) &&
         this.dispatchEventCommand(peer, stream, Cmds.ECommandId.stream_webrtc_onrecvstream);        
     }
     static onCommand_addstream(peer: Modules.Webrtc.IPeer,ev: Event) {
         let stream = ev['stream'] as MediaStream;
+        !peer.streams.recvs.exist(stream.id) &&
         this.dispatchEventCommand(peer, stream, Cmds.ECommandId.stream_webrtc_onrecvstream);
-    }    
+    }   
+    static onCommand_recvstream(peer: Modules.Webrtc.IPeer, stream: MediaStream) {
+        ServiceModules.Webrtc.Streams.addRecvStream(peer.streams, stream);
+    }         
 
     static onCommand_icecandidate = (peer: Modules.Webrtc.IPeer, ev: RTCPeerConnectionIceEvent): Promise<any> => {
         let data;

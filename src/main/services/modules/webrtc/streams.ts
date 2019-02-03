@@ -10,6 +10,7 @@ export class Streams{
         streams.sends.add(stream.id, stream);
         let onInactive = (ev) => {
             stream.removeEventListener('inactive', onInactive);  
+            streams.notDestroyed && 
             ServiceCmds.StreamWebrtcEvents.dispatchEventCommand(streams.peer, stream, Cmds.ECommandId.stream_webrtc_onsendstreaminactive);
         }
         stream.addEventListener('inactive', onInactive);   
@@ -21,7 +22,8 @@ export class Streams{
     static addRecvStream(streams: Modules.Webrtc.Streams, stream: MediaStream) {
         streams.recvs.add(stream.id, stream);
         let onInactive = (ev) => {
-            stream.removeEventListener('inactive', onInactive);                             
+            stream.removeEventListener('inactive', onInactive);              
+            streams.notDestroyed && 
             ServiceCmds.StreamWebrtcEvents.dispatchEventCommand(streams.peer, stream, Cmds.ECommandId.stream_webrtc_onrecvstreaminactive);
         }
         stream.addEventListener('inactive', onInactive);   

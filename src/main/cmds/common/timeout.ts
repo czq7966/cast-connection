@@ -42,7 +42,6 @@ export class CmdTimeout extends Base {
     }
     addCmd(cmd: Dts.ICommandData<any>) {
         if (cmd.type !== Dts.ECommandType.resp && (cmd.onResp || cmd.onRespTimeout) ) {
-            console.log(cmd, cmd.onResp)
             cmd.sessionId = cmd.sessionId || Helper.uuid();
             let sid = cmd.sessionId;
             let hander = setTimeout(() => {

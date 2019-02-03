@@ -1,5 +1,6 @@
 import * as Dts from './dts';
 import * as Common from './common/index'
+import { CommandReq, CommandResp } from './common'
 
 export class CommandStreamWebrtcOfferReq extends Common.Command<Dts.ICommandReqDataProps>{}
 export class CommandStreamWebrtcOfferResp extends Common.Command<Dts.ICommandRespDataProps> {}
@@ -37,22 +38,22 @@ Common.CommandTypes.RegistCommandType({
     RespClass: CommandStreamWebrtcCandidateResp
 })
 
-export class CommandStreamWebrtcReadyReq extends Common.Command<Dts.ICommandReqDataProps>{}
-export class CommandStreamWebrtcReadyResp extends Common.Command<Dts.ICommandRespDataProps> {}
+
 Common.CommandTypes.RegistCommandType({
     cmdId: Dts.ECommandId.stream_webrtc_ready,
-    name: 'ready',
-    ReqClass: CommandStreamWebrtcReadyReq,
-    RespClass: CommandStreamWebrtcReadyResp
+    name: 'stream_webrtc_ready',
+    ReqClass: CommandReq,
+    RespClass: CommandResp
 })
 
 export class CommandStreamWebrtcEventsReq extends Common.Command<Dts.ICommandReqDataProps>{}
 export class CommandStreamWebrtcEventsResp extends Common.Command<Dts.ICommandReqDataProps>{}
 Object.keys(Dts.ECommandId).forEach(key => {
-    if (key.indexOf(Dts.Command_stream_webrtc_on_prefix) === 0) {
+    let value = Dts.ECommandId[key];
+    if (value.indexOf(Dts.Command_stream_webrtc_on_prefix) === 0) {
         Common.CommandTypes.RegistCommandType({
-            cmdId: key,
-            name: key,
+            cmdId: value,
+            name: value,
             ReqClass: CommandStreamWebrtcEventsReq,
             RespClass: CommandStreamWebrtcEventsResp
         }) 

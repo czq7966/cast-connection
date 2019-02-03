@@ -4,7 +4,7 @@ import * as ServiceModules from '../modules/index'
 
 var Tag = "Service-Cmds-StreamWebrtcSdp"
 export class StreamWebrtcSdp {
-    static req(instanceId: string, toUser: Cmds.IUser, sdp: any): Promise<any> {
+    static req(instanceId: string, toUser: Cmds.IUser,  sdp: any): Promise<any> {
         return new Promise((resolve, reject) => {
             let cmd = new Cmds.CommandStreamWebrtcSdpReq({instanceId: instanceId})
             let user = Object.assign({}, toUser);
@@ -38,11 +38,11 @@ export class StreamWebrtcSdp {
         })
 
     }
-    static resp(reqCmd: Cmds.CommandStreamWebrtcSdpReq, fromUser: Cmds.IUser, sdp: any, msg?: string): Promise<any> {
+    static resp(reqCmd: Cmds.CommandStreamWebrtcSdpReq, toUser: Cmds.IUser, sdp: any, msg?: string): Promise<any> {
         let data = reqCmd.data;
         let instanceId = reqCmd.instanceId;
         let cmd =  new Cmds.CommandStreamWebrtcSdpResp({instanceId: instanceId});
-        let user = Object.assign({}, fromUser);
+        let user = Object.assign({}, toUser);
         user.extra = sdp;
         let respData = Object.assign({}, data, {
             type: Cmds.ECommandType.resp,
@@ -83,7 +83,6 @@ export class StreamWebrtcSdp {
         return new Promise((resolve, reject) => {
             let peer = mUser.getPeer();
             let user = mUser.item;
-            let reqData = reqCmd.data;
             ServiceModules.Webrtc.Peer.createAnswer(peer)
             .then(sdp => {
                 this.resp(reqCmd, user, sdp)

@@ -1,6 +1,7 @@
 import * as Cmds from "../../cmds";
 import { RoomHello } from "./room-hello";
 import { Hello } from "./hello";
+import { Dispatcher } from "../dispatcher";
 
 var Tag = "Service-Cmds-User"
 export class User extends Cmds.Common.Base {
@@ -28,5 +29,21 @@ export class User extends Cmds.Common.Base {
         reqCmd.data.from = {type: 'room', id: user.room.id};
         Hello.respHello(reqCmd, user);
     }
+    static onStateChange(instanceId: string, user: Cmds.IUser, chgStates: Cmds.EUserState, oldStates: Cmds.EUserState, newStates: Cmds.EUserState) {
+        user = Object.assign({}, user);
+        user.extra = {
+            chgStates: chgStates,
+            oldStates: oldStates,
+            newStates: newStates
+        }
+        let data: Cmds.ICommandData<Cmds.ICommandReqDataProps> = {
+            cmdId: Cmds.ECommandId.user_state_onchange,
+            props: {
+                user: user
+            }
+        }        
+        Dispatcher.getInstance<Dispatcher>(instanceId, false).onCommand(data);
+    }
+    
     
 }

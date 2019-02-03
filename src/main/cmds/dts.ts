@@ -35,6 +35,8 @@ export enum ECommandId {
     room_hello = 'room_hello',
     room_join_or_open = 'room_join_or_open',
 
+    user_state_onchange = 'user_state_onchange',
+
     stream_room_open = 'stream_room_open',
     stream_room_join = 'stream_room_join',
     stream_room_join_or_open = 'stream_room_join_or_open',

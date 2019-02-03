@@ -1,3 +1,4 @@
+import './events-ex';
 import { EventEmitter } from "events";
 
 export interface IClass {
@@ -91,3 +92,4 @@ export class Base {
         }        
     }             
 }
+

@@ -110,7 +110,7 @@ export class Peer extends Cmds.Common.CommandDispatcher implements IPeer  {
 
     // Command
     onCommand_Dispatched = (cmd: Cmds.Common.ICommand) => {
-        cmd.preventDefault = false;
+        console.log(Tag, 'onDispatched', 'Req', cmd.data);
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
         switch(cmdId) {
@@ -122,16 +122,15 @@ export class Peer extends Cmds.Common.CommandDispatcher implements IPeer  {
                 break;  
             case Cmds.ECommandId.stream_webrtc_candidate:
                 Services.Cmds.StreamWebrtcCandidate.Peer.onDispatched.req(this, cmd as any );
-                break;                 
+                break;
+            case Cmds.ECommandId.stream_webrtc_ready:
+                Services.Cmds.StreamWebrtcReady.Peer.onDispatched.req(this, cmd as any );
+                break;                                 
             default:
                 break;
         }
-        !!cmd.preventDefault !== true && this.eventEmitter.emit(Cmds.ECommandDispatchEvents.onDispatched, cmd);
     }
-    onCommandBeforeDispatched = (cmd: Cmds.Common.ICommand) => {
-        this.eventEmitter.emit(Cmds.ECommandDispatchEvents.onBeforeDispatched, cmd);
-        if (!!cmd.preventDefault === true) return;
-
+    onCommand_BeforeDispatched = (cmd: Cmds.Common.ICommand) => {
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
         switch(cmdId) {

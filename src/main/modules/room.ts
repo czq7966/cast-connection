@@ -32,6 +32,7 @@ export interface IRoom extends Cmds.Common.IBase {
     item: Cmds.IRoom;
     rooms: IRooms;
     users: Cmds.Common.Helper.KeyValue<IUser>;
+    eventRooter: Cmds.Common.IEventRooter
     getUser(user: Cmds.IUser | string): IUser
     delUser(id: string)
     clearUser()    
@@ -43,20 +44,24 @@ export class Room extends Cmds.Common.CommandDispatcher implements IRoom {
     item: Cmds.IRoom;
     rooms: IRooms;
     users: Cmds.Common.Helper.KeyValue<IUser>;
+    eventRooter: Cmds.Common.IEventRooter
 
     constructor(rooms: IRooms, item: Cmds.IRoom) {
         super(rooms.instanceId);
         this.rooms = rooms;
         this.item = Object.assign({}, item);
         this.users = new Cmds.Common.Helper.KeyValue();
+        this.eventRooter = new Cmds.Common.EventRooter(this.rooms.eventRooter)
         this.initEvents();
     }
     destroy() {                
         this.unInitEvents();   
         this.users.clear();
         this.users.destroy();
+        this.eventRooter.destroy();
         delete this.item;
         delete this.users;
+        delete this.eventRooter;
         super.destroy();
     }
 

@@ -1,5 +1,6 @@
 import * as Cmds from "../../cmds";
 import * as Modules from '../../modules'
+import * as ServiceModules from '../modules/index'
 import { RoomHello } from ".";
 // import { ServiceUser } from "./user";
 // import { Debug } from "../cmds/common/helper";

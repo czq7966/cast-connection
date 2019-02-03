@@ -58,8 +58,7 @@ export class User extends Cmds.Common.CommandDispatcher implements IUser  {
         this.room = room;
         this.states.states = this.item.states;
 
-        // this.peer = new Peer(this);
-        // this.room = user.room;
+        this.getPeer();
         this.initEvents();
     }
     destroy() {        
@@ -75,14 +74,6 @@ export class User extends Cmds.Common.CommandDispatcher implements IUser  {
         this.states.onChange.add(this.onStatesChange)
         this.room.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched);
         this.room.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched);        
-
-        // this.eventEmitter.addListener(ECustomEvents.message, this.onMessage);    
-
-        // this.peer.eventEmitter.addListener(ERTCPeerEvents.oniceconnectionstatechange, this.onIceConnectionStateChange);
-        // this.peer.eventEmitter.addListener(ERTCPeerEvents.onrecvstream, this.onRecvStream);
-
-
-
     }
     unInitEvents() {
         this.states.onChange.remove(this.onStatesChange);
@@ -97,6 +88,7 @@ export class User extends Cmds.Common.CommandDispatcher implements IUser  {
 
     onStatesChange = (chgStates: Cmds.EUserState, oldStates: Cmds.EUserState, newStates: Cmds.EUserState) => {
         this.item.states = newStates;
+        Services.Cmds.User.onStateChange(this.instanceId, this.item, chgStates, oldStates, newStates);
     }
 
     // Command
@@ -110,6 +102,9 @@ export class User extends Cmds.Common.CommandDispatcher implements IUser  {
                 type === Cmds.ECommandType.resp ?
                     Services.Cmds.StreamWebrtcSdp.User.onDispatched.resp(this, cmd as any) : null    
                 break;  
+            case Cmds.ECommandId.user_state_onchange:
+                    Services.Cmds.UserStateOnChange.User.onDispatched.req(this, cmd as any);
+                break;
             default:
                 break;
         }

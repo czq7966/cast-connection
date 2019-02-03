@@ -14,8 +14,7 @@ export class StreamRoomOpen extends Cmds.Common.Base {
         room = room || {id: User.getStreamRoomId(currUser)};
         let promise = RoomOpen.open(instanceId, room);
         promise.then(() => {
-            let mRoom = ServiceModules.Rooms.getRoom(instanceId, currUser.room.id);
-            let mUser = mRoom.getUser(currUser.id);
+            let mUser = ServiceModules.Rooms.getLoginRoom(instanceId).getUser(currUser.id);
             mUser.states.set(Cmds.EUserState.stream_room_opened);
             User.syncHello(instanceId, mUser.item);
         })

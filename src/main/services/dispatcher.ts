@@ -10,19 +10,24 @@ export interface IDispatcherConstructorParams extends Cmds.Common.IBaseConstruct
 
 export interface IDispatcher extends Cmds.Common.IDispatcher {
     signaler: Network.Signaler
+    eventRooter: Cmds.Common.IEventRooter
     onCommand(cmd: Cmds.ICommandData<any>)
 }
 
 export class Dispatcher extends Cmds.Common.Base implements IDispatcher {
     signaler: Network.Signaler
+    eventRooter: Cmds.Common.IEventRooter
     constructor(params: IDispatcherConstructorParams) {
         super(params);
         this.signaler = params.signaler;
+        this.eventRooter = new Cmds.Common.EventRooter(null);
         this.initEvents();
     }
     destroy() {
         this.unInitEvents();
+        this.eventRooter.destroy();
         delete this.signaler;
+        delete this.eventRooter;
         super.destroy();
     }
 

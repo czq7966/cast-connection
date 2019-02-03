@@ -1,6 +1,7 @@
 import * as Cmds from "../../cmds";
 import * as Modules from '../../modules'
 import * as ServiceCmds from '../cmds/index'
+import { Rooms } from './rooms'
 
 
 var Tag = "Service-Module-User"
@@ -16,5 +17,9 @@ export class User{
     static getStreamRoom(mUser: Modules.IUser): Modules.IRoom {
         let roomid = ServiceCmds.User.getStreamRoomId(mUser.item);
         return mUser.room.rooms.getRoom(roomid);
+    }
+
+    static CurrentUser(instanceId: string): Modules.IUser {
+        return Rooms.getLoginRoom(instanceId).me();
     }
 }
