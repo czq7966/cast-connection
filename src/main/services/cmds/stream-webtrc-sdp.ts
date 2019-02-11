@@ -100,30 +100,30 @@ export class StreamWebrtcSdp {
     }   
 
     static User = {
-        onDispatched: {
+        onBeforeRoot: {
             req(mUser: Modules.IUser, cmd: Cmds.CommandStreamWebrtcSdpReq) {
                 let data = cmd.data;
                 if (mUser.item.id === data.props.user.id && mUser.item.room.id === data.props.user.room.id) {
-                    console.log(Tag, 'User', mUser.item.room.id , 'onDispatched', 'Req', cmd.data);
+                    console.log(Tag, 'User', mUser.item.room.id , 'onBeforeRoot', 'Req', cmd.data);
                     mUser.getPeer();
                 }                  
             },
             resp(mUser: Modules.IUser, cmd: Cmds.CommandStreamWebrtcSdpResp) {
                 let data = cmd.data;
                 if (mUser.item.id === data.props.user.id && mUser.item.room.id === data.props.user.room.id) {
-                    console.log(Tag, 'User', mUser.item.room.id , 'onDispatched', 'Resp', cmd.data);
+                    console.log(Tag, 'User', mUser.item.room.id , 'onBeforeRoot', 'Resp', cmd.data);
                 }                  
             }                      
         },        
     } 
     static Peer = {
-        onDispatched: {
+        onBeforeRoot: {
             req(peer: Modules.Webrtc.IPeer, cmd: Cmds.CommandStreamWebrtcSdpReq) {
                 let data = cmd.data;
                 let mUser = peer.user;
                 let user = data.props.user;
                 if (mUser.item.id === user.id && mUser.item.room.id === user.room.id) {
-                    console.log(Tag, 'Peer', mUser.item.room.id , 'onDispatched', 'Req', cmd.data);                    
+                    console.log(Tag, 'Peer', mUser.item.room.id , 'onBeforeRoot', 'Req', cmd.data);                    
                     let sdp = user.extra;
                     ServiceModules.Webrtc.Peer.setOffer(peer, sdp)
                     .then(() => {
@@ -147,7 +147,7 @@ export class StreamWebrtcSdp {
                 let mUser = peer.user;
                 let user = data.props.user;
                 if (mUser.item.id === user.id && mUser.item.room.id === user.room.id) {
-                    console.log(Tag, 'Peer', mUser.item.room.id , 'onDispatched', 'Resp', cmd.data);
+                    console.log(Tag, 'Peer', mUser.item.room.id , 'onBeforeRoot', 'Resp', cmd.data);
                     let sdp = user.extra;
                     ServiceModules.Webrtc.Peer.setAnswer(peer, sdp);
                 }                   

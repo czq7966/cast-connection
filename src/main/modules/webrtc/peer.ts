@@ -29,7 +29,7 @@ export enum ERTCPeerEvents {
 
 
 
-export interface IPeer extends Cmds.Common.IBase {
+export interface IPeer extends Cmds.Common.ICommandRooter {
     config: Config;
     user: IUser
     streams: Streams;
@@ -41,7 +41,7 @@ export interface IPeer extends Cmds.Common.IBase {
 
 
 var Tag = "ModulePeer"
-export class Peer extends Cmds.Common.CommandDispatcher implements IPeer  {
+export class Peer extends Cmds.Common.CommandRooter implements IPeer  {
     config: Config;
     user: IUser
     streams: Streams;
@@ -79,70 +79,78 @@ export class Peer extends Cmds.Common.CommandDispatcher implements IPeer  {
         super.destroy();
     }
     initEvents() {
-        this.user.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched);
-        this.user.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched);
-        this.user.room.rooms.dispatcher.eventEmitter.addListener(Cmds.ECommandEvents.onCommand, this.Command_onCommand)
-        this.user.room.rooms.dispatcher.eventEmitter.addListener(Cmds.ECommandEvents.onBeforeCommand, this.Command_onBeforeCommand)
+        this.eventRooter.setParent(this.user.eventRooter);        
+        this.eventRooter.onBeforeRoot.add(this.onBeforeRoot)
+        this.eventRooter.onAfterRoot.add(this.onAfterRoot)
+
+        // this.user.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched);
+        // this.user.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched);
+        // this.user.room.rooms.dispatcher.eventEmitter.addListener(Cmds.ECommandEvents.onCommand, this.Command_onCommand)
+        // this.user.room.rooms.dispatcher.eventEmitter.addListener(Cmds.ECommandEvents.onBeforeCommand, this.Command_onBeforeCommand)
 
     }
     unInitEvents() {
-        this.user.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched)
-        this.user.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched)
-        this.user.room.rooms.dispatcher.eventEmitter.removeListener(Cmds.ECommandEvents.onCommand, this.Command_onCommand)        
-        this.user.room.rooms.dispatcher.eventEmitter.removeListener(Cmds.ECommandEvents.onBeforeCommand, this.Command_onBeforeCommand)
+        this.eventRooter.onBeforeRoot.remove(this.onBeforeRoot)
+        this.eventRooter.onAfterRoot.remove(this.onAfterRoot)
+        this.eventRooter.setParent();   
+
+        // this.user.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched)
+        // this.user.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched)
+        // this.user.room.rooms.dispatcher.eventEmitter.removeListener(Cmds.ECommandEvents.onCommand, this.Command_onCommand)        
+        // this.user.room.rooms.dispatcher.eventEmitter.removeListener(Cmds.ECommandEvents.onBeforeCommand, this.Command_onBeforeCommand)
     }   
     
-    onCommand_Command = (data: Cmds.ICommandData<Cmds.ICommandReqDataProps>) => {
-        let cmdId = data.cmdId;
-        let type = data.type;
-        switch(cmdId) {              
-            default:
-                break;
-        }
-    }
+    // onCommand_Command = (data: Cmds.ICommandData<Cmds.ICommandReqDataProps>) => {
+    //     let cmdId = data.cmdId;
+    //     let type = data.type;
+    //     switch(cmdId) {              
+    //         default:
+    //             break;
+    //     }
+    // }
 
-    onCommand_BeforeCommand = (data: Cmds.ICommandData<Cmds.ICommandReqDataProps>) => {
-        let cmdId = data.cmdId;
-        if (cmdId.indexOf(Cmds.Command_stream_webrtc_on_prefix) === 0) {
-            Services.Cmds.StreamWebrtcEvents.Peer.onBeforeCommand.req(this, data)
-        }
-    }
+    // onCommand_BeforeCommand = (data: Cmds.ICommandData<Cmds.ICommandReqDataProps>) => {
+    //     let cmdId = data.cmdId;
+    //     if (cmdId.indexOf(Cmds.Command_stream_webrtc_on_prefix) === 0) {
+    //         Services.Cmds.StreamWebrtcEvents.Peer.onBeforeCommand.req(this, data)
+    //     }
+    // }
 
     // Command
-    onCommand_Dispatched = (cmd: Cmds.Common.ICommand) => {
+    onBeforeRoot = (cmd: Cmds.Common.ICommand): any => {
         console.log(Tag, 'onDispatched', 'Req', cmd.data);
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
         switch(cmdId) {
             case Cmds.ECommandId.stream_webrtc_sdp:
                 type === Cmds.ECommandType.req ?
-                    Services.Cmds.StreamWebrtcSdp.Peer.onDispatched.req(this, cmd as any ) :
+                    Services.Cmds.StreamWebrtcSdp.Peer.onBeforeRoot.req(this, cmd as any ) :
                 type === Cmds.ECommandType.resp ?
-                    Services.Cmds.StreamWebrtcSdp.Peer.onDispatched.resp(this, cmd as any) : null    
+                    Services.Cmds.StreamWebrtcSdp.Peer.onBeforeRoot.resp(this, cmd as any) : null    
                 break;  
             case Cmds.ECommandId.stream_webrtc_candidate:
-                Services.Cmds.StreamWebrtcCandidate.Peer.onDispatched.req(this, cmd as any );
+                Services.Cmds.StreamWebrtcCandidate.Peer.onBeforeRoot.req(this, cmd as any );
                 break;
             case Cmds.ECommandId.stream_webrtc_ready:
-                Services.Cmds.StreamWebrtcReady.Peer.onDispatched.req(this, cmd as any );
+                Services.Cmds.StreamWebrtcReady.Peer.onBeforeRoot.req(this, cmd as any );
                 break;                                 
             default:
+        
                 break;
         }
     }
-    onCommand_BeforeDispatched = (cmd: Cmds.Common.ICommand) => {
+    onAfterRoot = (cmd: Cmds.Common.ICommand): any => {
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
         switch(cmdId) {
             case Cmds.ECommandId.network_disconnect:
                 break;
             default:
+                if (cmdId.indexOf(Cmds.Command_stream_webrtc_on_prefix) === 0) {
+                    Services.Cmds.StreamWebrtcEvents.Peer.onAfterCommand.req(this, cmd.data)
+                }               
                 break;
         }        
-
-        if (cmdId.indexOf(Cmds.Command_stream_webrtc_on_prefix) === 0) {
-            // Services.Cmds.StreamWebrtcEvents.Peer.onBeforeDispatched.req(this, cmd as any)
-        }
     }    
 
     initRTCEvents(rtc: RTCPeerConnection) {

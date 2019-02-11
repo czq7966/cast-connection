@@ -37,10 +37,10 @@ export class Logout extends Cmds.Common.Base {
  
 
     static Rooms = {
-        onBeforeDispatched: {
+        onAfterRoot: {
             req(rooms: Modules.IRooms, cmd: Cmds.CommandRoomLeaveReq) {
-                console.log(Tag, 'Rooms', 'onBeforeDispatched', 'Req', cmd.data);
-                RoomLeave.Rooms.onBeforeDispatched.req(rooms, cmd);
+                console.log(Tag, 'Rooms', 'onAfterRoot', 'Req', cmd.data);
+                RoomLeave.Rooms.onAfterRoot.req(rooms, cmd);
                 // let data = cmd.data;                
                 // let room = rooms.getRoom(data.props.user.room.id);
                 // if (room && room.users.count() == 0) {                    
@@ -48,8 +48,8 @@ export class Logout extends Cmds.Common.Base {
                 // }    
             },            
             resp(rooms: Modules.IRooms, cmd: Cmds.CommandRoomLeaveResp) {
-                console.log(Tag, 'Rooms', 'onBeforeDispatched', 'Resp', cmd.data);
-                RoomLeave.Rooms.onBeforeDispatched.resp(rooms, cmd);
+                console.log(Tag, 'Rooms', 'onAfterRoot', 'Resp', cmd.data);
+                RoomLeave.Rooms.onAfterRoot.resp(rooms, cmd);
                 // let data = cmd.data;                
                 // let room = rooms.getRoom(data.props.user.room.id);
                 // if (room && room.users.count() == 0) {                    
@@ -60,9 +60,9 @@ export class Logout extends Cmds.Common.Base {
     }
 
     static Room = {
-        onBeforeDispatched: {
+        onAfterRoot: {
             req(room: Modules.IRoom, cmd: Cmds.CommandLogoutReq) {
-                console.log(Tag, 'Room', room.item.id, 'onBeforeDispatched', 'Req', cmd.data)
+                console.log(Tag, 'Room', room.item.id, 'onAfterRoot', 'Req', cmd.data)
                 let user = cmd.data.props.user;
                 let me = room.me();
                 if (me && user.id === me.item.id) {
@@ -72,7 +72,7 @@ export class Logout extends Cmds.Common.Base {
                 }
             },
             resp(room: Modules.IRoom, cmd: Cmds.CommandLogoutResp) {
-                console.log(Tag, 'Room', room.item.id, 'onBeforeDispatched', 'Resp', cmd.data)
+                console.log(Tag, 'Room', room.item.id, 'onAfterRoot', 'Resp', cmd.data)
                 let user = cmd.data.props.user;
                 let me = room.me();
                 if (me && user.id === me.item.id) {

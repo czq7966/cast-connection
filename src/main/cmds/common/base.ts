@@ -61,7 +61,7 @@ export class Base {
         this.instanceId = params.instanceId === '' ? params.instanceId : (params.instanceId  || Base.instanceDefauleName);
         this.instanceSingle = params.instanceSingle;         
         this.eventEmitter = new EventEmitter();
-        this.instanceEventEmitter = new EventEmitter();    
+        this.instanceSingle && (this.instanceEventEmitter = new EventEmitter());    
 
    
     }
@@ -71,7 +71,7 @@ export class Base {
             delete constructor.instances[this.instanceId];
         }
         this.eventEmitter.removeAllListeners();
-        this.instanceEventEmitter.removeAllListeners();        
+        this.instanceEventEmitter && this.instanceEventEmitter.removeAllListeners();        
         delete this.eventEmitter;
         delete this.instanceEventEmitter;
         delete this.instanceId;

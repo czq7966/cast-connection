@@ -40,9 +40,9 @@ export class RoomLeave extends Cmds.Common.Base {
  
 
     static Rooms = {
-        onBeforeDispatched: {
+        onAfterRoot: {
             req(rooms: Modules.IRooms, cmd: Cmds.CommandRoomLeaveReq) {
-                console.log(Tag, 'Rooms', 'onBeforeDispatched', 'Req', cmd.data);
+                console.log(Tag, 'Rooms', 'onAfterRoot', 'Req', cmd.data);
                 let data = cmd.data;                
                 let room = rooms.getRoom(data.props.user.room.id);
                 if (room && room.users.count() == 0) {                    
@@ -61,9 +61,9 @@ export class RoomLeave extends Cmds.Common.Base {
     }
 
     static Room = {
-        onBeforeDispatched: {
+        onAfterRoot: {
             req(room: Modules.IRoom, cmd: Cmds.CommandRoomLeaveReq) {
-                console.log(Tag, 'Room', room.item.id ,'onBeforeDispatched', 'Req', cmd.data);
+                console.log(Tag, 'Room', room.item.id ,'onAfterRoot', 'Req', cmd.data);
                 let data = cmd.data;
                 if (room.item.id === data.props.user.room.id) {                    
                     let me = room.me();                    
@@ -75,7 +75,7 @@ export class RoomLeave extends Cmds.Common.Base {
                 }
             },            
             resp(room: Modules.IRoom, cmd: Cmds.CommandRoomLeaveResp) {
-                console.log(Tag, 'Room', room.item.id , 'onBeforeDispatched', 'Resp', cmd.data)
+                console.log(Tag, 'Room', room.item.id , 'onAfterRoot', 'Resp', cmd.data)
                 let data = cmd.data;
                 if (data.props.result && room.item.id === data.props.user.room.id) {                    
                     let me = room.me();                    

@@ -41,9 +41,9 @@ export class RoomOpen extends Cmds.Common.Base {
  
 
     static Rooms = {
-        onDispatched: {
+        onBeforeRoot: {
             resp(rooms: Modules.IRooms, cmd: Cmds.CommandRoomOpenResp) {
-                console.log(Tag, 'Rooms', 'onDispatched', 'Resp', cmd.data)
+                console.log(Tag, 'Rooms', 'onBeforeRoot', 'Resp', cmd.data)
                 let data = cmd.data;                
                 if (data.props.result) {
                     rooms.getRoom(data.props.user.room)
@@ -53,9 +53,9 @@ export class RoomOpen extends Cmds.Common.Base {
     }
 
     static Room = {
-        onDispatched: {
+        onBeforeRoot: {
             resp(room: Modules.IRoom, cmd: Cmds.CommandRoomOpenResp) {
-                console.log(Tag, 'Room', room.item.id , 'onDispatched', 'Resp', cmd.data)
+                console.log(Tag, 'Room', room.item.id , 'onBeforeRoot', 'Resp', cmd.data)
                 let data = cmd.data;                
                 if (data.props.result && room.item.id === data.props.user.room.id) {
                     let user = data.props.user

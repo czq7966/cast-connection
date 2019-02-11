@@ -14,44 +14,47 @@ export interface IRooms extends Cmds.Common.IBase {
     clearRoom();
 }
 
-export class Rooms extends Cmds.Common.CommandDispatcher implements IRooms {
+export class Rooms extends Cmds.Common.CommandRooter implements IRooms {
     items: Cmds.Common.Helper.KeyValue<IRoom>;
     dispatcher: Services.IDispatcher;
-    eventRooter: Cmds.Common.IEventRooter
 
     constructor(instanceId: string, dispatcher?:Services. IDispatcher ) {
         super(instanceId);
         this.dispatcher = dispatcher || Services.Dispatcher.getInstance(instanceId);
         this.items = new Cmds.Common.Helper.KeyValue();
-        this.eventRooter = new Cmds.Common.EventRooter(this.dispatcher.eventRooter);
         this.initEvents();
     }
     destroy() {
         this.unInitEvents();
         this.items.clear();
-        this.eventRooter.destroy();
         delete this.items;
         delete this.dispatcher;
-        delete this.eventRooter;
         super.destroy();
     }
 
     initEvents() {
-        this.dispatcher.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched)
-        this.dispatcher.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched)
+        this.eventRooter.setParent(this.dispatcher.eventRooter);        
+        this.eventRooter.onBeforeRoot.add(this.onBeforeRoot)
+        this.eventRooter.onAfterRoot.add(this.onAfterRoot)
+        // this.dispatcher.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched)
+        // this.dispatcher.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched)
     }
     unInitEvents() {
-        this.dispatcher.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched);
-        this.dispatcher.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched)
+        this.eventRooter.onBeforeRoot.remove(this.onBeforeRoot)
+        this.eventRooter.onAfterRoot.remove(this.onAfterRoot)
+        this.eventRooter.setParent();        
+
+        // this.dispatcher.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched);
+        // this.dispatcher.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched)
     }
 
-    onCommand_Dispatched = (cmd: Cmds.Common.ICommand) => {
+    onBeforeRoot = (cmd: Cmds.Common.ICommand): any  => {
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
         switch(cmdId) {
             case Cmds.ECommandId.adhoc_login:
                 type === Cmds.ECommandType.resp ?
-                    Services.Cmds.Login.Rooms.onDispatched.resp(this, cmd as any) : null
+                    Services.Cmds.Login.Rooms.onBeforeRoot.resp(this, cmd as any) : null
                 break;
             // case Cmds.ECommandId.adhoc_hello:
             //     type === Cmds.ECommandType.req ?
@@ -61,18 +64,18 @@ export class Rooms extends Cmds.Common.CommandDispatcher implements IRooms {
             //     break;
             case Cmds.ECommandId.room_open: 
                 type === Cmds.ECommandType.resp ?
-                    Services.Cmds.RoomOpen.Rooms.onDispatched.resp(this, cmd as any) : null
+                    Services.Cmds.RoomOpen.Rooms.onBeforeRoot.resp(this, cmd as any) : null
                 break;
             case Cmds.ECommandId.room_join: 
                 type === Cmds.ECommandType.resp ?
-                    Services.Cmds.RoomJoin.Rooms.onDispatched.resp(this, cmd as any) : null                    
+                    Services.Cmds.RoomJoin.Rooms.onBeforeRoot.resp(this, cmd as any) : null                    
                 break;
             default:
                 break;
         }
     }
 
-    onCommand_BeforeDispatched = (cmd: Cmds.Common.ICommand) => {
+    onAfterRoot = (cmd: Cmds.Common.ICommand): any => {
         // cmd.preventDefault = false;
         // this.eventEmitter.emit(Cmds.ECommandDispatchEvents.onBeforeDispatched, cmd);
         // if (!!cmd.preventDefault === true) return;
@@ -83,22 +86,22 @@ export class Rooms extends Cmds.Common.CommandDispatcher implements IRooms {
         switch(cmdId) {
             case Cmds.ECommandId.adhoc_logout:
                 type === Cmds.ECommandType.req ?
-                    Services.Cmds.Logout.Rooms.onBeforeDispatched.req(this, cmd as any) : null
+                    Services.Cmds.Logout.Rooms.onAfterRoot.req(this, cmd as any) : null
                 break;
             case Cmds.ECommandId.network_disconnect: 
-                Services.Cmds.Network.Disconnect.Rooms.onBeforeDispatched.req(this, cmd as any);
+                Services.Cmds.Network.Disconnect.Rooms.onAfterRoot.req(this, cmd as any);
                 break;     
             case Cmds.ECommandId.room_close:
                 type === Cmds.ECommandType.req ?
-                    Services.Cmds.RoomClose.Rooms.onBeforeDispatched.req(this, cmd as any) :
+                    Services.Cmds.RoomClose.Rooms.onAfterRoot.req(this, cmd as any) :
                 type === Cmds.ECommandType.resp ?
-                    Services.Cmds.RoomClose.Rooms.onBeforeDispatched.resp(this, cmd as any) : null    
+                    Services.Cmds.RoomClose.Rooms.onAfterRoot.resp(this, cmd as any) : null    
                 break;   
             case Cmds.ECommandId.room_leave:
                 type === Cmds.ECommandType.req ?
-                    Services.Cmds.RoomLeave.Rooms.onBeforeDispatched.req(this, cmd as any) :
+                    Services.Cmds.RoomLeave.Rooms.onAfterRoot.req(this, cmd as any) :
                 type === Cmds.ECommandType.resp ?
-                    Services.Cmds.RoomLeave.Rooms.onBeforeDispatched.resp(this, cmd as any) : null    
+                    Services.Cmds.RoomLeave.Rooms.onAfterRoot.resp(this, cmd as any) : null    
                 break;                                             
             default:
                 break;

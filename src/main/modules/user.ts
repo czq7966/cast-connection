@@ -9,32 +9,8 @@ import { Debug } from "../cmds/common/helper";
 
 
 var Tag = "ModuleUser"
-export interface IUserParams {
-    // socketId: string,
-    // isOwner: boolean,
-    // isReady?: boolean;
-    // signaler?: Network.Signaler;
-    // peer?: Peer;
-    // room?: IRoom;
-    // // stream?: MediaStream;
-    // streams?: Streams;
-    // video?: HTMLVideoElement;
-}
 
-export interface IUser extends IBase , IUserParams {
-    // initEvents()
-    // unInitEvents()
-    // onMessage(query: IUserQuery)
-    // onReady(query: IUserQuery)
-    // stopSharing(): Promise<any>
-    // imReady()
-    // sayHello(to?: string)
-    // addSendStream(stream: MediaStream)
-    // addSendStreams(streams: Array<MediaStream>)
-    // doICE()
-    // sendMessage(msg: any)
-    // close()
-
+export interface IUser extends Cmds.Common.ICommandRooter {
     item: Cmds.IUser;
     states: Cmds.Common.Helper.StateMachine<Cmds.EUserState>;
     room: IRoom;
@@ -42,11 +18,7 @@ export interface IUser extends IBase , IUserParams {
     getPeer(): Webrtc.IPeer
 }
 
-export class User extends Cmds.Common.CommandDispatcher implements IUser  {
-    // socketId: string;    
-    // isOwner: boolean;
-    // isReady: boolean;
-    // signaler: Signaler;
+export class User extends Cmds.Common.CommandRooter implements IUser  {
     item: Cmds.IUser;
     peer: Webrtc.IPeer;
     room: IRoom;
@@ -71,14 +43,21 @@ export class User extends Cmds.Common.CommandDispatcher implements IUser  {
     }
  
     initEvents() {
+        this.eventRooter.setParent(this.room.eventRooter);        
+        this.eventRooter.onPreventRoot.add(this.onPreventRoot)
+        this.eventRooter.onBeforeRoot.add(this.onBeforeRoot)
+        this.eventRooter.onAfterRoot.add(this.onAfterRoot)
         this.states.onChange.add(this.onStatesChange)
-        this.room.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched);
-        this.room.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched);        
     }
     unInitEvents() {
         this.states.onChange.remove(this.onStatesChange);
-        this.room.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched);
-        this.room.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched);
+        this.eventRooter.onPreventRoot.remove(this.onPreventRoot)
+        this.eventRooter.onBeforeRoot.remove(this.onBeforeRoot)
+        this.eventRooter.onAfterRoot.remove(this.onAfterRoot)
+        this.eventRooter.setParent();   
+
+        // this.room.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched);
+        // this.room.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched);
 
         // this.eventEmitter.removeListener(ECustomEvents.message, this.onMessage); 
 
@@ -92,24 +71,31 @@ export class User extends Cmds.Common.CommandDispatcher implements IUser  {
     }
 
     // Command
-    onCommand_Dispatched = (cmd: Cmds.Common.ICommand) => {
+    onPreventRoot = (cmd: Cmds.Common.ICommand): any => {
+        let user = cmd.data.props.user as Cmds.IUser;
+        if (user && user.id !== this.item.id) {
+            return Cmds.Common.EEventEmitterEmit2Result.preventRoot;
+        }
+    }
+
+    onBeforeRoot = (cmd: Cmds.Common.ICommand): any => {
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
         switch(cmdId) {
             case Cmds.ECommandId.stream_webrtc_sdp:
                 type === Cmds.ECommandType.req ?
-                    Services.Cmds.StreamWebrtcSdp.User.onDispatched.req(this, cmd as any ) :
+                    Services.Cmds.StreamWebrtcSdp.User.onBeforeRoot.req(this, cmd as any ) :
                 type === Cmds.ECommandType.resp ?
-                    Services.Cmds.StreamWebrtcSdp.User.onDispatched.resp(this, cmd as any) : null    
+                    Services.Cmds.StreamWebrtcSdp.User.onBeforeRoot.resp(this, cmd as any) : null    
                 break;  
             case Cmds.ECommandId.user_state_onchange:
-                    Services.Cmds.UserStateOnChange.User.onDispatched.req(this, cmd as any);
+                    Services.Cmds.UserStateOnChange.User.onBeforeRoot.req(this, cmd as any);
                 break;
             default:
                 break;
         }
     }
-    onCommand_BeforeDispatched = (cmd: Cmds.Common.ICommand) => {
+    onAfterRoot = (cmd: Cmds.Common.ICommand): any => {
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
         switch(cmdId) {

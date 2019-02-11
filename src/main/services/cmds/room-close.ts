@@ -39,14 +39,14 @@ export class RoomClose extends Cmds.Common.Base {
  
 
     static Rooms = {
-        onBeforeDispatched: {
+        onAfterRoot: {
             req(rooms: Modules.IRooms, cmd: Cmds.CommandRoomCloseReq) {
-                console.log(Tag, 'Rooms',  'onBeforeDispatched', 'Req', cmd.data)
+                console.log(Tag, 'Rooms',  'onAfterRoot', 'Req', cmd.data)
                 let data = cmd.data;
                 rooms.delRoom(data.props.user.room.id);
             },            
             resp(rooms: Modules.IRooms, cmd: Cmds.CommandRoomCloseResp) {
-                console.log(Tag, 'Rooms', 'onBeforeDispatched', 'Resp', cmd.data)                    
+                console.log(Tag, 'Rooms', 'onAfterRoot', 'Resp', cmd.data)                    
                 let data = cmd.data;
                 if (data.props.result) {                    
                     rooms.delRoom(data.props.user.room.id);
@@ -56,16 +56,16 @@ export class RoomClose extends Cmds.Common.Base {
     }
 
     static Room = {
-        onBeforeDispatched: {
+        onAfterRoot: {
             req(room: Modules.IRoom, cmd: Cmds.CommandRoomCloseReq) {
-                console.log(Tag, 'Room', room.item.id , 'onBeforeDispatched', 'Req', cmd.data)
+                console.log(Tag, 'Room', room.item.id , 'onAfterRoot', 'Req', cmd.data)
                 let data = cmd.data;
                 if (room.item.id === data.props.user.room.id) {                    
                     room.clearUser();
                 }
             },            
             resp(room: Modules.IRoom, cmd: Cmds.CommandRoomCloseResp) {
-                console.log(Tag, 'Room', room.item.id , 'onBeforeDispatched', 'Resp', cmd.data)
+                console.log(Tag, 'Room', room.item.id , 'onAfterRoot', 'Resp', cmd.data)
                 let data = cmd.data;
                 if (data.props.result && room.item.id === data.props.user.room.id) {                    
                     room.clearUser();

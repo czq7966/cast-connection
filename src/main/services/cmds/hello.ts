@@ -62,13 +62,13 @@ export class Hello extends Cmds.Common.Base {
     // }
 
     static Room = {
-        onDispatched: {
+        onBeforeRoot: {
             req(room: Modules.IRoom, cmd: Cmds.CommandHelloReq) {
-                console.log(Tag, 'Room',  room.item.id ,'onDispatched', 'Req', cmd.data); 
+                console.log(Tag, 'Room',  room.item.id ,'onBeforeRoot', 'Req', cmd.data); 
                 let data = cmd.data;
                 if (room.item.id === data.props.user.room.id) {
                     let respCmd = new Cmds.CommandHelloResp({instanceId: room.instanceId});  
-                    RoomHello.Room.onDispatched.req(room, cmd, respCmd);
+                    RoomHello.Room.onBeforeRoot.req(room, cmd, respCmd);
                     // let us = data.props.user;
                     // let user = room.getUser(us);
                     // Object.assign(user.item, us);
@@ -77,10 +77,10 @@ export class Hello extends Cmds.Common.Base {
                 }                
             },
             resp(room: Modules.IRoom, cmd: Cmds.CommandHelloResp) {
-                console.log(Tag, 'Room',  room.item.id ,'onDispatched', 'Resp', cmd.data);                
+                console.log(Tag, 'Room',  room.item.id ,'onBeforeRoot', 'Resp', cmd.data);                
                 let data = cmd.data;
                 if (room.item.id === data.props.user.room.id) {
-                    RoomHello.Room.onDispatched.resp(room, cmd);
+                    RoomHello.Room.onBeforeRoot.resp(room, cmd);
                     // let us = data.props.user;
                     // let user = room.getUser(us);       
                     // Object.assign(user.item, us);

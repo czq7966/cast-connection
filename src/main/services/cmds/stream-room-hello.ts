@@ -22,22 +22,22 @@ export class StreamRoomHello extends Cmds.Common.Base {
 
 
     static Room = {
-        onDispatched: {
+        onBeforeRoot: {
             req(room: Modules.IRoom, cmd: Cmds.CommandRoomHelloReq) {
-                console.log(Tag, 'Room', room.item.id , 'onDispatched', 'Req', cmd.data)
+                console.log(Tag, 'Room', room.item.id , 'onBeforeRoot', 'Req', cmd.data)
                 let data = cmd.data;
                 if (room.item.id === data.props.user.room.id) {
                     let respCmd = new Cmds.CommandStreamRoomHelloResp({instanceId: room.instanceId});
-                    RoomHello.Room.onDispatched.req(room, cmd, respCmd);
+                    RoomHello.Room.onBeforeRoot.req(room, cmd, respCmd);
                     respCmd.destroy()
                     respCmd = null;
                 }                  
             },            
             resp(room: Modules.IRoom, cmd: Cmds.CommandRoomHelloResp) {
-                console.log(Tag, 'Room', room.item.id , 'onDispatched', 'Resp', cmd.data)
+                console.log(Tag, 'Room', room.item.id , 'onBeforeRoot', 'Resp', cmd.data)
                 let data = cmd.data;
                 if (room.item.id === data.props.user.room.id) {
-                    RoomHello.Room.onDispatched.resp(room, cmd)
+                    RoomHello.Room.onBeforeRoot.resp(room, cmd)
                 }                  
             }            
         }  

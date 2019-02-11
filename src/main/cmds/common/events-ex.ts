@@ -1,8 +1,17 @@
 import { EventEmitter} from "events";
 
+export enum EEventEmitterEmit2Result {
+  none =                      0b0,
+  preventDefault =            0b1,
+  preventRoot =               0b10,
+}
+
+
 (EventEmitter.prototype as any).emit2 = function(type) {
-    var er, handler, len, args, i, listeners;
-  
+    var er, handler, len, args, i, listeners, preventRoot, preventDefault;
+    preventRoot = 0b0;
+    preventDefault = 0b0;
+
     if (!this._events)
       this._events = {};
   
@@ -25,7 +34,7 @@ import { EventEmitter} from "events";
     handler = this._events[type];
   
     if (isUndefined(handler))
-      return false;
+      return EEventEmitterEmit2Result.none;
   
     if (isFunction(handler)) {
       switch (arguments.length) {
@@ -48,12 +57,16 @@ import { EventEmitter} from "events";
       args = Array.prototype.slice.call(arguments, 1);
       listeners = handler.slice();
       len = listeners.length;
-      for (i = 0; i < len; i++) 
-        if (listeners[i].apply(this, args) === true) 
-            return true
+      for (i = 0; i < len; i++) {
+        var result = listeners[i].apply(this, args);
+        preventRoot = preventRoot | (result & EEventEmitterEmit2Result.preventRoot);
+        preventDefault = preventDefault | (result & EEventEmitterEmit2Result.preventDefault);        
+        if (preventDefault) 
+          break;
+      }
     }
   
-    return false;
+    return preventRoot | preventDefault;
   };
 
 function isFunction(arg) {

@@ -5,5 +5,7 @@ export * from './dts'
 export * from './dispatcher'
 export * from './command-dispatcher'
 export * from './event-rooter'
+export * from './events-ex'
+export * from './command-rooter'
 import * as Helper from './helper'
 export { Helper }

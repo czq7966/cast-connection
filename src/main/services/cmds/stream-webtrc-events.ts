@@ -6,7 +6,7 @@ import {StreamWebrtcCandidate } from './stream-webtrc-candidate'
 var Tag = "Service-Cmds-StreamWebrtcEvents"
 export class StreamWebrtcEvents {
     static Peer = {
-        onBeforeCommand: {
+        onAfterCommand: {
             req(peer: Modules.Webrtc.IPeer, data: Cmds.ICommandData<Cmds.ICommandReqDataProps>) {
                 let cmdId = data.cmdId;
                 let user = data.props.user;

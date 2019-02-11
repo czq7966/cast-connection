@@ -1,18 +1,19 @@
 import { Base, IBaseConstructorParams, IBase } from "./base";
-import { ICommand } from "./command";
-import { ECommandDispatchEvents, ECommandEvents, ICommandData } from "./dts";
-
-enum EDispatcherCommandName {
-    onCommand_Dispatched = 'onCommand_Dispatched',
-    onCommand_BeforeDispatched = 'onCommand_BeforeDispatched',
-    onCommand_Command = 'onCommand_Command',
-    onCommand_BeforeCommand = 'onCommand_BeforeCommand'
-}
+import { IEventRooter, EventRooter } from "./event-rooter";
 
 export interface ICommandRooter extends IBase {
-
+    eventRooter: IEventRooter
 }
 
 export class CommandRooter extends Base implements ICommandRooter {
-    eventRooter: Cmds.Common.IEventRooter
+    eventRooter: IEventRooter
+    constructor(params?: IBaseConstructorParams | string){
+        super(params)
+        this.eventRooter = new EventRooter()
+    }
+    destroy() {
+        this.eventRooter.destroy();
+        delete this.eventRooter;
+        super.destroy();
+    }
 }

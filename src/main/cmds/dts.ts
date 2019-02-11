@@ -72,9 +72,9 @@ export enum ECommandId {
 
 //分组前缀
 export enum ERoomPrefix {
-    adhoc = 'adhoc/',
-    agency = 'agency/',
-    stream = 'stream/'
+    adhoc = 'adhoc#',
+    agency = 'agency#',
+    stream = 'stream#'
 }
 
 // 用户数据

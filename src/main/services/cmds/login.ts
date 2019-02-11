@@ -45,10 +45,10 @@ export class Login extends Cmds.Common.Base {
     }
 
     static Rooms = {
-        onDispatched: {
+        onBeforeRoot: {
             resp(rooms: Modules.IRooms, cmd: Cmds.CommandLoginResp) {
-                console.log(Tag, 'Rooms', 'onDispatched', 'Resp', cmd.data);
-                RoomJoin.Rooms.onDispatched.resp(rooms, cmd);
+                console.log(Tag, 'Rooms', 'onBeforeRoot', 'Resp', cmd.data);
+                RoomJoin.Rooms.onBeforeRoot.resp(rooms, cmd);
 
                 // let data = cmd.data;
                 // if (data.props.result){
@@ -63,10 +63,10 @@ export class Login extends Cmds.Common.Base {
         }
     }
     static Room = {
-        onDispatched: {
+        onBeforeRoot: {
             resp(room: Modules.IRoom, cmd: Cmds.CommandLoginResp) {
-                console.log(Tag, 'Room', room.item.id , 'onDispatched', 'Resp', cmd.data)
-                RoomJoin.Room.onDispatched.resp(room, cmd);
+                console.log(Tag, 'Room', room.item.id , 'onBeforeRoot', 'Resp', cmd.data)
+                RoomJoin.Room.onBeforeRoot.resp(room, cmd);
                 // if (room.item.id === cmd.data.props.user.room.id) {
                 //     RoomJoin.Room.onDispatched.resp(room, cmd);
                 //     // let data = cmd.data;

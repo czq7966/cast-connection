@@ -40,34 +40,35 @@ export interface IRoom extends Cmds.Common.IBase {
     owner(): IUser
 }
 
-export class Room extends Cmds.Common.CommandDispatcher implements IRoom {
+export class Room extends Cmds.Common.CommandRooter implements IRoom {
     item: Cmds.IRoom;
     rooms: IRooms;
     users: Cmds.Common.Helper.KeyValue<IUser>;
-    eventRooter: Cmds.Common.IEventRooter
 
     constructor(rooms: IRooms, item: Cmds.IRoom) {
         super(rooms.instanceId);
         this.rooms = rooms;
         this.item = Object.assign({}, item);
         this.users = new Cmds.Common.Helper.KeyValue();
-        this.eventRooter = new Cmds.Common.EventRooter(this.rooms.eventRooter)
         this.initEvents();
     }
     destroy() {                
         this.unInitEvents();   
         this.users.clear();
         this.users.destroy();
-        this.eventRooter.destroy();
         delete this.item;
         delete this.users;
-        delete this.eventRooter;
         super.destroy();
     }
 
     initEvents() {
-        this.rooms.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched);
-        this.rooms.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched);
+        this.eventRooter.setParent(this.rooms.eventRooter);        
+        this.eventRooter.onPreventRoot.add(this.onPreventRoot)
+        this.eventRooter.onBeforeRoot.add(this.onBeforeRoot)
+        this.eventRooter.onAfterRoot.add(this.onAfterRoot)
+
+        // this.rooms.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched);
+        // this.rooms.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched);
 
 
         // this.eventEmitter.addListener(ECustomEvents.joinRoom, this.onJoinRoom);
@@ -79,8 +80,13 @@ export class Room extends Cmds.Common.CommandDispatcher implements IRoom {
         // this.eventEmitter.addListener(ERTCPeerEvents.onrecvstream, this.onRecvStream);        
     }
     unInitEvents() {
-        this.rooms.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched)
-        this.rooms.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched)
+        this.eventRooter.onPreventRoot.remove(this.onPreventRoot)
+        this.eventRooter.onBeforeRoot.remove(this.onBeforeRoot)
+        this.eventRooter.onAfterRoot.remove(this.onAfterRoot)
+        this.eventRooter.setParent();        
+
+        // this.rooms.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched)
+        // this.rooms.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched)
 
 
         // this.eventEmitter.removeListener(ECustomEvents.joinRoom, this.onJoinRoom)
@@ -93,65 +99,74 @@ export class Room extends Cmds.Common.CommandDispatcher implements IRoom {
     }
 
     // Command
-    onCommand_Dispatched = (cmd: Cmds.Common.ICommand) => {
+
+    onPreventRoot = (cmd: Cmds.Common.ICommand): any => {
+        let user = cmd.data.props.user as Cmds.IUser;
+        if (user && user.room && user.room.id !== this.item.id) {
+            return Cmds.Common.EEventEmitterEmit2Result.preventRoot;
+        }
+    }
+
+    onBeforeRoot = (cmd: Cmds.Common.ICommand): any => {
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
         switch(cmdId) {
             case Cmds.ECommandId.adhoc_login:
                 type === Cmds.ECommandType.resp ?
-                    Services.Cmds.Login.Room.onDispatched.resp(this, cmd as any) : null;
+                    Services.Cmds.Login.Room.onBeforeRoot.resp(this, cmd as any) : null;
                 break;
             case Cmds.ECommandId.adhoc_hello:
                 type === Cmds.ECommandType.req ?
-                    Services.Cmds.Hello.Room.onDispatched.req(this, cmd as any) :
+                    Services.Cmds.Hello.Room.onBeforeRoot.req(this, cmd as any) :
                 type === Cmds.ECommandType.resp ?
-                    Services.Cmds.Hello.Room.onDispatched.resp(this, cmd as any) : null;
+                    Services.Cmds.Hello.Room.onBeforeRoot.resp(this, cmd as any) : null;
                 break;
             case Cmds.ECommandId.room_open:
                 type === Cmds.ECommandType.resp ?
-                    Services.Cmds.RoomOpen.Room.onDispatched.resp(this, cmd as any) : null
+                    Services.Cmds.RoomOpen.Room.onBeforeRoot.resp(this, cmd as any) : null
                 break;
             case Cmds.ECommandId.room_join:
                 type === Cmds.ECommandType.resp ?
-                    Services.Cmds.RoomJoin.Room.onDispatched.resp(this, cmd as any) : null                    
+                    Services.Cmds.RoomJoin.Room.onBeforeRoot.resp(this, cmd as any) : null                    
                 break;
             case Cmds.ECommandId.room_hello:
                 type === Cmds.ECommandType.req ?
-                    Services.Cmds.RoomHello.Room.onDispatched.req(this, cmd as any) :
+                    Services.Cmds.RoomHello.Room.onBeforeRoot.req(this, cmd as any) :
                 type === Cmds.ECommandType.resp ?
-                    Services.Cmds.RoomHello.Room.onDispatched.resp(this, cmd as any) : null;
+                    Services.Cmds.RoomHello.Room.onBeforeRoot.resp(this, cmd as any) : null;
                 break;   
             case Cmds.ECommandId.stream_room_hello:
                 type === Cmds.ECommandType.req ?
-                    Services.Cmds.StreamRoomHello.Room.onDispatched.req(this, cmd as any) :
+                    Services.Cmds.StreamRoomHello.Room.onBeforeRoot.req(this, cmd as any) :
                 type === Cmds.ECommandType.resp ?
-                    Services.Cmds.StreamRoomHello.Room.onDispatched.resp(this, cmd as any) : null;
+                    Services.Cmds.StreamRoomHello.Room.onBeforeRoot.resp(this, cmd as any) : null;
                 break;                               
             default:
                 break;
         }
     }
-    onCommand_BeforeDispatched = (cmd: Cmds.Common.ICommand) => {
+
+    onAfterRoot = (cmd: Cmds.Common.ICommand): any => {
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
         switch(cmdId) {
             case Cmds.ECommandId.adhoc_logout:
-                    Services.Cmds.Logout.Room.onBeforeDispatched.req(this, cmd as any);
+                    Services.Cmds.Logout.Room.onAfterRoot.req(this, cmd as any);
                 break;
             case Cmds.ECommandId.network_disconnect: 
-                    Services.Cmds.Network.Disconnect.Room.onBeforeDispatched.req(this, cmd as any);
+                    Services.Cmds.Network.Disconnect.Room.onAfterRoot.req(this, cmd as any);
                 break;
             case Cmds.ECommandId.room_close:
                 type === Cmds.ECommandType.req ?
-                    Services.Cmds.RoomClose.Room.onBeforeDispatched.req(this, cmd as any) :
+                    Services.Cmds.RoomClose.Room.onAfterRoot.req(this, cmd as any) :
                 type === Cmds.ECommandType.resp ?
-                    Services.Cmds.RoomClose.Room.onBeforeDispatched.resp(this, cmd as any) : null     
+                    Services.Cmds.RoomClose.Room.onAfterRoot.resp(this, cmd as any) : null     
                 break;   
             case Cmds.ECommandId.room_leave:
                 type === Cmds.ECommandType.req ?
-                    Services.Cmds.RoomLeave.Room.onBeforeDispatched.req(this, cmd as any) :
+                    Services.Cmds.RoomLeave.Room.onAfterRoot.req(this, cmd as any) :
                 type === Cmds.ECommandType.resp ?
-                    Services.Cmds.RoomLeave.Room.onBeforeDispatched.resp(this, cmd as any) : null    
+                    Services.Cmds.RoomLeave.Room.onAfterRoot.resp(this, cmd as any) : null    
                 break;                              
             default:
                 break;

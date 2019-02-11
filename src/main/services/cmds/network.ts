@@ -7,14 +7,14 @@ export class Network extends Cmds.Common.Base {
 
     static Disconnect = {
         Rooms: {
-            onBeforeDispatched: {
+            onAfterRoot: {
                 req(rooms: Modules.IRooms, cmd: Cmds.CommandLogoutReq) {
                     rooms.clearRoom()
                 }
             }            
         },        
         Room: {
-            onBeforeDispatched: {
+            onAfterRoot: {
                 req(room: Modules.IRoom, cmd: Cmds.CommandLogoutReq) {
                     room.clearUser()                
                 }

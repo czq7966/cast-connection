@@ -9,7 +9,7 @@ export interface IStreams extends Cmds.Common.ICommandDispatcher {
     recvs: Cmds.Common.Helper.KeyValue<MediaStream>
 }
 
-export class Streams extends Cmds.Common.CommandDispatcher {
+export class Streams extends Cmds.Common.CommandRooter {
     peer: IPeer
     sends: Cmds.Common.Helper.KeyValue<MediaStream>
     recvs: Cmds.Common.Helper.KeyValue<MediaStream>
@@ -27,27 +27,27 @@ export class Streams extends Cmds.Common.CommandDispatcher {
         super.destroy();
     }
     initEvents() {
-        this.peer.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched);
-        this.peer.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched);
-        this.peer.eventEmitter.addListener(Cmds.ECommandEvents.onCommand, this.Command_onCommand)
-        this.peer.eventEmitter.addListener(Cmds.ECommandEvents.onBeforeCommand, this.Command_onBeforeCommand)
+        this.eventRooter.setParent(this.peer.eventRooter);        
+        this.eventRooter.onBeforeRoot.add(this.onBeforeRoot)
+        this.eventRooter.onAfterRoot.add(this.onAfterRoot)
+
+        // this.peer.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched);
+        // this.peer.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched);
+        // this.peer.eventEmitter.addListener(Cmds.ECommandEvents.onCommand, this.Command_onCommand)
+        // this.peer.eventEmitter.addListener(Cmds.ECommandEvents.onBeforeCommand, this.Command_onBeforeCommand)
     }
     unInitEvents() {
-        this.peer.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched);
-        this.peer.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched);
-        this.peer.eventEmitter.removeListener(Cmds.ECommandEvents.onCommand, this.Command_onCommand)
-        this.peer.eventEmitter.removeListener(Cmds.ECommandEvents.onBeforeCommand, this.Command_onBeforeCommand)
+        this.eventRooter.onBeforeRoot.remove(this.onBeforeRoot)
+        this.eventRooter.onAfterRoot.remove(this.onAfterRoot)
+        this.eventRooter.setParent();           
+        // this.peer.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched);
+        // this.peer.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched);
+        // this.peer.eventEmitter.removeListener(Cmds.ECommandEvents.onCommand, this.Command_onCommand)
+        // this.peer.eventEmitter.removeListener(Cmds.ECommandEvents.onBeforeCommand, this.Command_onBeforeCommand)
     }  
 
-    onCommand_BeforeCommand = (data: Cmds.ICommandData<Cmds.ICommandReqDataProps>) => {
-        let cmdId = data.cmdId;
-        if (cmdId.indexOf(Cmds.Command_stream_webrtc_on_prefix) === 0) {
-            // Services.Cmds.StreamWebrtcEvents.Peer.onBeforeCommand.req(this, data)
-        }
-    }
-
     // Command
-    onCommand_Dispatched = (cmd: Cmds.Common.ICommand) => {
+    onBeforeRoot = (cmd: Cmds.Common.ICommand): any => {
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
         switch(cmdId) {
@@ -55,7 +55,7 @@ export class Streams extends Cmds.Common.CommandDispatcher {
                 break;
         }
     }
-    onCommand_BeforeDispatched = (cmd: Cmds.Common.ICommand) => {
+    onAfterRoot = (cmd: Cmds.Common.ICommand): any => {
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
         switch(cmdId) {

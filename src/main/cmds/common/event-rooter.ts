@@ -1,16 +1,15 @@
-import { Base, IBaseConstructorParams, IBase } from "./base";
-import { ICommand } from "./command";
-import { ECommandDispatchEvents, ECommandEvents, ICommandData } from "./dts";
+import { Base, IBase } from "./base";
+import { EEventEmitterEmit2Result } from "./events-ex";
 
 enum EEventRooterEvents {
-    onCanStopRoot = 'onCanStopRoot',
+    onPreventRoot = 'onPreventRoot',
     onBeforeRoot = 'onBeforeRoot',
     onAfterRoot = 'onAfterRoot',
     onRoot = 'onRoot'
 }
 export interface IEventRooterEvents {
-    add(fn: (...args: any[]) => boolean)
-    remove(fn: (...args: any[]) => boolean)
+    add(fn: (...args: any[]) => EEventEmitterEmit2Result)
+    remove(fn: (...args: any[]) => EEventEmitterEmit2Result)
 }
 
 export class EventRooterEvents {
@@ -24,35 +23,37 @@ export class EventRooterEvents {
         delete this.event;
         delete this.rooter;
     }
-    add(fn: (...args: any[]) => boolean) {
+    add(fn: (...args: any[]) => EEventEmitterEmit2Result) {
         this.rooter.eventEmitter.addListener(this.event, fn)
     }
-    remove(fn: (...args: any[]) => boolean) {
+    remove(fn: (...args: any[]) => EEventEmitterEmit2Result) {
         this.rooter.eventEmitter.removeListener(this.event, fn)
     }    
 }
 
 export interface IEventRooter extends IBase {
     parent: IEventRooter;
-    onCanStopRoot: IEventRooterEvents;
+    onPreventRoot: IEventRooterEvents;
     onBeforeRoot: IEventRooterEvents;
     onAfterRoot: IEventRooterEvents;
+    root(...args: any[]): EEventEmitterEmit2Result;
+    setParent(parent?: IEventRooter);
 
 }
 
 export class EventRooter extends Base implements IEventRooter {
     parent: IEventRooter;
-    onCanStopRoot: IEventRooterEvents;
+    onPreventRoot: IEventRooterEvents;
     onBeforeRoot: IEventRooterEvents;
     onAfterRoot: IEventRooterEvents;
 
-    constructor(parent: IEventRooter){
+    constructor(parent?: IEventRooter){
         super();
         this.parent = parent;
         this.onAfterRoot = new EventRooterEvents(EEventRooterEvents.onAfterRoot, this);
         this.onBeforeRoot = new EventRooterEvents(EEventRooterEvents.onBeforeRoot, this);
-        this.onCanStopRoot = new EventRooterEvents(EEventRooterEvents.onCanStopRoot, this);
-        this.parent && this.parent.eventEmitter.removeListener(EEventRooterEvents.onRoot, this.root)        
+        this.onPreventRoot = new EventRooterEvents(EEventRooterEvents.onPreventRoot, this);
+        this.parent && this.parent.eventEmitter.addListener(EEventRooterEvents.onRoot, this.root)        
 
     }
     destroy() {
@@ -60,17 +61,32 @@ export class EventRooter extends Base implements IEventRooter {
         delete this.parent;
         delete this.onAfterRoot;
         delete this.onBeforeRoot;
-        delete this.onCanStopRoot;
+        delete this.onPreventRoot;
         super.destroy()
+    }
+    setParent(parent?: IEventRooter) {
+        this.parent && this.parent.eventEmitter.removeListener(EEventRooterEvents.onRoot, this.root);
+        this.parent = parent;
+        this.parent && this.parent.eventEmitter.addListener(EEventRooterEvents.onRoot, this.root);
     }
 
 
-    root = (...args: any[]) => {
-        let onCanStopRoot = (this.eventEmitter as any).emit2(EEventRooterEvents.onCanStopRoot, ...args) === true;
-        if (!onCanStopRoot) {
-            (this.eventEmitter as any).emit2(EEventRooterEvents.onBeforeRoot, ...args);
-            (this.eventEmitter as any).emit2(EEventRooterEvents.onRoot, ...args);
-            (this.eventEmitter as any).emit2(EEventRooterEvents.onAfterRoot, ...args);                
+    root = (...args: any[]): EEventEmitterEmit2Result => {
+        let onPreventRoot = EEventEmitterEmit2Result.none;
+        let onBeforeRoot = EEventEmitterEmit2Result.none;
+        let onRoot = EEventEmitterEmit2Result.none;
+        let onAfterRoot = EEventEmitterEmit2Result.none;
+
+        onPreventRoot = (this.eventEmitter as any).emit2(EEventRooterEvents.onPreventRoot, ...args) as EEventEmitterEmit2Result;
+        if ((onPreventRoot & EEventEmitterEmit2Result.preventRoot) !== EEventEmitterEmit2Result.preventRoot) {
+            onBeforeRoot = (this.eventEmitter as any).emit2(EEventRooterEvents.onBeforeRoot, ...args) as EEventEmitterEmit2Result;
+            if ((onBeforeRoot & EEventEmitterEmit2Result.preventRoot) !== EEventEmitterEmit2Result.preventRoot) {
+                onRoot = (this.eventEmitter as any).emit2(EEventRooterEvents.onRoot, ...args) as EEventEmitterEmit2Result;
+                if ((onRoot & EEventEmitterEmit2Result.preventRoot) !== EEventEmitterEmit2Result.preventRoot) {
+                    onAfterRoot = (this.eventEmitter as any).emit2(EEventRooterEvents.onAfterRoot, ...args) as EEventEmitterEmit2Result;                
+                }
+            }
         }
+        return onAfterRoot;
     }
 }

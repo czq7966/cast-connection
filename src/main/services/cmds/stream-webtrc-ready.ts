@@ -25,9 +25,9 @@ export class StreamWebrtcReady {
     }
     
     static Peer = {
-        onDispatched: {
+        onBeforeRoot: {
             req(peer: Modules.Webrtc.IPeer, cmd: Cmds.CommandReq) {
-                console.log(Tag, 'Peer', peer.user.item.room.id , 'onDispatched', 'Req', cmd.data);
+                console.log(Tag, 'Peer', peer.user.item.room.id , 'onBeforeRoot', 'Req', cmd.data);
                 let data = cmd.data;
                 if (data.props.user.id === peer.user.item.id && data.props.user.room.id === peer.user.item.room.id) {
                     let mMe = peer.user.room.me();
