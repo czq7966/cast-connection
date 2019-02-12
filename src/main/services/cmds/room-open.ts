@@ -1,5 +1,6 @@
 import * as Cmds from "../../cmds";
 import * as Modules from '../../modules'
+import * as ServiceModules from '../modules'
 import { User } from "./user";
 
 var Tag = "Service-Cmds-RoomOpen"
@@ -17,7 +18,7 @@ export class RoomOpen extends Cmds.Common.Base {
                 onResp: (cmdResp: Cmds.CommandRoomOpenResp) => {
                     let data = cmdResp.data;
                     data.props.user.states = Cmds.Common.Helper.StateMachine.set(data.props.user.states, Cmds.EUserState.roomOwner);
-                    Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onBeforeDispatched);
+                    // Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onBeforeDispatched);
                     Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
                     if (cmdResp.data.props.result) {
                         resolve(cmdResp.data);    
@@ -46,7 +47,9 @@ export class RoomOpen extends Cmds.Common.Base {
                 console.log(Tag, 'Rooms', 'onBeforeRoot', 'Resp', cmd.data)
                 let data = cmd.data;                
                 if (data.props.result) {
-                    rooms.getRoom(data.props.user.room)
+                    let room = rooms.getRoom(data.props.user.room);
+                    let pRoom =  room.getParent();
+                    pRoom && room.eventRooter.setParent(pRoom.subEventRooter)
                 }
             }
         }

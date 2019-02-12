@@ -71,6 +71,7 @@ export enum ECommandId {
 
 
 //分组前缀
+export var RoomIdSeparator = '/'
 export enum ERoomPrefix {
     adhoc = 'adhoc#',
     agency = 'agency#',

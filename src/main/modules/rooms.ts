@@ -56,12 +56,6 @@ export class Rooms extends Cmds.Common.CommandRooter implements IRooms {
                 type === Cmds.ECommandType.resp ?
                     Services.Cmds.Login.Rooms.onBeforeRoot.resp(this, cmd as any) : null
                 break;
-            // case Cmds.ECommandId.adhoc_hello:
-            //     type === Cmds.ECommandType.req ?
-            //         Services.Cmds.Hello.Rooms.onDispatched.req(this, cmd as any) :
-            //     type === Cmds.ECommandType.resp ?
-            //         Services.Cmds.Hello.Rooms.onDispatched.resp(this, cmd as any) : null
-            //     break;
             case Cmds.ECommandId.room_open: 
                 type === Cmds.ECommandType.resp ?
                     Services.Cmds.RoomOpen.Rooms.onBeforeRoot.resp(this, cmd as any) : null
@@ -76,17 +70,15 @@ export class Rooms extends Cmds.Common.CommandRooter implements IRooms {
     }
 
     onAfterRoot = (cmd: Cmds.Common.ICommand): any => {
-        // cmd.preventDefault = false;
-        // this.eventEmitter.emit(Cmds.ECommandDispatchEvents.onBeforeDispatched, cmd);
-        // if (!!cmd.preventDefault === true) return;
-
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
 
         switch(cmdId) {
             case Cmds.ECommandId.adhoc_logout:
                 type === Cmds.ECommandType.req ?
-                    Services.Cmds.Logout.Rooms.onAfterRoot.req(this, cmd as any) : null
+                    Services.Cmds.Logout.Rooms.onAfterRoot.req(this, cmd as any) : 
+                type === Cmds.ECommandType.resp ?
+                    Services.Cmds.Logout.Rooms.onAfterRoot.resp(this, cmd as any) : null                    
                 break;
             case Cmds.ECommandId.network_disconnect: 
                 Services.Cmds.Network.Disconnect.Rooms.onAfterRoot.req(this, cmd as any);

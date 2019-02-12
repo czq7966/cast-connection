@@ -17,7 +17,7 @@ export class StreamWebrtcSdp {
                 onResp: (cmdResp: Cmds.CommandStreamWebrtcSdpResp) => {                
                     let data = cmdResp.data;
                     if (data.props.result) {
-                        Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onBeforeDispatched);
+                        // Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onBeforeDispatched);
                         Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
                         resolve(data);
                     } else {

@@ -87,6 +87,6 @@ export class EventRooter extends Base implements IEventRooter {
                 }
             }
         }
-        return onAfterRoot;
+        return onAfterRoot | onRoot;
     }
 }

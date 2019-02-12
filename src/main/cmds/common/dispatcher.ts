@@ -23,7 +23,7 @@ export class Dispatcher extends Base {
         if (cmd) {
             cmd.instanceId = dispatcher.instanceId;
             if (!this.cmdTimeout.respCmd(cmd)) {
-                this.dispatch(cmd, Dts.ECommandDispatchEvents.onBeforeDispatched, ...args)
+                // this.dispatch(cmd, Dts.ECommandDispatchEvents.onBeforeDispatched, ...args)
                 this.dispatch(cmd, Dts.ECommandDispatchEvents.onDispatched, ...args)
             } 
             cmd.destroy();

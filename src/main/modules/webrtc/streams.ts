@@ -18,8 +18,10 @@ export class Streams extends Cmds.Common.CommandRooter {
         this.peer = peer;
         this.sends = new Cmds.Common.Helper.KeyValue<MediaStream>();
         this.recvs = new Cmds.Common.Helper.KeyValue<MediaStream>();
+        this.initEvents();
     }
     destroy() {
+        this.unInitEvents();
         this.sends.clear();
         this.recvs.clear();
         delete this.sends;
@@ -30,20 +32,11 @@ export class Streams extends Cmds.Common.CommandRooter {
         this.eventRooter.setParent(this.peer.eventRooter);        
         this.eventRooter.onBeforeRoot.add(this.onBeforeRoot)
         this.eventRooter.onAfterRoot.add(this.onAfterRoot)
-
-        // this.peer.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched);
-        // this.peer.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched);
-        // this.peer.eventEmitter.addListener(Cmds.ECommandEvents.onCommand, this.Command_onCommand)
-        // this.peer.eventEmitter.addListener(Cmds.ECommandEvents.onBeforeCommand, this.Command_onBeforeCommand)
     }
     unInitEvents() {
         this.eventRooter.onBeforeRoot.remove(this.onBeforeRoot)
         this.eventRooter.onAfterRoot.remove(this.onAfterRoot)
         this.eventRooter.setParent();           
-        // this.peer.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched);
-        // this.peer.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched);
-        // this.peer.eventEmitter.removeListener(Cmds.ECommandEvents.onCommand, this.Command_onCommand)
-        // this.peer.eventEmitter.removeListener(Cmds.ECommandEvents.onBeforeCommand, this.Command_onBeforeCommand)
     }  
 
     // Command
@@ -59,8 +52,21 @@ export class Streams extends Cmds.Common.CommandRooter {
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
         switch(cmdId) {
-            case Cmds.ECommandId.network_disconnect:
+            case Cmds.ECommandId.network_disconnect: 
+                Services.Cmds.Network.Disconnect.Streams.onAfterRoot.req(this, cmd as any);
                 break;
+            case Cmds.ECommandId.adhoc_logout:
+                type === Cmds.ECommandType.req ?
+                    Services.Cmds.Logout.Streams.onAfterRoot.req(this, cmd as any) :
+                type === Cmds.ECommandType.resp ?            
+                    Services.Cmds.Logout.Streams.onAfterRoot.resp(this, cmd as any) : null
+                break;
+            case Cmds.ECommandId.room_close:
+                type === Cmds.ECommandType.req ?
+                    Services.Cmds.RoomClose.Streams.onAfterRoot.req(this, cmd as any) :
+                type === Cmds.ECommandType.resp ?
+                    Services.Cmds.RoomClose.Streams.onAfterRoot.resp(this, cmd as any) : null     
+                break;                  
             default:
                 break;
         }        

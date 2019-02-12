@@ -15,7 +15,7 @@ export class RoomClose extends Cmds.Common.Base {
                     user: user
                 },
                 onResp: (cmdResp: Cmds.CommandRoomCloseResp) => {
-                    Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onBeforeDispatched);
+                    // Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onBeforeDispatched);
                     Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
                     if (cmdResp.data.props.result) {
                         resolve(cmdResp.data);    
@@ -72,7 +72,45 @@ export class RoomClose extends Cmds.Common.Base {
                 } 
             }            
         }  
-    }    
+    }   
+    
+    static User = {
+        onAfterRoot: {
+            req(user: Modules.IUser, cmd: Cmds.CommandRoomCloseReq) {
+                console.log(Tag, 'User', user.item.id , 'onAfterRoot', 'Req', cmd.data)
+            },            
+            resp(user: Modules.IUser, cmd: Cmds.CommandRoomCloseResp) {
+                console.log(Tag, 'User', user.item.id , 'onAfterRoot', 'Resp', cmd.data)
+            }            
+        }  
+    }      
 
+    static Peer = {
+        onAfterRoot: {
+            req(peer: Modules.Webrtc.IPeer, cmd: Cmds.CommandRoomCloseReq) {
+                console.log(Tag, 'Peer', peer.user.item.id , 'onAfterRoot', 'Req', cmd.data)
+                peer.rtc && peer.getRtc().close();
+            },            
+            resp(peer: Modules.Webrtc.IPeer, cmd: Cmds.CommandRoomCloseResp) {
+                console.log(Tag, 'Peer', peer.user.item.id , 'onAfterRoot', 'Resp', cmd.data)
+                peer.rtc && peer.getRtc().close();
+            }            
+        }  
+    }     
+
+    static Streams = {
+        onAfterRoot: {
+            req(streams: Modules.Webrtc.IStreams, cmd: Cmds.CommandLogoutReq) {
+                console.log(Tag, 'Streams', streams.peer.user.item.id, 'onAfterRoot', 'Req', cmd.data)
+                streams.sends.clear();
+                streams.recvs.clear();
+            },  
+            resp(streams: Modules.Webrtc.IStreams, cmd: Cmds.CommandLogoutReq) {
+                console.log(Tag, 'Streams', streams.peer.user.item.id, 'onAfterRoot', 'Resp', cmd.data)
+                streams.sends.clear();
+                streams.recvs.clear();
+            },      
+        }
+    }
 
 }

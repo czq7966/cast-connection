@@ -33,6 +33,8 @@ export interface IRoom extends Cmds.Common.IBase {
     rooms: IRooms;
     users: Cmds.Common.Helper.KeyValue<IUser>;
     eventRooter: Cmds.Common.IEventRooter
+    subEventRooter: Cmds.Common.IEventRooter
+    getParent(): IRoom
     getUser(user: Cmds.IUser | string): IUser
     delUser(id: string)
     clearUser()    
@@ -44,12 +46,14 @@ export class Room extends Cmds.Common.CommandRooter implements IRoom {
     item: Cmds.IRoom;
     rooms: IRooms;
     users: Cmds.Common.Helper.KeyValue<IUser>;
+    subEventRooter: Cmds.Common.IEventRooter;
 
     constructor(rooms: IRooms, item: Cmds.IRoom) {
         super(rooms.instanceId);
         this.rooms = rooms;
         this.item = Object.assign({}, item);
         this.users = new Cmds.Common.Helper.KeyValue();
+        this.subEventRooter = new Cmds.Common.EventRooter();
         this.initEvents();
     }
     destroy() {                
@@ -62,6 +66,7 @@ export class Room extends Cmds.Common.CommandRooter implements IRoom {
     }
 
     initEvents() {
+        this.subEventRooter.setParent(this.eventRooter);
         this.eventRooter.setParent(this.rooms.eventRooter);        
         this.eventRooter.onPreventRoot.add(this.onPreventRoot)
         this.eventRooter.onBeforeRoot.add(this.onBeforeRoot)
@@ -83,7 +88,8 @@ export class Room extends Cmds.Common.CommandRooter implements IRoom {
         this.eventRooter.onPreventRoot.remove(this.onPreventRoot)
         this.eventRooter.onBeforeRoot.remove(this.onBeforeRoot)
         this.eventRooter.onAfterRoot.remove(this.onAfterRoot)
-        this.eventRooter.setParent();        
+        this.eventRooter.setParent();   
+        this.subEventRooter.setParent();     
 
         // this.rooms.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched)
         // this.rooms.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched)
@@ -101,15 +107,34 @@ export class Room extends Cmds.Common.CommandRooter implements IRoom {
     // Command
 
     onPreventRoot = (cmd: Cmds.Common.ICommand): any => {
-        let user = cmd.data.props.user as Cmds.IUser;
-        if (user && user.room && user.room.id !== this.item.id) {
-            return Cmds.Common.EEventEmitterEmit2Result.preventRoot;
+        let cmdId = cmd.data.cmdId;
+        let type = cmd.data.type;
+        switch(cmdId) {
+            case Cmds.ECommandId.adhoc_logout:
+            case Cmds.ECommandId.network_disconnect:            
+                break;
+            default:
+                let user = cmd.data.props.user as Cmds.IUser;            
+                if (user && user.room && user.room.id.indexOf(this.item.id) !== 0 ) {
+                    return Cmds.Common.EEventEmitterEmit2Result.preventRoot;                    
+                }            
+                break;            
         }
+
+
     }
 
     onBeforeRoot = (cmd: Cmds.Common.ICommand): any => {
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
+        switch(cmdId) {
+            default:
+                let user = cmd.data.props.user as Cmds.IUser;            
+                if (user && user.room && user.room.id !== this.item.id)
+                    return;
+                break;
+        }
+
         switch(cmdId) {
             case Cmds.ECommandId.adhoc_login:
                 type === Cmds.ECommandType.resp ?
@@ -149,10 +174,25 @@ export class Room extends Cmds.Common.CommandRooter implements IRoom {
     onAfterRoot = (cmd: Cmds.Common.ICommand): any => {
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
+
         switch(cmdId) {
             case Cmds.ECommandId.adhoc_logout:
-                    Services.Cmds.Logout.Room.onAfterRoot.req(this, cmd as any);
+            case Cmds.ECommandId.network_disconnect:  
                 break;
+            default:
+                let user = cmd.data.props.user as Cmds.IUser;            
+                if (user && user.room && user.room.id !== this.item.id)
+                    return;
+                break;
+        }
+
+        switch(cmdId) {
+            case Cmds.ECommandId.adhoc_logout:
+                type === Cmds.ECommandType.req ?
+                    Services.Cmds.Logout.Room.onAfterRoot.req(this, cmd as any) :
+                type === Cmds.ECommandType.resp ?            
+                    Services.Cmds.Logout.Room.onAfterRoot.resp(this, cmd as any) : null
+                break; 
             case Cmds.ECommandId.network_disconnect: 
                     Services.Cmds.Network.Disconnect.Room.onAfterRoot.req(this, cmd as any);
                 break;
@@ -173,6 +213,10 @@ export class Room extends Cmds.Common.CommandRooter implements IRoom {
         }        
     }    
 
+    // Room
+    getParent(): IRoom {
+        return Services.Modules.Room.getParent(this)
+    }
 
     // User
     me(): IUser {
@@ -185,7 +229,7 @@ export class Room extends Cmds.Common.CommandRooter implements IRoom {
         let user: IUser
         this.users.keys().some(key => {
             let _user = this.users.get(key);
-            if (Cmds.Common.Helper.StateMachine.isset(user.item.states, Cmds.EUserState.roomOwner)) {
+            if (Cmds.Common.Helper.StateMachine.isset(_user.item.states, Cmds.EUserState.roomOwner)) {
                 user = _user;
                 return true;
             }

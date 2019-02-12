@@ -1,8 +1,7 @@
 import * as Cmds from "../../cmds";
 import * as Modules from '../../modules'
 import * as ServiceCmds from '../cmds/index'
-import { Connection } from "./connection";
-
+import { Rooms } from "./rooms";
 
 
 var Tag = "Service-Module-Room"
@@ -39,4 +38,10 @@ export class Room{
             }
         }
     }   
+    static getParent(mRoom: Modules.IRoom): Modules.IRoom {
+        let room = ServiceCmds.Room.getParent(mRoom.item)
+        if (room) {
+            return Rooms.getRoom(mRoom.instanceId, room.id)
+        }
+    }
 }

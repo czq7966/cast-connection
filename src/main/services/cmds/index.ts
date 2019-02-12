@@ -1,4 +1,5 @@
 export * from './user'
+export * from './room'
 export * from './hello'
 export * from './login'
 export * from './logout'

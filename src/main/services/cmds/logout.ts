@@ -1,5 +1,6 @@
 import * as Cmds from "../../cmds";
 import * as Modules from '../../modules'
+import * as ServiceModules from '../modules'
 import { User } from "./user";
 import { RoomLeave } from "./room-leave";
 
@@ -14,7 +15,7 @@ export class Logout extends Cmds.Common.Base {
                     user: currUser
                 },
                 onResp: (cmdResp: Cmds.CommandLoginResp) => {
-                    Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onBeforeDispatched);
+                    // Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onBeforeDispatched);
                     Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
                     if (cmdResp.data.props.result) {
                         resolve(cmdResp.data);    
@@ -50,6 +51,7 @@ export class Logout extends Cmds.Common.Base {
             resp(rooms: Modules.IRooms, cmd: Cmds.CommandRoomLeaveResp) {
                 console.log(Tag, 'Rooms', 'onAfterRoot', 'Resp', cmd.data);
                 RoomLeave.Rooms.onAfterRoot.resp(rooms, cmd);
+                rooms.clearRoom();
                 // let data = cmd.data;                
                 // let room = rooms.getRoom(data.props.user.room.id);
                 // if (room && room.users.count() == 0) {                    
@@ -83,6 +85,45 @@ export class Logout extends Cmds.Common.Base {
             },            
         }
     }    
+
+    static User = {
+        onAfterRoot: {
+            req(user: Modules.IUser, cmd: Cmds.CommandLogoutReq) {
+                console.log(Tag, 'User', user.item.id, 'onAfterRoot', 'Req', cmd.data)
+            },  
+            resp(user: Modules.IUser, cmd: Cmds.CommandLogoutReq) {
+                console.log(Tag, 'User', user.item.id, 'onAfterRoot', 'Resp', cmd.data)
+            },      
+        }
+    }
+
+    static Peer = {
+        onAfterRoot: {
+            req(peer: Modules.Webrtc.IPeer, cmd: Cmds.CommandLogoutReq) {
+                console.log(Tag, 'Peer', peer.user.item.id, 'onAfterRoot', 'Req', cmd.data)
+                peer.rtc && peer.getRtc().close();
+            },  
+            resp(peer: Modules.Webrtc.IPeer, cmd: Cmds.CommandLogoutReq) {
+                console.log(Tag, 'Peer', peer.user.item.id, 'onAfterRoot', 'Resp', cmd.data)
+                peer.rtc && peer.getRtc().close();
+            },      
+        }
+    }
+
+    static Streams = {
+        onAfterRoot: {
+            req(streams: Modules.Webrtc.IStreams, cmd: Cmds.CommandLogoutReq) {
+                console.log(Tag, 'Streams', streams.peer.user.item.id, 'onAfterRoot', 'Req', cmd.data)
+                streams.sends.clear();
+                streams.recvs.clear();
+            },  
+            resp(streams: Modules.Webrtc.IStreams, cmd: Cmds.CommandLogoutReq) {
+                console.log(Tag, 'Streams', streams.peer.user.item.id, 'onAfterRoot', 'Resp', cmd.data)
+                streams.sends.clear();
+                streams.recvs.clear();
+            },      
+        }
+    }
 
 
 }

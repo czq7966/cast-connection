@@ -4,10 +4,10 @@ import * as ServiceModules from '../modules/index'
 
 var Tag = "Service-Cmds-StreamWebrtcCandidate"
 export class StreamWebrtcCandidate {
-    static candidate(instanceId: string, toUser: Cmds.IUser, candidate: any): Promise<any> {
+    static candidate(instanceId: string, toUser: Cmds.IUser, toRoomUser: Cmds.IUser, candidate: any): Promise<any> {
         return new Promise((resolve, reject) => {
             let cmd = new Cmds.CommandStreamWebrtcCandidateReq({instanceId: instanceId})
-            let user = Object.assign({}, toUser);
+            let user = Object.assign({}, toRoomUser);
             user.extra = candidate;
             cmd.data = {
                 to: {type: 'user', id: toUser.id},

@@ -4,7 +4,7 @@ import { Hello } from "./hello";
 import { Dispatcher } from "../dispatcher";
 
 var Tag = "Service-Cmds-User"
-export class User extends Cmds.Common.Base {
+export class User {
     static CurrentUser(instanceId: string): Cmds.IUser {
         let data = Cmds.CommandLoginResp.getInstance<Cmds.CommandLoginResp>(instanceId).data; 
         let user = data && data.props && data.props.user
@@ -22,7 +22,7 @@ export class User extends Cmds.Common.Base {
         return !!(data && data.props && data.props.user && data.props.user)
     }
     static getStreamRoomId(user: Cmds.IUser) {
-        return user.room.id + '/' + Cmds.ERoomPrefix.stream + user.id;
+        return user.room.id + Cmds.RoomIdSeparator + Cmds.ERoomPrefix.stream + user.id;
     }
     static syncHello(instanceId: string, user: Cmds.IUser) {
         let reqCmd = new Cmds.CommandHelloReq({instanceId: instanceId});

@@ -73,8 +73,23 @@ export class User extends Cmds.Common.CommandRooter implements IUser  {
     // Command
     onPreventRoot = (cmd: Cmds.Common.ICommand): any => {
         let user = cmd.data.props.user as Cmds.IUser;
-        if (user && user.id !== this.item.id) {
-            return Cmds.Common.EEventEmitterEmit2Result.preventRoot;
+        let cmdId = cmd.data.cmdId;
+        let type = cmd.data.type;
+        switch(cmdId) {
+            case Cmds.ECommandId.adhoc_logout:
+                if (type === Cmds.ECommandType.resp)
+                    break;
+            case Cmds.ECommandId.room_close:
+                if (user && user.room && user.room.id !== this.room.item.id) {
+                    return Cmds.Common.EEventEmitterEmit2Result.preventRoot;
+                }
+                break;
+            default:
+                user = cmd.data.props.user as Cmds.IUser;            
+                if (user && user.id !== this.item.id) {
+                    return Cmds.Common.EEventEmitterEmit2Result.preventRoot;
+                }            
+                break;            
         }
     }
 
@@ -98,10 +113,23 @@ export class User extends Cmds.Common.CommandRooter implements IUser  {
     onAfterRoot = (cmd: Cmds.Common.ICommand): any => {
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
+
         switch(cmdId) {
-            case Cmds.ECommandId.network_disconnect:
-                Debug.log(Tag, 'onBeforeDispatched', cmdId)
+            case Cmds.ECommandId.network_disconnect: 
+                Services.Cmds.Network.Disconnect.User.onAfterRoot.req(this, cmd as any);
                 break;
+            case Cmds.ECommandId.adhoc_logout:
+                type === Cmds.ECommandType.req ?
+                    Services.Cmds.Logout.User.onAfterRoot.req(this, cmd as any) :
+                type === Cmds.ECommandType.resp ?            
+                    Services.Cmds.Logout.User.onAfterRoot.resp(this, cmd as any) : null
+                break; 
+            case Cmds.ECommandId.room_close:
+                type === Cmds.ECommandType.req ?
+                    Services.Cmds.RoomClose.User.onAfterRoot.req(this, cmd as any) :
+                type === Cmds.ECommandType.resp ?
+                    Services.Cmds.RoomClose.User.onAfterRoot.resp(this, cmd as any) : null     
+                break;                                
             default:
                 break;
         }        

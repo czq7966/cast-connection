@@ -8,10 +8,12 @@ import {StreamWebrtcCandidate } from './stream-webtrc-candidate'
 var Tag = "Service-Cmds-StreamWebrtcEvents"
 export class StreamWebrtcStreams {
     static sendingStream(streams: Modules.Webrtc.IStreams, stream: MediaStream) {
-        ServiceModules.Webrtc.Streams.addSendStream(streams, stream);
+        stream && ServiceModules.Webrtc.Streams.addSendStream(streams, stream);
+        let mRoom = streams.peer.user.room;
+        let mpRoom = ServiceModules.Room.getParent(mRoom)
         let instanceId = streams.instanceId;        
-        let mUser = ServiceModules.Rooms.getLoginRoom(instanceId).getUser(streams.peer.user.item.id)
-        mUser.states.set(Cmds.EUserState.stream_room_sending);
+        let mUser = mpRoom.getUser(streams.peer.user.item.id)
+        streams.sends.count() > 0 ? mUser.states.set(Cmds.EUserState.stream_room_sending) : mUser.states.reset(Cmds.EUserState.stream_room_sending);
         User.syncHello(instanceId, mUser.item);
     }
     static sendStream(streams: Modules.Webrtc.IStreams, stream: MediaStream): Promise<any> {
@@ -21,19 +23,10 @@ export class StreamWebrtcStreams {
         let peer = mUser.peer;
         let mMe = mRoom.me();
         if (mMe.item.id === mUser.item.id) {
-            // let promises = [];
-            // mRoom.users.keys().forEach(key => {
-            //     let nUser = mRoom.getUser(key);
-            //     if (nUser.item.id !== mUser.item.id) {
-            //         let promise = this.sendStream(nUser.getPeer().streams, stream);
-            //         promises.push(promise);
-            //     }
-            // })
-            // return Promise.all(promises);
             console.warn('Can not send stream to self!')
             
         } else {
-            (peer.getRtc() as any).addStream(stream);
+            let str = (peer.getRtc() as any).addStream(stream);
             let promise = StreamWebrtcSdp.offer(mUser);            
             return promise;
         }

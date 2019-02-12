@@ -35,7 +35,8 @@ export interface IPeer extends Cmds.Common.ICommandRooter {
     streams: Streams;
     datachannels: DataChannels;
     input: Input;  
-    getRtc(): RTCPeerConnection
+    rtc: RTCPeerConnection
+    getRtc(create?: boolean): RTCPeerConnection
     delRtc()
 }
 
@@ -118,7 +119,6 @@ export class Peer extends Cmds.Common.CommandRooter implements IPeer  {
 
     // Command
     onBeforeRoot = (cmd: Cmds.Common.ICommand): any => {
-        console.log(Tag, 'onDispatched', 'Req', cmd.data);
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
         switch(cmdId) {
@@ -143,8 +143,21 @@ export class Peer extends Cmds.Common.CommandRooter implements IPeer  {
         let cmdId = cmd.data.cmdId;
         let type = cmd.data.type;
         switch(cmdId) {
-            case Cmds.ECommandId.network_disconnect:
+            case Cmds.ECommandId.network_disconnect: 
+                Services.Cmds.Network.Disconnect.Peer.onAfterRoot.req(this, cmd as any);
                 break;
+            case Cmds.ECommandId.adhoc_logout:
+                type === Cmds.ECommandType.req ?
+                    Services.Cmds.Logout.Peer.onAfterRoot.req(this, cmd as any) :
+                type === Cmds.ECommandType.resp ?            
+                    Services.Cmds.Logout.Peer.onAfterRoot.resp(this, cmd as any) : null
+                break;  
+            case Cmds.ECommandId.room_close:
+                type === Cmds.ECommandType.req ?
+                    Services.Cmds.RoomClose.Peer.onAfterRoot.req(this, cmd as any) :
+                type === Cmds.ECommandType.resp ?
+                    Services.Cmds.RoomClose.Peer.onAfterRoot.resp(this, cmd as any) : null     
+                break;                              
             default:
                 if (cmdId.indexOf(Cmds.Command_stream_webrtc_on_prefix) === 0) {
                     Services.Cmds.StreamWebrtcEvents.Peer.onAfterCommand.req(this, cmd.data)
@@ -187,8 +200,8 @@ export class Peer extends Cmds.Common.CommandRooter implements IPeer  {
     getConfig(): Config {
         return this.config;
     }    
-    getRtc(): RTCPeerConnection {
-        if (!this.rtc) {
+    getRtc(create: boolean = true): RTCPeerConnection {
+        if (!this.rtc && create) {
             switch(Config.platform) {
                 case EPlatform.reactnative:
                     this.rtc = new WebRTC.RTCPeerConnection(this.getConfig().rtcConfig)

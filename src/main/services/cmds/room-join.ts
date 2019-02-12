@@ -16,7 +16,7 @@ export class RoomJoin extends Cmds.Common.Base {
                 },
                 onResp: (cmdResp: Cmds.CommandRoomJoinResp) => {
                     let data = cmdResp.data;
-                    Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onBeforeDispatched);
+                    // Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onBeforeDispatched);
                     Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
                     if (data.props.result) {
                         resolve(data);    
@@ -45,7 +45,9 @@ export class RoomJoin extends Cmds.Common.Base {
                 console.log(Tag, 'Rooms', 'onBeforeRoot', 'Resp', cmd.data)
                 let data = cmd.data;
                 if (data.props.result) {
-                    rooms.getRoom(data.props.user.room)
+                    let room = rooms.getRoom(data.props.user.room);
+                    let pRoom =  room.getParent();
+                    pRoom && room.eventRooter.setParent(pRoom.subEventRooter)
                 }
             }
         }
