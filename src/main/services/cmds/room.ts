@@ -1,7 +1,4 @@
 import * as Cmds from "../../cmds";
-import { RoomHello } from "./room-hello";
-import { Hello } from "./hello";
-import { Dispatcher } from "../dispatcher";
 
 var Tag = "Service-Cmds-Room"
 export class Room {

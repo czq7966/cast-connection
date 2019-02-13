@@ -1,6 +1,5 @@
 import * as Cmds from "../../cmds";
 import * as Modules from '../../modules'
-import * as ServiceModules from '../modules'
 import { User } from "./user";
 
 var Tag = "Service-Cmds-RoomOpen"
@@ -69,6 +68,4 @@ export class RoomOpen extends Cmds.Common.Base {
             }  
         }
     }    
-
-
 }

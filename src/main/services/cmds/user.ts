@@ -1,5 +1,4 @@
 import * as Cmds from "../../cmds";
-import { RoomHello } from "./room-hello";
 import { Hello } from "./hello";
 import { Dispatcher } from "../dispatcher";
 
@@ -44,6 +43,4 @@ export class User {
         }        
         Dispatcher.getInstance<Dispatcher>(instanceId, false).onCommand(data);
     }
-    
-    
 }

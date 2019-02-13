@@ -3,7 +3,6 @@ import * as Modules from '../../modules'
 import * as ServiceModules from '../modules/index'
 import { User } from "./user";
 import { StreamWebrtcSdp } from './stream-webtrc-sdp'
-import {StreamWebrtcCandidate } from './stream-webtrc-candidate'
 
 var Tag = "Service-Cmds-StreamWebrtcEvents"
 export class StreamWebrtcStreams {

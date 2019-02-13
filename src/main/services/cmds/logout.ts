@@ -42,21 +42,12 @@ export class Logout extends Cmds.Common.Base {
             req(rooms: Modules.IRooms, cmd: Cmds.CommandRoomLeaveReq) {
                 console.log(Tag, 'Rooms', 'onAfterRoot', 'Req', cmd.data);
                 RoomLeave.Rooms.onAfterRoot.req(rooms, cmd);
-                // let data = cmd.data;                
-                // let room = rooms.getRoom(data.props.user.room.id);
-                // if (room && room.users.count() == 0) {                    
-                //     rooms.delRoom(room.item.id)
-                // }    
+
             },            
             resp(rooms: Modules.IRooms, cmd: Cmds.CommandRoomLeaveResp) {
                 console.log(Tag, 'Rooms', 'onAfterRoot', 'Resp', cmd.data);
                 RoomLeave.Rooms.onAfterRoot.resp(rooms, cmd);
                 rooms.clearRoom();
-                // let data = cmd.data;                
-                // let room = rooms.getRoom(data.props.user.room.id);
-                // if (room && room.users.count() == 0) {                    
-                //     rooms.delRoom(room.item.id)
-                // }                
             } 
         }
     }
@@ -124,6 +115,4 @@ export class Logout extends Cmds.Common.Base {
             },      
         }
     }
-
-
 }

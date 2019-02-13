@@ -2,7 +2,6 @@ import * as Cmds from "../../cmds";
 import * as Modules from '../../modules'
 import * as ServiceModules from '../modules/index'
 import {StreamWebrtcCandidate } from './stream-webtrc-candidate'
-import { StreamWebrtcStreams } from "./stream-webtrc-streams";
 
 var Tag = "Service-Cmds-StreamWebrtcEvents"
 export class StreamWebrtcEvents {
@@ -113,15 +112,6 @@ export class StreamWebrtcEvents {
             console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_oniceconnectionstatechange', state); 
             if (state == 'disconnected' || state == 'failed') 
                 rtc.close();
-            
-
-            // if (state == 'closed' || state == 'failed' || state == 'disconnected' ) {
-            //     ServiceModules.Webrtc.Streams.delRecvStream(peer.streams);
-            //     ServiceModules.Webrtc.Streams.delSendStream(peer.streams);
-            //     if (state == 'disconnected') {
-            //         rtc.close();
-            //     }                
-            // }
         }
     }
 

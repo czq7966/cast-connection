@@ -1,7 +1,6 @@
 import * as Cmds from "../../cmds";
 import * as Modules from '../../../modules'
 import * as Helper from '../../../helper/index'
-import * as ServiceCmds from '../../cmds/index'
 import { Config, EPlatform } from "../../../config";
 
 

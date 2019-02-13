@@ -71,18 +71,6 @@ export class Room extends Cmds.Common.CommandRooter implements IRoom {
         this.eventRooter.onPreventRoot.add(this.onPreventRoot)
         this.eventRooter.onBeforeRoot.add(this.onBeforeRoot)
         this.eventRooter.onAfterRoot.add(this.onAfterRoot)
-
-        // this.rooms.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched);
-        // this.rooms.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched);
-
-
-        // this.eventEmitter.addListener(ECustomEvents.joinRoom, this.onJoinRoom);
-        // this.eventEmitter.addListener(ECustomEvents.leaveRoom, this.onLeaveRoom);
-        // this.eventEmitter.addListener(ECustomEvents.closeRoom, this.onCloseRoom);
-        // this.eventEmitter.addListener(ECustomEvents.message, this.onMessage);
-
-        // this.eventEmitter.addListener(ERTCPeerEvents.oniceconnectionstatechange, this.onIceConnectionStateChange);
-        // this.eventEmitter.addListener(ERTCPeerEvents.onrecvstream, this.onRecvStream);        
     }
     unInitEvents() {
         this.eventRooter.onPreventRoot.remove(this.onPreventRoot)
@@ -90,18 +78,6 @@ export class Room extends Cmds.Common.CommandRooter implements IRoom {
         this.eventRooter.onAfterRoot.remove(this.onAfterRoot)
         this.eventRooter.setParent();   
         this.subEventRooter.setParent();     
-
-        // this.rooms.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched)
-        // this.rooms.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched)
-
-
-        // this.eventEmitter.removeListener(ECustomEvents.joinRoom, this.onJoinRoom)
-        // this.eventEmitter.removeListener(ECustomEvents.leaveRoom, this.onLeaveRoom);
-        // this.eventEmitter.removeListener(ECustomEvents.closeRoom, this.onCloseRoom);
-        // this.eventEmitter.removeListener(ECustomEvents.message, this.onMessage)
-
-        // this.eventEmitter.removeListener(ERTCPeerEvents.oniceconnectionstatechange, this.onIceConnectionStateChange);
-        // this.eventEmitter.removeListener(ERTCPeerEvents.onrecvstream, this.onRecvStream);        
     }
 
     // Command
@@ -262,120 +238,4 @@ export class Room extends Cmds.Common.CommandRooter implements IRoom {
             this.delUser(key)
         });
     }
-    // onJoinRoom = (query: IUserQuery) => {
-    //     if (!this.users[query.from]) {
-    //         let user = new User({
-    //             socketId: query.from,
-    //             isOwner: query.isOwner
-    //         })
-    //         this.addUser(user);
-    //         this.currUser().sayHello(user.socketId);
-    //     }
-    // }
-    // onLeaveRoom = (query: IUserQuery) => {
-    //     this.delUser(query.from);
-    // }
-    // onCloseRoom = (query: IUserQuery) => {
-        
-    // }
-    // onMessage = (query: IUserQuery) => {
-    //     let msg = query.msg as ISignalerMessage;
-    //     let user = this.getUser(query.from);
-    //     switch(msg.type) {
-    //         case ESignalerMessageType.hello:
-    //             if (!user) {
-    //                 user = new User({
-    //                     socketId: query.from,
-    //                     isOwner: query.isOwner
-    //                 })
-    //                 this.addUser(user); 
-    //             }
-    //             break;
-    //         default:                
-    //             break;
-    //     }
-    //     user && user.eventEmitter.emit(ECustomEvents.message, query);        
-    // }
-    // onRecvStream = (stream: MediaStream, user: IUser) => {
-    //     this.streams.addRecvStream(stream);
-    // }
-    // onIceConnectionStateChange = (ev: RTCTrackEvent, user: IUser) => {
-    //     // this.eventEmitter.emit(ERTCPeerEvents.oniceconnectionstatechange, ev, user);
-    // }    
-
-    // getOwner():IUser {
-    //     let user: IUser
-    //     Object.keys(this.users).some(key => {
-    //         if (this.users[key].isOwner) {
-    //             user = this.users[key];
-    //             return true;
-    //         }
-    //     })
-    //     return user;
-    // }
-    // isOwner(socketId: string): boolean {
-    //     return this.users[socketId] && this.users[socketId].isOwner;        
-    // }
-    // addUser(user: IUser): IUser {
-    //     if (user && user.socketId) {
-    //         user.room = this;
-    //         user.signaler = user.signaler || this.signaler;
-    //         this.users[user.socketId] = user;
-    //         this.eventEmitter.emit(ERoomEvents.onadduser, user)
-
-    //         return this.users[user.socketId]
-    //     }
-    // }
-    // delUser(socketId: string) {
-    //     let user = this.users[socketId];
-    //     if (user) {
-    //         delete this.users[socketId];
-    //         this.eventEmitter.emit(ERoomEvents.ondeluser, user)
-    //         user.destroy();            
-    //     }        
-    // }
-    // clearUsers() {
-    //     Object.keys(this.users).forEach(key => {
-    //         this.delUser(key)
-    //     })
-    // }
-    // getUser(socketId: string) {
-    //     return this.users[socketId];
-    // }
-    // getUsers(): Array<IUser> {
-    //     let result = [];
-    //     Object.keys(this.users).forEach(id => {
-    //         result.push(this.users[id])
-    //     })
-    //     return result;
-    // }
-    // currUser(): IUser {
-    //     return this.getUser(this.signaler.id());
-    // }
-    // addSendStream(stream: MediaStream, user?: IUser) {    
-    //     if (stream) {
-    //         if (!this.streams.getSendStream(stream.id)) {
-    //             this.streams.addSendStream(stream);
-    //         }
-    //     }
-    //     this.sendStreamsToUser();  
-    // }
-    // sendStreamsToUser(user?: IUser) {
-    //     let streams = this.streams.getSendStreams();
-    //     if (user) {
-    //         user.addSendStreams(streams)
-    //     } else {
-    //         this.getUsers().forEach(user => {
-    //             user.addSendStreams(streams)
-    //         })            
-    //     }
-    // }
-    // close() {
-    //     Object.keys(this.users).forEach(key => {
-    //         this.users[key].close();
-    //     })      
-    // }    
-    // userCount(): number {
-    //     return this.getUsers().length;
-    // }
 }

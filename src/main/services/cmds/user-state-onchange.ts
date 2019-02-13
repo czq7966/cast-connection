@@ -1,6 +1,5 @@
 import * as Cmds from "../../cmds";
 import * as Modules from '../../modules'
-import * as ServiceModules from '../modules/index'
 
 var Tag = "Service-Cmds-UserStateOnChange"
 export class UserStateOnChange {

@@ -41,13 +41,7 @@ export class Dispatcher extends Cmds.Common.CommandRooter implements IDispatcher
     // Command
     onCommand = (cmd: Cmds.ICommandData<any>) => {
         console.warn('OnCommand', cmd)
-        // this.eventEmitter.emit(Dts.ECommandEvents.onBeforeCommand, cmd);
-        // this.eventEmitter.emit(Dts.ECommandEvents.onCommand, cmd);
-        // if (cmd.preventDispatch !== true) {
-            // this.eventEmitter['emit2'](Dts.CommandID, cmd)
-            Cmds.Common.Dispatcher.onCommand(cmd, this);
-            // this.eventEmitter.emit(Dts.CommandID, cmd)
-        // }
+        Cmds.Common.Dispatcher.onCommand(cmd, this);
     }
     sendCommand(cmd: Cmds.ICommandData<any>): Promise<any> {
         console.warn('SendCommand', cmd)
@@ -60,7 +54,6 @@ export class Dispatcher extends Cmds.Common.CommandRooter implements IDispatcher
 
     // Network
     onDisconnect = () => {
-        // this.eventEmitter.emit(Dts.EClientSocketEvents.disconnect)
         let data: Cmds.ICommandData<any> = {
             cmdId: Cmds.ECommandId.network_disconnect,
             props: {}

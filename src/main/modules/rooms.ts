@@ -36,16 +36,11 @@ export class Rooms extends Cmds.Common.CommandRooter implements IRooms {
         this.eventRooter.setParent(this.dispatcher.eventRooter);        
         this.eventRooter.onBeforeRoot.add(this.onBeforeRoot)
         this.eventRooter.onAfterRoot.add(this.onAfterRoot)
-        // this.dispatcher.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched)
-        // this.dispatcher.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched)
     }
     unInitEvents() {
         this.eventRooter.onBeforeRoot.remove(this.onBeforeRoot)
         this.eventRooter.onAfterRoot.remove(this.onAfterRoot)
         this.eventRooter.setParent();        
-
-        // this.dispatcher.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched);
-        // this.dispatcher.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched)
     }
 
     onBeforeRoot = (cmd: Cmds.Common.ICommand): any  => {
@@ -133,44 +128,4 @@ export class Rooms extends Cmds.Common.CommandRooter implements IRooms {
             this.delRoom(key)
         });
     }    
-
-
-    // userCount(): number {
-    //     let result = 0;
-    //     Object.keys(this.rooms).forEach(roomid => {
-    //         let room = this.getRoom(roomid)
-    //         result = result + room.userCount();
-    //     })
-    //     return result;
-    // }
-
-
-    // onCloseRoom = (query: IUserQuery) => {
-    //     this.delRoom(query.roomid);
-    // }
-    // newRoom(roomid: string, password?: string): Room {
-    //     if (roomid) {
-    //         let room = new Room({roomid: roomid, password: password});
-    //         room.signaler = this.signaler;
-    //         this.rooms[roomid] = room;
-    //         this.eventEmitter.emit(ERoomsEvents.onnewroom, room)
-    //         return room;
-    //     }
-    // }
-    // getRoom(roomid: string): Room {
-    //     return this.rooms[roomid];
-    // }
-    // delRoom(roomid: string) {
-    //     let room = this.rooms[roomid];
-    //     room && room.destroy();
-    //     delete this.rooms[roomid];
-    // }
-    // close() {
-    //     Object.keys(this.rooms).forEach(key => {
-    //         this.rooms[key].close();
-    //     })       
-    // }
-
-
-
 }

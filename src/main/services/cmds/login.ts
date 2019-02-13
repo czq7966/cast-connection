@@ -41,24 +41,12 @@ export class Login extends Cmds.Common.Base {
             cmd.destroy();
             cmd = null;     
         })
-
     }
-
     static Rooms = {
         onBeforeRoot: {
             resp(rooms: Modules.IRooms, cmd: Cmds.CommandLoginResp) {
                 console.log(Tag, 'Rooms', 'onBeforeRoot', 'Resp', cmd.data);
                 RoomJoin.Rooms.onBeforeRoot.resp(rooms, cmd);
-
-                // let data = cmd.data;
-                // if (data.props.result){
-                //     let us = data.props.user;
-                //     let room = rooms.getRoom(us.room.id);
-                //     if (!room) {
-                //         room = rooms.getRoom({id: us.room.id});
-                //         console.log(rooms)
-                //     }
-                // }
             }
         }
     }
@@ -67,17 +55,6 @@ export class Login extends Cmds.Common.Base {
             resp(room: Modules.IRoom, cmd: Cmds.CommandLoginResp) {
                 console.log(Tag, 'Room', room.item.id , 'onBeforeRoot', 'Resp', cmd.data)
                 RoomJoin.Room.onBeforeRoot.resp(room, cmd);
-                // if (room.item.id === cmd.data.props.user.room.id) {
-                //     RoomJoin.Room.onDispatched.resp(room, cmd);
-                //     // let data = cmd.data;
-                //     // if (data.props.result){
-                //     //     let us = data.props.user;
-                //     //     let user = room.getUser(us.id);
-                //     //     if (!user) {
-                //     //         user = room.getUser(us);
-                //     //     }
-                //     // }
-                // }
             }
         }
     }    

@@ -3,7 +3,7 @@ import * as Services from '../../services'
 
 import { IPeer } from "./peer";
 
-export interface IStreams extends Cmds.Common.ICommandDispatcher {
+export interface IStreams extends Cmds.Common.ICommandRooter {
     peer: IPeer
     sends: Cmds.Common.Helper.KeyValue<MediaStream>
     recvs: Cmds.Common.Helper.KeyValue<MediaStream>

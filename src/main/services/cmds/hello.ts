@@ -1,9 +1,6 @@
 import * as Cmds from "../../cmds";
 import * as Modules from '../../modules'
-import * as ServiceModules from '../modules/index'
-import { RoomHello } from ".";
-// import { ServiceUser } from "./user";
-// import { Debug } from "../cmds/common/helper";
+import { RoomHello } from "./room-hello";
 
 var Tag = 'Service-Cmds-Hello';
 export class Hello extends Cmds.Common.Base {
@@ -20,47 +17,6 @@ export class Hello extends Cmds.Common.Base {
         cmd.destroy();
         cmd = null;
     }        
-        
-    // static sayHello(instanceId: string, user: Cmds.IUser) {
-    //     let cmd = new Cmds.CommandHelloReq({instanceId: instanceId});
-    //     cmd.data = {
-    //         to: {type: 'room', id: user.room.id},
-    //         props: {
-    //             user: user
-    //         }    
-    //     }
-    //     cmd.sendCommand();        
-    //     cmd.destroy();
-    //     cmd = null;
-    // }
-
-    // static respHello(reqCmd: Cmds.CommandHelloReq, user: Cmds.IUser) {
-    //     let data = reqCmd.data;
-    //     let instanceId = reqCmd.instanceId;
-    //     let cmd = new Cmds.CommandHelloResp({instanceId: instanceId});
-    //     cmd.data = {
-    //         type: Cmds.ECommandType.resp,
-    //         to: data.from,
-    //         props: {
-    //             user: user
-    //         }    
-    //     }
-    //     cmd.sendCommand();        
-    //     cmd.destroy();
-    //     cmd = null;
-    // }    
-
-    // static Rooms = {
-    //     onDispatched: {
-    //         req(rooms: Modules.IRooms, cmd: Cmds.CommandHelloReq) {
-    //             console.log(Tag, 'Rooms', 'onDispatched', 'Req', cmd.data);                   
-    //         },
-    //         resp(rooms: Modules.IRooms, cmd: Cmds.CommandHelloResp) {
-    //             console.log(Tag, 'Rooms', 'onDispatched', 'Resp', cmd.data);               
-    //         }  
-    //     }
-    // }
-
     static Room = {
         onBeforeRoot: {
             req(room: Modules.IRoom, cmd: Cmds.CommandHelloReq) {
@@ -69,11 +25,6 @@ export class Hello extends Cmds.Common.Base {
                 if (room.item.id === data.props.user.room.id) {
                     let respCmd = new Cmds.CommandHelloResp({instanceId: room.instanceId});  
                     RoomHello.Room.onBeforeRoot.req(room, cmd, respCmd);
-                    // let us = data.props.user;
-                    // let user = room.getUser(us);
-                    // Object.assign(user.item, us);
-                    // let me = room.me().item;
-                    // Hello.respHello(cmd, me);
                 }                
             },
             resp(room: Modules.IRoom, cmd: Cmds.CommandHelloResp) {
@@ -81,14 +32,8 @@ export class Hello extends Cmds.Common.Base {
                 let data = cmd.data;
                 if (room.item.id === data.props.user.room.id) {
                     RoomHello.Room.onBeforeRoot.resp(room, cmd);
-                    // let us = data.props.user;
-                    // let user = room.getUser(us);       
-                    // Object.assign(user.item, us);
-                    // console.log('1111111111', user)
                 }            
             }  
         }
-    }    
-
-
+    } 
 }
