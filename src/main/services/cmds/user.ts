@@ -28,13 +28,9 @@ export class User {
         reqCmd.data.from = {type: 'room', id: user.room.id};
         Hello.respHello(reqCmd, user);
     }
-    static onStateChange(instanceId: string, user: Cmds.IUser, chgStates: Cmds.EUserState, oldStates: Cmds.EUserState, newStates: Cmds.EUserState) {
+    static onStateChange(instanceId: string, user: Cmds.IUser, values: Cmds.Common.Helper.IStateChangeValues) {
         user = Object.assign({}, user);
-        user.extra = {
-            chgStates: chgStates,
-            oldStates: oldStates,
-            newStates: newStates
-        }
+        user.extra = values;
         let data: Cmds.ICommandData<Cmds.ICommandReqDataProps> = {
             cmdId: Cmds.ECommandId.user_state_onchange,
             props: {

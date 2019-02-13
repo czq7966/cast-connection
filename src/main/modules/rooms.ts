@@ -127,5 +127,9 @@ export class Rooms extends Cmds.Common.CommandRooter implements IRooms {
         this.items.keys().forEach(key => {
             this.delRoom(key)
         });
-    }    
+    }   
+    
+    getLoginRoom(): IRoom{
+        return Services.Modules.Rooms.getLoginRoom(this.instanceId)
+    }
 }

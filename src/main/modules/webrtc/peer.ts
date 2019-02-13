@@ -83,39 +83,13 @@ export class Peer extends Cmds.Common.CommandRooter implements IPeer  {
         this.eventRooter.setParent(this.user.eventRooter);        
         this.eventRooter.onBeforeRoot.add(this.onBeforeRoot)
         this.eventRooter.onAfterRoot.add(this.onAfterRoot)
-
-        // this.user.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched);
-        // this.user.eventEmitter.addListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched);
-        // this.user.room.rooms.dispatcher.eventEmitter.addListener(Cmds.ECommandEvents.onCommand, this.Command_onCommand)
-        // this.user.room.rooms.dispatcher.eventEmitter.addListener(Cmds.ECommandEvents.onBeforeCommand, this.Command_onBeforeCommand)
-
     }
     unInitEvents() {
         this.eventRooter.onBeforeRoot.remove(this.onBeforeRoot)
         this.eventRooter.onAfterRoot.remove(this.onAfterRoot)
         this.eventRooter.setParent();   
-
-        // this.user.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onDispatched, this.Command_onDispatched)
-        // this.user.eventEmitter.removeListener(Cmds.ECommandDispatchEvents.onBeforeDispatched, this.Command_onBeforeDispatched)
-        // this.user.room.rooms.dispatcher.eventEmitter.removeListener(Cmds.ECommandEvents.onCommand, this.Command_onCommand)        
-        // this.user.room.rooms.dispatcher.eventEmitter.removeListener(Cmds.ECommandEvents.onBeforeCommand, this.Command_onBeforeCommand)
     }   
-    
-    // onCommand_Command = (data: Cmds.ICommandData<Cmds.ICommandReqDataProps>) => {
-    //     let cmdId = data.cmdId;
-    //     let type = data.type;
-    //     switch(cmdId) {              
-    //         default:
-    //             break;
-    //     }
-    // }
 
-    // onCommand_BeforeCommand = (data: Cmds.ICommandData<Cmds.ICommandReqDataProps>) => {
-    //     let cmdId = data.cmdId;
-    //     if (cmdId.indexOf(Cmds.Command_stream_webrtc_on_prefix) === 0) {
-    //         Services.Cmds.StreamWebrtcEvents.Peer.onBeforeCommand.req(this, data)
-    //     }
-    // }
 
     // Command
     onBeforeRoot = (cmd: Cmds.Common.ICommand): any => {
@@ -160,7 +134,7 @@ export class Peer extends Cmds.Common.CommandRooter implements IPeer  {
                 break;                              
             default:
                 if (cmdId.indexOf(Cmds.Command_stream_webrtc_on_prefix) === 0) {
-                    Services.Cmds.StreamWebrtcEvents.Peer.onAfterCommand.req(this, cmd.data)
+                    Services.Cmds.StreamWebrtcEvents.Peer.onAfterRoot.req(this, cmd)
                 }               
                 break;
         }        

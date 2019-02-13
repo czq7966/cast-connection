@@ -56,10 +56,9 @@ export class User extends Cmds.Common.CommandRooter implements IUser  {
         this.eventRooter.onAfterRoot.remove(this.onAfterRoot)
         this.eventRooter.setParent();   
     }
-
-    onStatesChange = (chgStates: Cmds.EUserState, oldStates: Cmds.EUserState, newStates: Cmds.EUserState) => {
-        this.item.states = newStates;
-        Services.Cmds.User.onStateChange(this.instanceId, this.item, chgStates, oldStates, newStates);
+    onStatesChange = (values: Cmds.Common.Helper.IStateChangeValues) => {
+        this.item.states = values.newStates;
+        Services.Cmds.User.onStateChange(this.instanceId,  this.item, values);
     }
 
     // Command

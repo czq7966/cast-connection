@@ -61,7 +61,10 @@ export class RoomHello extends Cmds.Common.Base {
                 let data = cmd.data;
                 if (room.item.id === data.props.user.room.id) {
                     let user = data.props.user;
+                    let states = user.states;
+                    user.states = Cmds.EUserState.none;
                     let mUser = room.getUser(user);
+                    user.states = states;
                     ServiceModules.User.update(mUser, user)
                     let me = room.me().item;
                     RoomHello.respHello(cmd, me, respCmd);
@@ -72,7 +75,10 @@ export class RoomHello extends Cmds.Common.Base {
                 let data = cmd.data;
                 if (room.item.id === data.props.user.room.id) {
                     let user = data.props.user;
+                    let states = user.states;
+                    user.states = Cmds.EUserState.none;
                     let mUser = room.getUser(user);
+                    user.states = states;
                     ServiceModules.User.update(mUser, user)
                 }                  
             }            
