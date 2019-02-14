@@ -5,7 +5,7 @@ export class CommandLogoutReq extends Common.Command<Dts.ICommandLogoutReqDataPr
     
 }
 
-export class CommandLogoutResp extends Common.Command<Dts.ICommandLogoutReqDataProps> {
+export class CommandLogoutResp extends Common.Command<Dts.ICommandLogoutRespDataProps> {
     
 }
 

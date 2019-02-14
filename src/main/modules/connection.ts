@@ -49,9 +49,13 @@ export class Connection extends Cmds.Common.Base {
         return Services.Cmds.Login.isLogin(instanceId);
     }
     logout(): Promise<any> {
-        let instanceId = this.instanceId;
-        let promise = Services.Cmds.Logout.logout(instanceId);
-        return promise;        
+        if (this.isLogin()) {
+            let instanceId = this.instanceId;
+            let promise = Services.Cmds.Logout.logout(instanceId);
+            return promise;        
+        } else {
+            return Promise.resolve();
+        }
     }
 
     //temp

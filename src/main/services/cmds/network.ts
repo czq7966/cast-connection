@@ -10,7 +10,8 @@ export class Network extends Cmds.Common.Base {
             onAfterRoot: {
                 req(rooms: Modules.IRooms, cmd: Cmds.CommandLogoutReq) {
                     console.log(Tag, 'Rooms', 'onAfterRoot', 'Req', cmd.data)
-                    rooms.clearRoom()
+                    rooms.clearRoom();
+                    Cmds.CommandLoginResp.getInstance<Cmds.CommandLoginResp>(rooms.instanceId).data = {}
                 }
             }            
         },        

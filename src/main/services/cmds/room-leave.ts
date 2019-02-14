@@ -16,7 +16,6 @@ export class RoomLeave extends Cmds.Common.Base {
                 },
                 onResp: (respCmd: Cmds.CommandRoomLeaveResp) => {
                     let data = respCmd.data;
-                    // Cmds.Common.Dispatcher.dispatch(respCmd , Cmds.ECommandDispatchEvents.onBeforeDispatched);
                     Cmds.Common.Dispatcher.dispatch(respCmd , Cmds.ECommandDispatchEvents.onDispatched);
                     if (data.props.result) {
                         resolve(data);    
@@ -50,7 +49,7 @@ export class RoomLeave extends Cmds.Common.Base {
                 }    
             },            
             resp(rooms: Modules.IRooms, cmd: Cmds.CommandRoomLeaveResp) {
-                console.log(Tag, 'Rooms', 'onBeforeDispatched', 'Resp', cmd.data);
+                console.log(Tag, 'Rooms', 'onAfterRoot', 'Resp', cmd.data);
                 let data = cmd.data;                
                 let room = rooms.getRoom(data.props.user.room.id);
                 if (room && room.users.count() == 0) {                    

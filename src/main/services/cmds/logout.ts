@@ -14,8 +14,7 @@ export class Logout extends Cmds.Common.Base {
                 props: {
                     user: currUser
                 },
-                onResp: (cmdResp: Cmds.CommandLoginResp) => {
-                    // Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onBeforeDispatched);
+                onResp: (cmdResp: Cmds.CommandLogoutResp) => {
                     Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
                     if (cmdResp.data.props.result) {
                         resolve(cmdResp.data);    
@@ -48,6 +47,7 @@ export class Logout extends Cmds.Common.Base {
                 console.log(Tag, 'Rooms', 'onAfterRoot', 'Resp', cmd.data);
                 RoomLeave.Rooms.onAfterRoot.resp(rooms, cmd);
                 rooms.clearRoom();
+                Cmds.CommandLoginResp.getInstance<Cmds.CommandLoginResp>(rooms.instanceId).data = {}
             } 
         }
     }
