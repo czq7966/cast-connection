@@ -1,11 +1,10 @@
 import * as Cmds from "../../cmds";
 import * as Services from '../../services'
+import * as IO from './io'
 import { IUser } from "./../user";
-import { Config } from "./../config";
+import { Config, EPlatform } from "./config";
 import { Streams } from "./streams";
-import { DataChannels } from "./datachannels";
-import { Input } from "./input";
-import { EPlatform } from "../config";
+
 import { WebRTC } from "./webrtc";
 
 export enum ERTCPeerEvents {
@@ -33,11 +32,13 @@ export interface IPeer extends Cmds.Common.ICommandRooter {
     config: Config;
     user: IUser
     streams: Streams;
-    datachannels: DataChannels;
-    input: Input;  
+    datachannels: IO.DataChannels;
+    input: IO.Input;  
     rtc: RTCPeerConnection
     getRtc(create?: boolean): RTCPeerConnection
     delRtc()
+    createDataChannels()
+    getConfig(): Config
 }
 
 
@@ -46,8 +47,8 @@ export class Peer extends Cmds.Common.CommandRooter implements IPeer  {
     config: Config;
     user: IUser
     streams: Streams;
-    datachannels: DataChannels;
-    input: Input;
+    datachannels: IO.DataChannels;
+    input: IO.Input;
     rtc: RTCPeerConnection
     private _rtcevents;
     constructor(user: IUser) {
@@ -56,8 +57,8 @@ export class Peer extends Cmds.Common.CommandRooter implements IPeer  {
         this.user = user;        
         this.config = new Config();
         this.streams = new Streams(this);
-        this.datachannels = new DataChannels(this);
-        this.input = new Input(this.datachannels);
+        this.datachannels = new IO.DataChannels(this);
+        this.input = new IO.Input(this.datachannels);
 
         this.initEvents();
     }
@@ -131,7 +132,13 @@ export class Peer extends Cmds.Common.CommandRooter implements IPeer  {
                     Services.Cmds.RoomClose.Peer.onAfterRoot.req(this, cmd as any) :
                 type === Cmds.ECommandType.resp ?
                     Services.Cmds.RoomClose.Peer.onAfterRoot.resp(this, cmd as any) : null     
-                break;                              
+                break;     
+            case Cmds.ECommandId.room_leave:
+                type === Cmds.ECommandType.req ?
+                    Services.Cmds.RoomLeave.Peer.onAfterRoot.req(this, cmd as any) :
+                type === Cmds.ECommandType.resp ?
+                    Services.Cmds.RoomLeave.Peer.onAfterRoot.resp(this, cmd as any) : null    
+                break;                                         
             default:
                 if (cmdId.indexOf(Cmds.Command_stream_webrtc_on_prefix) === 0) {
                     Services.Cmds.StreamWebrtcEvents.Peer.onAfterRoot.req(this, cmd)
@@ -172,6 +179,7 @@ export class Peer extends Cmds.Common.CommandRooter implements IPeer  {
     }     
 
     getConfig(): Config {
+        Services.Cmds.StreamWebrtcEvents.dispatchEventCommand(this, null, Cmds.ECommandId.stream_webrtc_ongetconfig)
         return this.config;
     }    
     getRtc(create: boolean = true): RTCPeerConnection {
@@ -193,4 +201,7 @@ export class Peer extends Cmds.Common.CommandRooter implements IPeer  {
         this.rtc && this.rtc.close();        
         delete this.rtc;
     }
+    createDataChannels() {
+        this.datachannels.createDataChannels();
+    }    
 }

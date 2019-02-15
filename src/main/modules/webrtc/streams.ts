@@ -66,7 +66,13 @@ export class Streams extends Cmds.Common.CommandRooter {
                     Services.Cmds.RoomClose.Streams.onAfterRoot.req(this, cmd as any) :
                 type === Cmds.ECommandType.resp ?
                     Services.Cmds.RoomClose.Streams.onAfterRoot.resp(this, cmd as any) : null     
-                break;                  
+                break; 
+            case Cmds.ECommandId.room_leave:
+                type === Cmds.ECommandType.req ?
+                    Services.Cmds.RoomLeave.Streams.onAfterRoot.req(this, cmd as any) :
+                type === Cmds.ECommandType.resp ?
+                    Services.Cmds.RoomLeave.Streams.onAfterRoot.resp(this, cmd as any) : null    
+                break;                                 
             default:
                 if (cmdId.indexOf(Cmds.Command_stream_webrtc_on_prefix) === 0) {
                     Services.Cmds.StreamWebrtcEvents.Streams.onAfterRoot.req(this, cmd)

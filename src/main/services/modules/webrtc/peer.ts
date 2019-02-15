@@ -1,7 +1,7 @@
 import * as Cmds from "../../cmds";
 import * as Modules from '../../../modules'
 import * as Helper from '../../../helper/index'
-import { Config, EPlatform } from "../../../config";
+
 
 
 var Tag = "Service-Module-Peer"
@@ -12,9 +12,9 @@ export class Peer{
                 offerToReceiveAudio: true,
                 offerToReceiveVideo: true
             }).then((sdp) => {
-                let codec = peer.config.codec || Modules.ECodecs.default;
+                let codec = peer.config.codec || Modules.Webrtc.ECodecs.default;
                 let bandwidth = peer.config.bandwidth || 0;
-                if (codec !== Modules.ECodecs.default) {
+                if (codec !== Modules.Webrtc.ECodecs.default) {
                     sdp.sdp = Helper.SdpHelper.preferCodec(sdp.sdp, codec);
                 }
                 if (bandwidth > 0) {                     
@@ -36,8 +36,8 @@ export class Peer{
         })
     }  
     static createAnswer(peer: Modules.Webrtc.IPeer): Promise<any> {        
-        switch(Config.platform) {
-            case EPlatform.reactnative :
+        switch(Modules.Webrtc.Config.platform) {
+            case Modules.Webrtc.EPlatform.reactnative :
                 return this.createAnswer_reactnative(peer);
                 break;
             default:
@@ -89,8 +89,8 @@ export class Peer{
     
     
     static setOffer(peer: Modules.Webrtc.IPeer, data: any): Promise<any> {
-        switch(Config.platform) {
-            case EPlatform.reactnative :
+        switch(Modules.Webrtc.Config.platform) {
+            case Modules.Webrtc.EPlatform.reactnative :
                 return this.setOffer_reactnative(peer, data);
                 break;
             default:
@@ -128,8 +128,8 @@ export class Peer{
     }       
 
     static setAnswer(peer: Modules.Webrtc.IPeer, data: any): Promise<any>  {
-        switch(Config.platform) {
-            case EPlatform.reactnative :
+        switch(Modules.Webrtc.Config.platform) {
+            case Modules.Webrtc.EPlatform.reactnative :
                 return this.setAnswer_reactnative(peer, data);
                 break;
             default:
@@ -168,8 +168,8 @@ export class Peer{
     }       
     
     static setCandidate(peer: Modules.Webrtc.IPeer,data: any) {
-        switch(Config.platform) {
-            case EPlatform.reactnative :
+        switch(Modules.Webrtc.Config.platform) {
+            case Modules.Webrtc.EPlatform.reactnative :
                 return this.setCandidate_reactnative(peer, data);
                 break;
             default:

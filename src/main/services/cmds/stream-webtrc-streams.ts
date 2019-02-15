@@ -16,7 +16,6 @@ export class StreamWebrtcStreams {
         User.syncHello(instanceId, mUser.item);
     }
     static sendStream(streams: Modules.Webrtc.IStreams, stream: MediaStream): Promise<any> {
-        ServiceModules.Webrtc.Streams.addSendStream(streams, stream);        
         let mUser = streams.peer.user;
         let mRoom = mUser.room;
         let peer = mUser.peer;
@@ -25,7 +24,9 @@ export class StreamWebrtcStreams {
             console.warn('Can not send stream to self!')
             
         } else {
-            let str = (peer.getRtc() as any).addStream(stream);
+            ServiceModules.Webrtc.Streams.addSendStream(streams, stream);            
+            (peer.getRtc() as any).addStream(stream);
+            peer.createDataChannels();
             let promise = StreamWebrtcSdp.offer(mUser);            
             return promise;
         }

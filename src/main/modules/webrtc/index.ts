@@ -1,7 +1,6 @@
-export * from './datachannel'
-export * from './datachannels'
-export * from './gesture'
-export * from './input'
+import * as IO from './io/index'
+export {IO}
+export * from './config'
 export * from './peer'
 export * from './webrtc'
 export * from './streams'

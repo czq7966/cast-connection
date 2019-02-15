@@ -1,8 +1,9 @@
-import * as Modules from './modules'
-import { Base } from "./base";
+import { Base, IBase } from '../base'
 // import { DataChannels, EDataChannelsEvents } from "./datachannels";
 // import { DataChannel, EDataChannelLabel, EDataChannelEvents } from "./datachannel";
 import { Gesture } from "./gesture";
+import { DataChannel, EDataChannelLabel, EDataChannelEvents } from './datachannel';
+import { DataChannels, EDataChannelsEvents } from './datachannels';
 
 export enum EInputEvents {
     onDispatchEvent = 'onDispatchEvent',
@@ -90,15 +91,26 @@ export interface ICavansEvent {
 }
 export type IInputEvent = ITouchEvent | IMouseEvent
 
-
-export class Input extends Base {
+export interface IInput extends IBase {
     OS: EInputOS
     platform: EInputPlatform
     touchMode: EInputDevice        
-    datachannel: Modules.Webrtc.DataChannel
-    datachannels: Modules.Webrtc.DataChannels
+    datachannel: DataChannel
+    datachannels: DataChannels
     gesture: Gesture
-    constructor(datachannels: Modules.Webrtc.DataChannels) {
+    dispatchEvent(event: IInputEvent)
+    inputEvent(event: IInputEvent )
+    sendEvent(event: IInputEvent): Promise<any>
+}
+
+export class Input extends Base implements IInput {
+    OS: EInputOS
+    platform: EInputPlatform
+    touchMode: EInputDevice        
+    datachannel: DataChannel
+    datachannels: DataChannels
+    gesture: Gesture
+    constructor(datachannels: DataChannels) {
         super();
         this.OS = EInputOS.window;
         this.platform = EInputPlatform.browser;
@@ -117,24 +129,24 @@ export class Input extends Base {
         super.destroy();
     }
     initEvents() {
-        this.datachannels.eventEmitter.addListener(Modules.Webrtc.EDataChannelsEvents.onAddDataChannel, this.onAddDataChannel)
+        this.datachannels.eventEmitter.addListener(EDataChannelsEvents.onAddDataChannel, this.onAddDataChannel)
     }
     unInitEvents() {
-        this.datachannels.eventEmitter.removeListener(Modules.Webrtc.EDataChannelsEvents.onAddDataChannel, this.onAddDataChannel)
+        this.datachannels.eventEmitter.removeListener(EDataChannelsEvents.onAddDataChannel, this.onAddDataChannel)
     }
-    onAddDataChannel = (datachannel: Modules.Webrtc.DataChannel) => {
-        if (datachannel && datachannel.rtcchannel.label === Modules.Webrtc.EDataChannelLabel.input) {
+    onAddDataChannel = (datachannel: DataChannel) => {
+        if (datachannel && datachannel.rtcchannel.label === EDataChannelLabel.input) {
             this.datachannel = datachannel;
-            this.datachannel.eventEmitter.addListener(Modules.Webrtc.EDataChannelEvents.onmessage, this.onDataChannelMessage)                        
-            this.datachannel.eventEmitter.addListener(Modules.Webrtc.EDataChannelEvents.onopen, this.onDataChannelOpen)                 
-            this.datachannel.eventEmitter.addListener(Modules.Webrtc.EDataChannelEvents.onclose, this.onDataChannelClose) 
+            this.datachannel.eventEmitter.addListener(EDataChannelEvents.onmessage, this.onDataChannelMessage)                        
+            this.datachannel.eventEmitter.addListener(EDataChannelEvents.onopen, this.onDataChannelOpen)                 
+            this.datachannel.eventEmitter.addListener(EDataChannelEvents.onclose, this.onDataChannelClose) 
         }
     }
     unInitDataChannelEvents() {
         if (this.datachannel && this.datachannel.notDestroyed) {
-            this.datachannel.eventEmitter.removeListener(Modules.Webrtc.EDataChannelEvents.onmessage, this.onDataChannelMessage);
-            this.datachannel.eventEmitter.removeListener(Modules.Webrtc.EDataChannelEvents.onopen, this.onDataChannelOpen)
-            this.datachannel.eventEmitter.removeListener(Modules.Webrtc.EDataChannelEvents.onclose, this.onDataChannelClose) 
+            this.datachannel.eventEmitter.removeListener(EDataChannelEvents.onmessage, this.onDataChannelMessage);
+            this.datachannel.eventEmitter.removeListener(EDataChannelEvents.onopen, this.onDataChannelOpen)
+            this.datachannel.eventEmitter.removeListener(EDataChannelEvents.onclose, this.onDataChannelClose) 
         }
     }
     onDataChannelMessage = (ev: MessageEvent) => {        

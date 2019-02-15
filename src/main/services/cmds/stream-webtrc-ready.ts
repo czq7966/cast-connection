@@ -6,22 +6,20 @@ import { StreamWebrtcStreams } from './stream-webtrc-streams'
 var Tag = "Service-Cmds-StreamWebrtcReady"
 export class StreamWebrtcReady {
     static ready(instanceId: string, toUser: Cmds.IUser, fromUser?: Cmds.IUser): Promise<any> {
-        return new Promise((resolve, reject) => {
-            let cmd = new Cmds.CommandReq({instanceId: instanceId})
-            fromUser = fromUser || ServiceModules.Rooms.getRoom(instanceId, toUser.room.id).me().item;
-            let user = Object.assign({}, fromUser);
-            cmd.data = {
-                cmdId: Cmds.ECommandId.stream_webrtc_ready,
-                to: {type: 'user', id: toUser.id},
-                props: {
-                    user: user
-                }
+        let cmd = new Cmds.CommandReq({instanceId: instanceId})
+        fromUser = fromUser || ServiceModules.Rooms.getRoom(instanceId, toUser.room.id).me().item;
+        let user = Object.assign({}, fromUser);
+        cmd.data = {
+            cmdId: Cmds.ECommandId.stream_webrtc_ready,
+            to: {type: 'user', id: toUser.id},
+            props: {
+                user: user
             }
-            let promise = cmd.sendCommand();   
-            cmd.destroy();
-            cmd = null;   
-            return promise;  
-        })
+        }
+        let promise = cmd.sendCommand();   
+        cmd.destroy();
+        cmd = null;   
+        return promise;  
     }
     
     static Peer = {

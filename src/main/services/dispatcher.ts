@@ -15,14 +15,18 @@ export interface IDispatcher extends Cmds.Common.IDispatcher {
 }
 
 export class Dispatcher extends Cmds.Common.CommandRooter implements IDispatcher {
+    dataRooter: Cmds.Common.IEventRooter;
     signaler: Network.Signaler
     constructor(params: IDispatcherConstructorParams) {
         super(params);
+        this.dataRooter = new Cmds.Common.EventRooter();
         this.signaler = params.signaler;
         this.initEvents();
     }
     destroy() {
         this.unInitEvents();
+        this.dataRooter.destroy();
+        delete this.dataRooter;
         delete this.signaler;
         super.destroy();
     }
@@ -41,6 +45,8 @@ export class Dispatcher extends Cmds.Common.CommandRooter implements IDispatcher
     // Command
     onCommand = (cmd: Cmds.ICommandData<any>) => {
         console.warn('OnCommand', cmd)
+        let result = this.dataRooter.root(cmd) ;
+        !Cmds.Common.Helper.StateMachine.isset(result, Cmds.Common.EEventEmitterEmit2Result.preventRoot) &&
         Cmds.Common.Dispatcher.onCommand(cmd, this);
     }
     sendCommand(cmd: Cmds.ICommandData<any>): Promise<any> {

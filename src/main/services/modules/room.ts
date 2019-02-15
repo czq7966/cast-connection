@@ -44,4 +44,24 @@ export class Room{
             return Rooms.getRoom(mRoom.instanceId, room.id)
         }
     }
+    static getRecvStreams(room: Modules.IRoom): Array<Modules.Webrtc.IStreams> {
+        let streams: Array<Modules.Webrtc.IStreams> = [];
+        room.users.keys().forEach(uKey => {
+            let user = room.getUser(uKey)
+            if (user.peer.streams.recvs.count() > 0) {
+                streams.push(user.peer.streams)
+            }
+        })
+        return streams;
+    }
+    static getSendStreams(room: Modules.IRoom): Array<Modules.Webrtc.IStreams> {
+        let streams: Array<Modules.Webrtc.IStreams> = [];
+        room.users.keys().forEach(uKey => {
+            let user = room.getUser(uKey)
+            if (user.peer.streams.sends.count() > 0) {
+                streams.push(user.peer.streams)
+            }
+        })
+        return streams;
+    }    
 }

@@ -1,10 +1,15 @@
-import { Base } from "./base";
-import { IInputEvent, EInputOS, EInputPlatform, Input, IInputPoint, IMouseEvent, ITouchEvent, EInputDeviceTouchType, EInputDeviceMouseType, EInputDevice } from "./input";
+import { Base, IBase } from "../base";
+import { IInputEvent, EInputOS, EInputPlatform, Input, IInputPoint, IMouseEvent, ITouchEvent, EInputDeviceTouchType, EInputDeviceMouseType, EInputDevice, IInput } from "./input";
 
-export class Gesture extends Base {
-    input: Input
+export interface IGesture extends IBase {
+    input: IInput
+    inputEvent(event: IInputEvent)
+}
+
+export class Gesture extends Base implements IGesture {
+    input: IInput
     touchCount: number;
-    constructor(input: Input) {
+    constructor(input: IInput) {
         super();
         this.input = input;
         this.touchCount = 0
