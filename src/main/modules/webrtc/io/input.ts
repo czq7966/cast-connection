@@ -1,9 +1,10 @@
-import { Base, IBase } from '../base'
-// import { DataChannels, EDataChannelsEvents } from "./datachannels";
-// import { DataChannel, EDataChannelLabel, EDataChannelEvents } from "./datachannel";
+import * as Cmds from "../../../cmds";
+import * as Modules from "../../../modules";
+import * as Services from '../../../services'
 import { Gesture } from "./gesture";
 import { DataChannel, EDataChannelLabel, EDataChannelEvents } from './datachannel';
-import { DataChannels, EDataChannelsEvents } from './datachannels';
+import { InputSource } from './input-source';
+import { IPeer } from "../peer";
 
 export enum EInputEvents {
     onDispatchEvent = 'onDispatchEvent',
@@ -91,62 +92,101 @@ export interface ICavansEvent {
 }
 export type IInputEvent = ITouchEvent | IMouseEvent
 
-export interface IInput extends IBase {
+export interface IInput extends  Cmds.Common.ICommandRooter {
+    peer: IPeer
     OS: EInputOS
     platform: EInputPlatform
     touchMode: EInputDevice        
     datachannel: DataChannel
-    datachannels: DataChannels
     gesture: Gesture
     dispatchEvent(event: IInputEvent)
     inputEvent(event: IInputEvent )
     sendEvent(event: IInputEvent): Promise<any>
+    setDataChannel(datachannel: DataChannel)
+    onDataChannelOpen()
+    onDataChannelClose()
 }
 
-export class Input extends Base implements IInput {
+export class Input extends Cmds.Common.CommandRooter implements IInput {
+    peer: IPeer
     OS: EInputOS
     platform: EInputPlatform
     touchMode: EInputDevice        
     datachannel: DataChannel
-    datachannels: DataChannels
     gesture: Gesture
-    constructor(datachannels: DataChannels) {
-        super();
+    inputSource: InputSource
+    constructor(peer: IPeer) {
+        super(peer.instanceId);
+        this.peer = peer;
         this.OS = EInputOS.window;
         this.platform = EInputPlatform.browser;
         this.touchMode = EInputDevice.touch;
-        this.datachannels = datachannels;      
+
         this.gesture = new Gesture(this);  
+        this.inputSource = new InputSource(this);
         this.initEvents();
     }
     destroy() {
-        this.unInitDataChannelEvents();
         this.unInitEvents();
+        this.inputSource.destroy();
         this.gesture.destroy();
         delete this.gesture;
         delete this.datachannel;
-        delete this.datachannels;
+        delete this.inputSource;
         super.destroy();
     }
     initEvents() {
-        this.datachannels.eventEmitter.addListener(EDataChannelsEvents.onAddDataChannel, this.onAddDataChannel)
+        this.eventRooter.setParent(this.peer.eventRooter);        
+        this.eventRooter.onBeforeRoot.add(this.onBeforeRoot)
+        this.eventRooter.onAfterRoot.add(this.onAfterRoot)
     }
     unInitEvents() {
-        this.datachannels.eventEmitter.removeListener(EDataChannelsEvents.onAddDataChannel, this.onAddDataChannel)
-    }
-    onAddDataChannel = (datachannel: DataChannel) => {
-        if (datachannel && datachannel.rtcchannel.label === EDataChannelLabel.input) {
+        this.unInitDataChannelEvents();
+        this.eventRooter.onBeforeRoot.remove(this.onBeforeRoot)
+        this.eventRooter.onAfterRoot.remove(this.onAfterRoot)
+        this.eventRooter.setParent();           
+    } 
+    onBeforeRoot = (cmd: Cmds.Common.ICommand): any => {
+        let cmdId = cmd.data.cmdId;
+        let type = cmd.data.type;
+        switch(cmdId) {
+            case Cmds.ECommandId.stream_webrtc_ondatachannel: 
+                let label = cmd.data.extra as string;
+                if (label !== EDataChannelLabel.input)
+                    Services.Cmds.StreamIOInput.Input.onBeforeRoot.req(this, cmd as any)
+                    
+                break;
+            default:
+                
+                break;
+        }
+    }     
+    onAfterRoot = (cmd: Cmds.Common.ICommand): any => {
+        let cmdId = cmd.data.cmdId;
+        let type = cmd.data.type;
+        let label = cmd.data.extra as string;
+        switch(cmdId) {
+            case Cmds.ECommandId.stream_webrtc_ondatachannelopen: 
+            case Cmds.ECommandId.stream_webrtc_ondatachannelclose:                 
+                if (label !== Modules.Webrtc.IO.EDataChannelLabel.input) 
+                    Services.Cmds.StreamIOInput.Input.onAfterRoot.req(this, cmd as any)
+                break;
+            default:
+                
+                break;
+        }
+    }  
+    setDataChannel(datachannel: DataChannel){
+        this.unInitDataChannelEvents();
+        if (datachannel) {
             this.datachannel = datachannel;
-            this.datachannel.eventEmitter.addListener(EDataChannelEvents.onmessage, this.onDataChannelMessage)                        
-            this.datachannel.eventEmitter.addListener(EDataChannelEvents.onopen, this.onDataChannelOpen)                 
-            this.datachannel.eventEmitter.addListener(EDataChannelEvents.onclose, this.onDataChannelClose) 
+            this.datachannel.rtcdatachannel.addEventListener(EDataChannelEvents.onmessage, this.onDataChannelMessage)                        
         }
     }
     unInitDataChannelEvents() {
-        if (this.datachannel && this.datachannel.notDestroyed) {
-            this.datachannel.eventEmitter.removeListener(EDataChannelEvents.onmessage, this.onDataChannelMessage);
-            this.datachannel.eventEmitter.removeListener(EDataChannelEvents.onopen, this.onDataChannelOpen)
-            this.datachannel.eventEmitter.removeListener(EDataChannelEvents.onclose, this.onDataChannelClose) 
+        if (this.datachannel) {
+            this.datachannel.rtcdatachannel.removeEventListener(EDataChannelEvents.onmessage, this.onDataChannelMessage)                        
+            delete this.datachannel
         }
     }
     onDataChannelMessage = (ev: MessageEvent) => {        
@@ -190,6 +230,7 @@ export class Input extends Base implements IInput {
     sendEvent(event: IInputEvent): Promise<any> {        
         if (this.datachannel) {
             return this.datachannel.sendMessage(event)
+            console.warn(event)
         } else {
             
         }

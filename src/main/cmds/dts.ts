@@ -49,6 +49,7 @@ export enum ECommandId {
     stream_webrtc_ready = 'stream_webrtc_ready',
 
     stream_webrtc_sendstream = 'stream_webrtc_sendstream',
+    stream_webrtc_io_input = 'stream_webrtc_io_input',
 
     stream_webrtc_onconnectionstatechange = 'stream_webrtc_onconnectionstatechange',
     stream_webrtc_ondatachannel = 'stream_webrtc_ondatachannel',
@@ -65,8 +66,13 @@ export enum ECommandId {
     stream_webrtc_onrecvstream = 'stream_webrtc_on_recvstream',
     stream_webrtc_onrecvstreaminactive = 'stream_webrtc_on_recvstreaminactive',
     stream_webrtc_onsendstreaminactive = 'stream_webrtc_on_sendstreaminactive',
-    stream_webrtc_ongetconfig = 'stream_webrtc_on_getconfig'    
+    stream_webrtc_ongetconfig = 'stream_webrtc_on_getconfig',   
 
+    stream_webrtc_ondatachannelbufferedamountlow = 'stream_webrtc_ondatachannelbufferedamountlow',
+    stream_webrtc_ondatachannelclose = 'stream_webrtc_ondatachannelclose',
+    stream_webrtc_ondatachannelerror = 'stream_webrtc_ondatachannelerror',
+    stream_webrtc_ondatachannelmessage = 'stream_webrtc_ondatachannelmessage',
+    stream_webrtc_ondatachannelopen = 'stream_webrtc_ondatachannelopen' 
 }
 
 

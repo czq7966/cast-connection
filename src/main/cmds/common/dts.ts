@@ -12,7 +12,7 @@ export interface IAddressData {
 
 export interface ICommandBaseData {
     //本地关键字，用于中断指令路由
-    preventDefault?: boolean
+    // preventDefault?: boolean
 }
 
 // 指令包
@@ -35,7 +35,7 @@ export interface ICommandData<T> extends ICommandBaseData  {
     extra?: any
 
     //本地关键字，用于中断指令 解析分发（用于解析分发前）
-    preventDispatch?: boolean
+    // preventDispatch?: boolean
 
 }
 

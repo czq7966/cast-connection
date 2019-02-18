@@ -1,4 +1,4 @@
-import { EInputDeviceMouseType, IMouseEvent, IInput } from "./input";
+import { EInputDeviceMouseType, IMouseEvent, IInput, EInputDeviceTouchType, ITouchPoint, ITouchEvent } from "./input";
 
 export interface IInputSource {
     attachHTMLElement(source: HTMLElement);
@@ -65,5 +65,47 @@ export class InputSource implements IInputSource {
             ev.preventDefault();
         }        
         
+    }    
+    onHTMLElementTouchEvent = (ev: TouchEvent) => {
+        let type = EInputDeviceTouchType[ev.type];
+        if (type) {       
+            let touches: ITouchPoint[] = [];          
+            let changedTouches: ITouchPoint[] = [];
+            for (let i = 0; i < ev.touches.length; i++) {
+                let touch = ev.touches[i];
+                touches.push({
+                    x: touch.clientX,
+                    y: touch.clientY,
+                    radiusX: touch.radiusX,
+                    radiusY: touch.radiusY,
+                    rotationAngle: touch.rotationAngle,
+                    force: touch.force,
+                    id: touch.identifier
+                })
+            }
+            for (let i = 0; i < ev.changedTouches.length; i++) {
+                let touch = ev.changedTouches[i];
+                changedTouches.push({
+                    x: touch.clientX,
+                    y: touch.clientY,
+                    radiusX: touch.radiusX,
+                    radiusY: touch.radiusY,
+                    rotationAngle: touch.rotationAngle,
+                    force: touch.force,
+                    id: touch.identifier
+                })
+            }            
+            
+            let event: ITouchEvent = {
+                type: type,
+                touches: touches,
+                changedTouches: changedTouches,
+                destX: (ev.target as HTMLVideoElement).offsetWidth,
+                destY: (ev.target as HTMLVideoElement).offsetHeight,
+            }
+            this.input.sendEvent(event)
+        }    
+
+        ev.preventDefault();
     }    
 }

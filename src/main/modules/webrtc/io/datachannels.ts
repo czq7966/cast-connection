@@ -1,71 +1,103 @@
-import { Base } from "../base"
-import { Peer, ERTCPeerEvents } from "../peer";
+import * as Cmds from "../../../cmds";
+import * as Services from '../../../services'
+import { Peer } from "../peer";
 import { DataChannel, EDataChannelLabel } from "./datachannel";
 
 export enum EDataChannelsEvents {
     onAddDataChannel = 'onAddDataChannel'
 }
 
-export class DataChannels extends Base {
+export interface IDataChannels extends Cmds.Common.ICommandRooter {
     peer: Peer
-    channels: {[label: string]: DataChannel}
+    dataChannels: {[label: string]: DataChannel}
+    createDataChannels()
+    closeDataChannels()
+    createDataChannel(label: string): DataChannel
+    closeDataChannel(label: string) 
+    getDataChannel(label: string): DataChannel
+    addDataChannel(datachannel: DataChannel)
+    onDataChannel(ev: RTCDataChannelEvent)
+    close() 
+}
+
+export class DataChannels extends Cmds.Common.CommandRooter implements IDataChannels {
+    peer: Peer
+    dataChannels: {[label: string]: DataChannel}
     constructor(peer: Peer){
-        super();
+        super(peer.instanceId);
         this.peer = peer;
-        this.channels = {};
-        this.initEvents(peer);
+        this.dataChannels = {};
+        this.initEvents();
     }
     destroy() {
         this.close();
-        this.unInitEvents(this.peer);
-        delete this.channels;
+        this.unInitEvents();
+        delete this.dataChannels;
         delete this.peer;
         super.destroy();
     }
-    attachPeer(peer: Peer) {
-        this.unInitEvents(this.peer);
-        delete this.peer;
-        this.peer = peer;
-        this.initEvents(peer)
-    }
 
-    initEvents(peer: Peer) {
-        if (peer) {
-            peer.eventEmitter.addListener(ERTCPeerEvents.ondatachannel, this.onDataChannel)
+    initEvents() {
+        this.eventRooter.setParent(this.peer.eventRooter);        
+        this.eventRooter.onBeforeRoot.add(this.onBeforeRoot)
+        this.eventRooter.onAfterRoot.add(this.onAfterRoot)
+    }
+    unInitEvents() {
+        this.eventRooter.onBeforeRoot.remove(this.onBeforeRoot)
+        this.eventRooter.onAfterRoot.remove(this.onAfterRoot)
+        this.eventRooter.setParent();           
+    }  
+
+    // Command
+    onBeforeRoot = (cmd: Cmds.Common.ICommand): any => {
+        let cmdId = cmd.data.cmdId;
+        let type = cmd.data.type;
+        switch(cmdId) {
+            case Cmds.ECommandId.stream_webrtc_ondatachannel: 
+                Services.Cmds.StreamIODataChannels.DataChannels.onBeforeRoot.req(this, cmd as any)
+                break;
+            default:
+                
+                break;
         }
     }
-    unInitEvents(peer: Peer) {
-        if (peer) {
-            peer.eventEmitter.removeListener(ERTCPeerEvents.ondatachannel, this.onDataChannel)
-        }
-    }
-
+    onAfterRoot = (cmd: Cmds.Common.ICommand): any => {
+        let cmdId = cmd.data.cmdId;
+        let type = cmd.data.type;
+        switch(cmdId) {
+            case Cmds.ECommandId.stream_webrtc_ondatachannelclose: 
+                Services.Cmds.StreamIODataChannels.DataChannels.onAfterRoot.req(this, cmd as any)
+                break;
+            default:
+                
+                break;
+        }     
+    }  
     onDataChannel = (ev: RTCDataChannelEvent) => {
         let rtcchannel = ev.channel;
         if (rtcchannel) {
-            let channel = this.getChannel(rtcchannel.label);
-            if (channel && channel.rtcchannel === rtcchannel) {
+            let channel = this.getDataChannel(rtcchannel.label);
+            if (channel && channel.rtcdatachannel === rtcchannel) {
                 console.log('data channel had exists ' + rtcchannel.label)
-
             } else {
                 this.addDataChannel(new DataChannel(this, rtcchannel))
             }
         }
     }
-    addDataChannel(channel: DataChannel) {
-        if (channel) {
-            let _channel = this.getChannel(channel.rtcchannel.label)
-            if (!_channel || _channel !== channel) {
-                this.closeChannel(channel.rtcchannel.label);
-                channel.channels = this;
-                this.channels[channel.rtcchannel.label] = channel;
-                this.eventEmitter.emit(EDataChannelsEvents.onAddDataChannel, channel)
+    addDataChannel(datachannel: DataChannel) {
+        if (datachannel) {
+            let _datachannel = this.getDataChannel(datachannel.rtcdatachannel.label)
+            if (!_datachannel || _datachannel !== datachannel) {
+                this.closeDataChannel(datachannel.rtcdatachannel.label);
+                datachannel.datachannels = this;
+                this.dataChannels[datachannel.rtcdatachannel.label] = datachannel;
+                this.eventEmitter.emit(EDataChannelsEvents.onAddDataChannel, datachannel)
             }
         }
     }
     createDataChannel(label: string): DataChannel {
         if (this.peer && label) {
-            let channel = this.getChannel(label);
+            let channel = this.getDataChannel(label);
             if (!channel) {
                 let rtcchannel = this.peer.getRtc().createDataChannel(label);
                 channel = new DataChannel(this, rtcchannel);
@@ -77,31 +109,30 @@ export class DataChannels extends Base {
     createDataChannels(){
         Object.keys(EDataChannelLabel).forEach(key => {
             let label = EDataChannelLabel[key]
-
             this.createDataChannel(label)
         })
     }    
-    getChannel(label: string): DataChannel {
-        return this.channels[label];
+    getDataChannel(label: string): DataChannel {
+        return this.dataChannels[label];
     }
 
-    getInputChannel(): DataChannel {
-        return this.getChannel(EDataChannelLabel.input);
+    getInputDataChannel(): DataChannel {
+        return this.getDataChannel(EDataChannelLabel.input);
     }    
-    closeChannel(label: string) {
-        let channel = this.getChannel(label);
+    closeDataChannel(label: string) {
+        let channel = this.getDataChannel(label);
         if (channel) {
             channel.close();  
-            delete this.channels[label]                      
+            delete this.dataChannels[label]                      
             channel.destroy();           
         }            
     }
-    closeChannels() {
-        Object.keys(this.channels).forEach(label => {
-            this.closeChannel(label);
+    closeDataChannels() {
+        Object.keys(this.dataChannels).forEach(label => {
+            this.closeDataChannel(label);
         })
     }
     close() {
-        this.closeChannels();
+        this.closeDataChannels();
     }
 }

@@ -27,10 +27,10 @@ export class StreamWebrtcEvents {
                             StreamWebrtcEvents.onCommand_peer_icecandidate(peer, args[0]);
                             break;  
                         case Cmds.ECommandId.stream_webrtc_oniceconnectionstatechange:   
-                            StreamWebrtcEvents.onCommand_peer_oniceconnectionstatechange(peer);
+                            StreamWebrtcEvents.onCommand_peer_iceconnectionstatechange(peer);
                             break;   
                         case Cmds.ECommandId.stream_webrtc_onsignalingstatechange:
-                            StreamWebrtcEvents.onCommand_peer_onsignalingstatechange(peer);
+                            StreamWebrtcEvents.onCommand_peer_signalingstatechange(peer);
                             break;   
                         case Cmds.ECommandId.stream_webrtc_onsendstreaminactive:
                             StreamWebrtcEvents.onCommand_peer_sendstreaminactive(peer);
@@ -115,7 +115,7 @@ export class StreamWebrtcEvents {
         }
         return StreamWebrtcCandidate.candidate(peer.instanceId, toUser.item, peer.user.item, data);
     }
-    static onCommand_peer_oniceconnectionstatechange = (peer: Modules.Webrtc.IPeer) => {
+    static onCommand_peer_iceconnectionstatechange = (peer: Modules.Webrtc.IPeer) => {
         let rtc = peer.getRtc(false);
         if (rtc) {
             let state = rtc.iceConnectionState;
@@ -124,7 +124,7 @@ export class StreamWebrtcEvents {
                 rtc.close();
         }
     }
-    static onCommand_peer_onsignalingstatechange = (peer: Modules.Webrtc.IPeer) => {
+    static onCommand_peer_signalingstatechange = (peer: Modules.Webrtc.IPeer) => {
         let rtc = peer.getRtc(false);
         if (rtc) {
             let state = rtc.signalingState
@@ -141,6 +141,9 @@ export class StreamWebrtcEvents {
         let rtc = peer.getRtc(false);
         rtc && rtc.close();
     }   
+
+
+
 
     // Streams
     static onCommand_streams_recvstream(streams: Modules.Webrtc.IStreams, stream: MediaStream) {
