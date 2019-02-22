@@ -33,6 +33,7 @@ export enum ECommandId {
     room_join = 'room_join',
     room_leave = 'room_leave',
     room_hello = 'room_hello',
+    room_changeid = 'room_changeid',
     room_join_or_open = 'room_join_or_open',
 
     user_state_onchange = 'user_state_onchange',
@@ -49,6 +50,7 @@ export enum ECommandId {
     stream_webrtc_ready = 'stream_webrtc_ready',
 
     stream_webrtc_sendstream = 'stream_webrtc_sendstream',
+    stream_webrtc_resolution = 'stream_webrtc_resolution',
     stream_webrtc_io_input = 'stream_webrtc_io_input',
 
     stream_webrtc_onconnectionstatechange = 'stream_webrtc_onconnectionstatechange',
@@ -72,7 +74,8 @@ export enum ECommandId {
     stream_webrtc_ondatachannelclose = 'stream_webrtc_ondatachannelclose',
     stream_webrtc_ondatachannelerror = 'stream_webrtc_ondatachannelerror',
     stream_webrtc_ondatachannelmessage = 'stream_webrtc_ondatachannelmessage',
-    stream_webrtc_ondatachannelopen = 'stream_webrtc_ondatachannelopen' 
+    stream_webrtc_ondatachannelopen = 'stream_webrtc_ondatachannelopen',
+    stream_webrtc_ondatachanneladd = 'stream_webrtc_ondatachanneladd' 
 }
 
 
@@ -81,7 +84,8 @@ export var RoomIdSeparator = '/'
 export enum ERoomPrefix {
     adhoc = 'adhoc#',
     agency = 'agency#',
-    stream = 'stream#'
+    stream = 'stream#',
+    turn = 'turn#'
 }
 
 // 用户数据
@@ -100,11 +104,14 @@ export enum EUserState {
     streamSender =              0b100,
     stream_room_opened =        0b1000,
     stream_room_sending =       0b10000,
+    stream_turn_room_opened =   0b100000,
+    stream_turn_room_sending =  0b1000000,
 }
 
 //群组数据
 export interface IRoom {
     id: string
+    sim?: string
 }
 
 export interface ICommandReqDataProps {
@@ -136,6 +143,11 @@ export interface ICommandRoomLeaveRespDataProps extends ICommandRespDataProps{}
 export interface ICommandRoomHelloReqDataProps extends ICommandReqDataProps{}
 // Command Room Hello Resp Props
 export interface ICommandRoomHelloRespDataProps extends ICommandRespDataProps{}
+// Command Room ChangeId Req Props
+export interface ICommandRoomChangeIdReqDataProps extends ICommandReqDataProps{}
+// Command Room ChangeId Resp Props
+export interface ICommandRoomChangeIdRespDataProps extends ICommandRespDataProps{}
+
 
 
 

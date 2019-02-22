@@ -19,6 +19,12 @@ export class Config {
         this.bandwidth = 0;
         this.codec = ECodecs.default;
         this.iceServers = [
+            {
+                'urls': [
+                    'stun:adhoc-turn.101.com:3478',
+                    'stun:adhoc-turn.101.com:3478?transport=udp',
+                ]
+            }             
             // {
             //     'urls': [
             //         'stun:webrtcweb.com:7788', // coTURN

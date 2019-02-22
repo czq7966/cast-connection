@@ -46,35 +46,11 @@ export class  DataChannel  extends Cmds.Common.CommandRooter implements IDataCha
         super.destroy();
     }
     initEvents() {
-        // this.eventRooter.setParent(this.datachannels.eventRooter);        
-        // this.eventRooter.onPreventRoot.add(this.onPreventRoot)
-        // this.eventRooter.onAfterRoot.add(this.onAfterRoot)
         this.initChannelEvents()              
     }
     unInitEvents() {
         this.unInitChannelEvents();
-        // this.eventRooter.onPreventRoot.remove(this.onPreventRoot)
-        // this.eventRooter.onAfterRoot.remove(this.onAfterRoot)
-        // this.eventRooter.setParent();           
-    }   
-    onPreventRoot = (cmd: Cmds.Common.ICommand): any => {
-        let cmdId = cmd.data.cmdId;
-        let type = cmd.data.type;
-        switch(cmdId) {
-            case Cmds.ECommandId.stream_webrtc_ondatachannelopen: 
-            case Cmds.ECommandId.stream_webrtc_ondatachannelclose: 
-            case Cmds.ECommandId.stream_webrtc_ondatachannelbufferedamountlow:             
-            case Cmds.ECommandId.stream_webrtc_ondatachannelmessage:
-                let label = cmd.data.extra as string;
-                if (label !== this.rtcdatachannel.label)
-                    return Cmds.Common.EEventEmitterEmit2Result.preventRoot;
-                break;
-            default:
-                
-                break;
-        }
-    }   
-
+    }  
     initChannelEvents() {
         let datachannel = this.rtcdatachannel;
         Object.keys(EDataChannelEvents).forEach(key => {            
@@ -93,7 +69,8 @@ export class  DataChannel  extends Cmds.Common.CommandRooter implements IDataCha
                 this.datachannels.peer.user.room.rooms.dispatcher.onCommand(data)
             }
             this._channelevents[value] = event;
-            datachannel.addEventListener(value, event)
+
+            value !== EDataChannelEvents.onmessage && datachannel.addEventListener(value, event)
         })
     }    
     unInitChannelEvents() {

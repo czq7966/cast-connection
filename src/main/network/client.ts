@@ -1,11 +1,24 @@
 import * as io from 'socket.io-client'
 import * as Dts from '../declare';
 import { EventEmitter } from 'events';
+export interface IClient {
+    eventEmitter: EventEmitter;
+    socket: SocketIOClient.Socket;
+    url: string;    
+    destroy()
+    id(): string 
+    connected(): boolean
+    connecting(): boolean 
+    connect(url?: string): Promise<any>
+    disconnect()
+    sendCommand(cmd: any): Promise<any>
+}
 
 export class Client {
     eventEmitter: EventEmitter;
     socket: SocketIOClient.Socket;
     url: string;
+    _connecting: boolean;
 
     constructor(url?: string) {
         this.eventEmitter = new EventEmitter();
@@ -25,12 +38,16 @@ export class Client {
     connected(): boolean {
         return this.socket && this.socket.connected
     }
+    connecting(): boolean {
+        return this._connecting;
+    }
 
     connect(url?: string): Promise<any> {
-        if (this.socket && this.socket.connected) {
+        if (this.connected()) {
             return Promise.resolve()
         }
-        return new Promise((resolve, reject) => {
+        this._connecting = true;
+        let promise = new Promise((resolve, reject) => {
             delete this.socket;
             url = url || this.url || "";
             url = url[url.length - 1] !== '/' ? url : url.substr(0, url.length - 1);            
@@ -52,7 +69,9 @@ export class Client {
                 reject(error);
             })        
             this.socket.connect();
-        })      
+        })  
+        promise.then(() => {this._connecting = false}).catch(() => {this._connecting = false})
+        return promise;    
     }
     disconnect() {
         this.socket && this.socket.disconnect();

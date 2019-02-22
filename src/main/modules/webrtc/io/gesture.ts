@@ -1,14 +1,16 @@
+import * as InputDts from './input.dts'
 import { Base, IBase } from "../base";
-import { IInputEvent, EInputOS, EInputPlatform, Input, IInputPoint, IMouseEvent, ITouchEvent, EInputDeviceTouchType, EInputDeviceMouseType, EInputDevice, IInput } from "./input";
+import { IInput } from './input';
 
 export interface IGesture extends IBase {
     input: IInput
-    inputEvent(event: IInputEvent)
+    inputEvent(event: InputDts.IInputEvent)
 }
 
 export class Gesture extends Base implements IGesture {
     input: IInput
     touchCount: number;
+    previousTouchEvent: InputDts.ITouchEvent;
     constructor(input: IInput) {
         super();
         this.input = input;
@@ -19,79 +21,79 @@ export class Gesture extends Base implements IGesture {
         delete this.input;
         super.destroy();
     }
-    inputEvent(event: IInputEvent) {
+    inputEvent(event: InputDts.IInputEvent) {
         switch(this.input.OS) {
-            case EInputOS.window:
+            case InputDts.EInputOS.window:
                 this.inputEventWindow(event);
                 break;
-            case EInputOS.android:
+            case InputDts.EInputOS.android:
                 this.inputEventAndroid(event);
                 break;
         }
     }
 
-    dealInputEvent(event: IInputEvent) {
+    dealInputEvent(event: InputDts.IInputEvent) {
         switch(this.input.OS) {
-            case EInputOS.window:
+            case InputDts.EInputOS.window:
                 this.inputEventWindow(event);
                 break;
-            case EInputOS.android:
+            case InputDts.EInputOS.android:
                 this.inputEventAndroid(event);
                 break;
         }
     }
-    inputEventWindow(event: IInputEvent) {
+    inputEventWindow(event: InputDts.IInputEvent) {
         switch(this.input.platform) {
-            case EInputPlatform.browser:
+            case InputDts.EInputPlatform.browser:
                 this.inputEventWindowBrowser(event)
                 break;
-            case EInputPlatform.reactnative:
+            case InputDts.EInputPlatform.reactnative:
                 this.inputEventWindowBrowser(event)
                 break;
         }
 
     }
-    inputEventAndroid(event: IInputEvent) {
+    inputEventAndroid(event: InputDts.IInputEvent) {
         switch(this.input.platform) {
-            case EInputPlatform.browser:
+            case InputDts.EInputPlatform.browser:
                 this.inputEventAndroidBrowser(event);
                 break;
-            case EInputPlatform.reactnative:
+            case InputDts.EInputPlatform.reactnative:
                 this.inputEventAndroidReactnative(event);
                 break;
         }
     }
-    inputEventWindowBrowser(event: IInputEvent) {
+    inputEventWindowBrowser(event: InputDts.IInputEvent) {
         switch(event.type) {
-            case EInputDeviceMouseType.mousedown:
-            case EInputDeviceMouseType.mousemove:
-            case EInputDeviceMouseType.mouseup:
-            case EInputDeviceMouseType.wheel:   
-                this.handleMouseEvent(event as IMouseEvent);
+            case InputDts.EInputDeviceMouseType.mousedown:
+            case InputDts.EInputDeviceMouseType.mousemove:
+            case InputDts.EInputDeviceMouseType.mouseup:
+            case InputDts.EInputDeviceMouseType.wheel:   
+                this.handleMouseEvent(event as InputDts.IMouseEvent);
                 break;
-            case EInputDeviceTouchType.touchcancel:
-            case EInputDeviceTouchType.touchend:
-            case EInputDeviceTouchType.touchmove:
-            case EInputDeviceTouchType.touchstart:
-                this.handleTouchEvent(event as ITouchEvent);
+            case InputDts.EInputDeviceTouchType.touchcancel:
+            case InputDts.EInputDeviceTouchType.touchend:
+            case InputDts.EInputDeviceTouchType.touchmove:
+            case InputDts.EInputDeviceTouchType.touchstart:
+                this.handleTouchEvent(event as InputDts.ITouchEvent);
                 break;
-            case EInputDeviceMouseType.mouseenter:
-            case EInputDeviceMouseType.mouseleave:                    
-            case EInputDeviceMouseType.mouseout:
-            case EInputDeviceMouseType.mouseover:              
+            case InputDts.EInputDeviceMouseType.mouseenter:
+            case InputDts.EInputDeviceMouseType.mouseleave:                    
+            case InputDts.EInputDeviceMouseType.mouseout:
+            case InputDts.EInputDeviceMouseType.mouseover:              
                 break;
             default: 
                 break;
         }        
 
     }
-    inputEventAndroidBrowser(event: IInputEvent) {
+    inputEventAndroidBrowser(event: InputDts.IInputEvent) {
         this.inputEventWindowBrowser(event)
     }
-    inputEventAndroidReactnative(event: IInputEvent) {
+    inputEventAndroidReactnative(event: InputDts.IInputEvent) {
         this.inputEventWindowBrowser(event)
     }
-    calcInputEventXY(point: IInputPoint, source: IInputPoint, dest: IInputPoint): IInputPoint {
+    calcInputEventXY(point: InputDts.IInputPoint, source: InputDts.IInputPoint, dest: InputDts.IInputPoint): InputDts.IInputPoint {
             let x = 0, y = 0;
             let xp = point.x;
             let yp = point.y;
@@ -115,20 +117,42 @@ export class Gesture extends Base implements IGesture {
             x = Math.ceil(xr * xs), y = Math.ceil(yr * ys);             
             return {x, y}
     }
+    calcInputEventDeltaXY(first: InputDts.IInputPoint, second: InputDts.IInputPoint, delta: number): InputDts.IInputPoint {
+        let x = 0, y = 0;
+        let xf = first.x;
+        let yf = first.y;
+        let xs = second.x;
+        let ys = second.y;
+        x = (xs - xf) * delta;
+        y = (ys - yf) * delta;
+        return {x, y}
+    }    
     changeTouchMode() {
         switch(this.input.touchMode) {
-            case EInputDevice.mouse:
-                this.input.touchMode = EInputDevice.touch;
+            case InputDts.EInputDevice.mouse:
+                this.input.touchMode = InputDts.EInputDevice.touch;
                 break;
-            case EInputDevice.touch:
-                this.input.touchMode = EInputDevice.mouse;
+            case InputDts.EInputDevice.touch:
+                this.input.touchMode = InputDts.EInputDevice.mouse;
                 break;
         }
         this.input.sendEvent({
             touchMode: this.input.touchMode
         })
     }
-    handleMouseEvent(evt: IMouseEvent) {
+    getPreviousTouchPoint(id: number): InputDts.ITouchPoint {
+        let previous = this.previousTouchEvent;
+        if (previous) {
+            let prePoint: InputDts.ITouchPoint;
+            previous.changedTouches.forEach(pp => {
+                if (pp.id === id) {
+                    prePoint = pp
+                }
+            })
+            return prePoint;
+        }
+    }
+    handleMouseEvent(evt: InputDts.IMouseEvent) {
         let p = this.calcInputEventXY({x: evt.x, y: evt.y}, {x: evt.sourceX, y: evt.sourceY}, {x: evt.destX, y: evt.destY});
         if (p.x >= 0 ) {
             evt.x = p.x;
@@ -136,45 +160,71 @@ export class Gesture extends Base implements IGesture {
             this.input.dispatchEvent(evt)
         }        
     }
-    handleTouchEvent(event: ITouchEvent) {
-        // if (evt.points.length >= 4) {                
-        //     this.changeTouchMode();  
-        //     return;             
-        // }
+    handleTouchEvent(evt: InputDts.ITouchEvent) {     
+        let valid = false;
+        evt.changedTouches.forEach(point => {            
+            let p = this.calcInputEventXY({x: point.x, y: point.y}, {x: evt.sourceX, y: evt.sourceY}, {x: evt.destX, y: evt.destY});
+            if (p.x >= 0 ) {
+                point.x = p.x;
+                point.y = p.y;
+                valid = true;
 
-        if (this.input.touchMode === EInputDevice.mouse) {
-            this.handleTouchToMouseEvent(event)
+                if (evt.type === InputDts.EInputDeviceTouchType.touchmove) {
+                    let prePoint = this.getPreviousTouchPoint(point.id)
+                    if (prePoint) {
+                        let delta = point.timestamp - prePoint.timestamp;
+                        p = this.calcInputEventDeltaXY({x: prePoint.x, y: prePoint.y}, {x: point.x, y: point.y}, 1);
+                        if (p.y <=5 && p.y >=-5 ) return;
+                        valid = false;
+                        point.deltaX = 0;
+                        point.deltaY = p.y;
+                    }    
+                }    
+            }            
+        })        
+
+        if (valid) {
+            this.previousTouchEvent = null;            
+            if (evt.type === InputDts.EInputDeviceTouchType.touchmove) 
+                this.previousTouchEvent = evt;
+            this.input.dispatchEvent(evt)
+        }
+
+        return;
+
+        if (this.input.touchMode === InputDts.EInputDevice.mouse) {
+            this.handleTouchToMouseEvent(evt)
         } else {
-            event.touchPoints = [];
-            event.changedTouches.forEach(point => {
-                let p = this.calcInputEventXY({x: point.x, y: point.y}, {x: event.sourceX, y: event.sourceY}, {x: event.destX, y: event.destY});
+            evt.touchPoints = [];
+            evt.changedTouches.forEach(point => {
+                let p = this.calcInputEventXY({x: point.x, y: point.y}, {x: evt.sourceX, y: evt.sourceY}, {x: evt.destX, y: evt.destY});
                 if (p.x >= 0 ) {
                     point.x = p.x;
                     point.y = p.y;
                 }            
             })
-            event.touchPoints = event.changedTouches;
+            evt.touchPoints = evt.changedTouches;
             switch(event.type) {
-                case EInputDeviceTouchType.touchcancel:
-                    event.touchPoints = [];
+                case InputDts.EInputDeviceTouchType.touchcancel:
+                    evt.touchPoints = [];
                     this.touchCount = 0;
-                    this.input.dispatchEvent(event)
+                    this.input.dispatchEvent(evt)
                     break;
-                case EInputDeviceTouchType.touchend:
-                    event.touchPoints = [];
-                    this.touchCount = event.touches.length;
-                    this.touchCount <= 0 && (this.touchCount = 0, this.input.dispatchEvent(event))
+                case InputDts.EInputDeviceTouchType.touchend:
+                    evt.touchPoints = [];
+                    this.touchCount = evt.touches.length;
+                    this.touchCount <= 0 && (this.touchCount = 0, this.input.dispatchEvent(evt))
                     break;
-                case EInputDeviceTouchType.touchmove:
-                    this.touchCount = event.touches.length;
-                    event.touches.length == 1 && this.input.dispatchEvent(event);                    
+                case InputDts.EInputDeviceTouchType.touchmove:
+                    this.touchCount = evt.touches.length;
+                    evt.touches.length == 1 && this.input.dispatchEvent(evt);                    
                     break;
-                case EInputDeviceTouchType.touchstart:
+                case InputDts.EInputDeviceTouchType.touchstart:
                     if (this.touchCount <= 0  ) {                        
-                        this.touchCount = event.touches.length;
-                        this.input.dispatchEvent(event);
+                        this.touchCount = evt.touches.length;
+                        this.input.dispatchEvent(evt);
                     } else {
-                        this.touchCount = event.touches.length;
+                        this.touchCount = evt.touches.length;
                     }
                     break;
                 default:
@@ -184,7 +234,7 @@ export class Gesture extends Base implements IGesture {
             
         }        
     }
-    handleTouchToMouseEvent(event: ITouchEvent) {
+    handleTouchToMouseEvent(event: InputDts.ITouchEvent) {
         event.changedTouches.forEach(point => {
             let p = this.calcInputEventXY({x: point.x, y: point.y}, {x: event.sourceX, y: event.sourceY}, {x: event.destX, y: event.destY});
             if (p.x >= 0 ) {
@@ -192,7 +242,7 @@ export class Gesture extends Base implements IGesture {
                 point.y = p.y;
             }            
         })        
-        let evtMouse: IMouseEvent = { 
+        let evtMouse: InputDts.IMouseEvent = { 
                 x: event.changedTouches[0].x, 
                 y: event.changedTouches[0].y,
                 destX: event.destX,
@@ -207,7 +257,7 @@ export class Gesture extends Base implements IGesture {
             case 2:
                 evtMouse.button = 'left';                
                 evtMouse.clickCount = 0;           
-                evtMouse.type = EInputDeviceMouseType.wheel;  
+                evtMouse.type = InputDts.EInputDeviceMouseType.wheel;  
                 evtMouse.deltaX = event.changedTouches[0].deltaX * 100 || 0;
                 evtMouse.deltaY = event.changedTouches[0].deltaX * 100 || 10;
                 break;
@@ -217,19 +267,19 @@ export class Gesture extends Base implements IGesture {
                 break;
         }
 
-        let type: EInputDeviceMouseType;
+        let type: InputDts.EInputDeviceMouseType;
         switch(event.type) {
-            case EInputDeviceTouchType.touchcancel:
-                type = EInputDeviceMouseType.mouseup;
+            case InputDts.EInputDeviceTouchType.touchcancel:
+                type = InputDts.EInputDeviceMouseType.mouseup;
                 break;
-            case EInputDeviceTouchType.touchend:
-                type = EInputDeviceMouseType.mouseup;
+            case InputDts.EInputDeviceTouchType.touchend:
+                type = InputDts.EInputDeviceMouseType.mouseup;
                 break;
-            case EInputDeviceTouchType.touchmove:
-                type = EInputDeviceMouseType.mousemove;
+            case InputDts.EInputDeviceTouchType.touchmove:
+                type = InputDts.EInputDeviceMouseType.mousemove;
                 break;
-            case EInputDeviceTouchType.touchstart:
-                type = EInputDeviceMouseType.mousedown;                
+            case InputDts.EInputDeviceTouchType.touchstart:
+                type = InputDts.EInputDeviceMouseType.mousedown;                
                 break;
         } 
         !evtMouse.type && (evtMouse.type = type) 

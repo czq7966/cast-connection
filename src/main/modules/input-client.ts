@@ -4,8 +4,10 @@ import * as Network from '../network'
 import * as Services from '../services'
 
 export interface IInputClient extends Cmds.Common.IBase {
-    wsClient: Network.Client
+    wsClient: Network.IClient
     dispatcher?:Services. IDispatcher
+    sendCommand(cmd: Cmds.ICommandData<any>)
+    setEnabled(enalbed: boolean)
 } 
 
 export interface IInputClientConstructorParams extends Cmds.Common.IBaseConstructorParams {
@@ -13,8 +15,10 @@ export interface IInputClientConstructorParams extends Cmds.Common.IBaseConstruc
 }
 
 export class InputClient extends Cmds.Common.CommandRooter implements IInputClient {
-    wsClient: Network.Client
+    wsClient: Network.IClient
     dispatcher?:Services. IDispatcher
+    enabled: boolean
+    timeoutHandler: number
     constructor(params: IInputClientConstructorParams, dispatcher?:Services. IDispatcher) {
         super(params);
         this.wsClient = new Network.Signaler(params.url);
@@ -27,6 +31,7 @@ export class InputClient extends Cmds.Common.CommandRooter implements IInputClie
         this.wsClient.destroy();
         delete this.wsClient;
         delete this.dispatcher;
+        delete this.timeoutHandler;
         super.destroy();
     }
 
@@ -37,18 +42,50 @@ export class InputClient extends Cmds.Common.CommandRooter implements IInputClie
     unInitEvents() {
         this.eventRooter.onAfterRoot.remove(this.onAfterRoot)
         this.eventRooter.setParent();   
-    }
 
+        clearTimeout(this.timeoutHandler) 
+    }
+    setEnabled(enabled: boolean) {
+        this.enabled = enabled;
+        if (this.enabled) {
+            if(!this.wsClient.connecting() && !this.timeoutHandler) {
+                this.wsClient.connect()
+                .catch(err => {
+                    this.timeoutHandler = setTimeout(() => {
+                        clearTimeout(this.timeoutHandler) 
+                        this.timeoutHandler = 0;
+                        // this.setEnabled(this.enabled)                    
+                    }, 5000) as any;
+                })
+            }
+        } else {
+            this.wsClient.disconnect();
+            clearTimeout(this.timeoutHandler)
+            this.timeoutHandler = 0;
+        }
+    }
     onAfterRoot = (data: Cmds.ICommandData<any>): any => {
         let cmdId = data.cmdId;
         switch(cmdId) {
             case Cmds.ECommandId.stream_webrtc_io_input:     
-                // Services.Cmds.StreamIOInput.InputClient.onAfterRoot.req(this, data)
+                Services.Cmds.StreamIOInput.InputClient.onAfterRoot.req(this, data)
                 return Cmds.Common.EEventEmitterEmit2Result.preventRoot; 
                 break;
             default:
      
                 break;            
+        }
+    }
+    sendCommand(cmd: Cmds.ICommandData<any>) {
+        if (this.enabled) {
+            if (this.wsClient.connected()) {
+                this.wsClient.sendCommand(cmd)
+                .catch(err => {
+                    console.log(err)
+                })
+            } else {
+                this.setEnabled(this.enabled)
+            }
         }
     }
 

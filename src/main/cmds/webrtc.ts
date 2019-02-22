@@ -59,3 +59,11 @@ Object.keys(Dts.ECommandId).forEach(key => {
         }) 
     }
 })
+
+
+Common.CommandTypes.RegistCommandType({
+    cmdId: Dts.ECommandId.stream_webrtc_resolution,
+    name: '用户状态变更',
+    ReqClass: CommandReq,
+    RespClass: CommandResp
+})

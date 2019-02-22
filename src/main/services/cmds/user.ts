@@ -39,4 +39,16 @@ export class User {
         }        
         Dispatcher.getInstance<Dispatcher>(instanceId, false).onCommand(data);
     }
+    static dispatchCommand(instanceId: string, user: Cmds.IUser, userExtra: any,  dataExtra: any, cmdId: Cmds.ECommandId) {
+        user = Object.assign({}, user);
+        user.extra = userExtra;
+        let data: Cmds.ICommandData<Cmds.ICommandReqDataProps> = {
+            cmdId: cmdId,
+            props: {
+                user: user
+            },
+            extra: dataExtra
+        }
+        Dispatcher.getInstance<Dispatcher>(instanceId, false).onCommand(data);
+    }     
 }

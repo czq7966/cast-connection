@@ -11,13 +11,14 @@ export class Streams{
         let onInactive = (ev) => {
             stream.removeEventListener('inactive', onInactive);              
             streams.notDestroyed && streams.sends.exist(stream.id) &&
-            ServiceCmds.StreamWebrtcEvents.dispatchEventCommand(streams.peer, stream, Cmds.ECommandId.stream_webrtc_onsendstreaminactive);
+            ServiceCmds.StreamWebrtcEvents.dispatchEventCommand(streams.peer, stream, null, Cmds.ECommandId.stream_webrtc_onsendstreaminactive);
         }
         stream.addEventListener('inactive', onInactive);           
     }
     static delSendStream(streams: Modules.Webrtc.IStreams, id?: string) {
         if (id) {
             streams.sends.del(id);
+            streams.resolutions.del(id);
         } else {
             streams.sends.keys().forEach(key => {
                 this.delSendStream(streams, streams.sends.get(key).id)
@@ -30,13 +31,14 @@ export class Streams{
         let onInactive = (ev) => {
             stream.removeEventListener('inactive', onInactive);              
             streams.notDestroyed &&  streams.recvs.exist(stream.id) &&
-            ServiceCmds.StreamWebrtcEvents.dispatchEventCommand(streams.peer, stream, Cmds.ECommandId.stream_webrtc_onrecvstreaminactive);
+            ServiceCmds.StreamWebrtcEvents.dispatchEventCommand(streams.peer, stream, null, Cmds.ECommandId.stream_webrtc_onrecvstreaminactive);
         }
         stream.addEventListener('inactive', onInactive);   
     }
     static delRecvStream(streams: Modules.Webrtc.IStreams, id?: string) {
         if (id) {
             streams.recvs.del(id);
+            streams.resolutions.del(id);
         } else {
             streams.sends.keys().forEach(key => {
                 this.delRecvStream(streams, streams.sends.get(key).id)

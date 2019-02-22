@@ -71,14 +71,15 @@ export class StreamWebrtcEvents {
         }      
     }   
 
-    static dispatchEventCommand(peer: Modules.Webrtc.IPeer, extra: any, cmdId: Cmds.ECommandId) {
+    static dispatchEventCommand(peer: Modules.Webrtc.IPeer, userExtra: any,  dataExtra: any, cmdId: Cmds.ECommandId) {
         let user = Object.assign({}, peer.user.item);
-        user.extra = extra;
+        user.extra = userExtra;
         let data: Cmds.ICommandData<Cmds.ICommandReqDataProps> = {
             cmdId: cmdId,
             props: {
                 user: user
-            }
+            },
+            extra: dataExtra
         }
         peer.user.room.rooms.dispatcher.onCommand(data)        
     }
@@ -87,20 +88,20 @@ export class StreamWebrtcEvents {
         let streams = ev.streams;
         streams.forEach(stream => {    
             !peer.streams.recvs.exist(stream.id) &&
-            this.dispatchEventCommand(peer, stream, Cmds.ECommandId.stream_webrtc_onrecvstream);
+            this.dispatchEventCommand(peer, stream, null, Cmds.ECommandId.stream_webrtc_onrecvstream);
         })
     }
     static onCommand_peer_stream (peer: Modules.Webrtc.IPeer,ev: any)  {
         console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_peer_stream', peer.user); 
         let stream = ev.stream as MediaStream;
         !peer.streams.recvs.exist(stream.id) &&
-        this.dispatchEventCommand(peer, stream, Cmds.ECommandId.stream_webrtc_onrecvstream);        
+        this.dispatchEventCommand(peer, stream, null, Cmds.ECommandId.stream_webrtc_onrecvstream);        
     }
     static onCommand_peer_addstream(peer: Modules.Webrtc.IPeer,ev: Event) {
         console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_peer_addstream', peer.user); 
         let stream = ev['stream'] as MediaStream;
         !peer.streams.recvs.exist(stream.id) &&
-        this.dispatchEventCommand(peer, stream, Cmds.ECommandId.stream_webrtc_onrecvstream);
+        this.dispatchEventCommand(peer, stream, null, Cmds.ECommandId.stream_webrtc_onrecvstream);
     }   
     static onCommand_peer_icecandidate = (peer: Modules.Webrtc.IPeer, ev: RTCPeerConnectionIceEvent): Promise<any> => {
         console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_peer_icecandidate', peer.user); 

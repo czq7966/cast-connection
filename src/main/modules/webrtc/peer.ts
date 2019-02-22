@@ -57,16 +57,14 @@ export class Peer extends Cmds.Common.CommandRooter implements IPeer  {
         this.user = user;        
         this.config = new Config();
         this.streams = new Streams(this);
+        this.input = new IO.Input(this);        
         this.datachannels = new IO.DataChannels(this);
-        this.input = new IO.Input(this);
-
         this.initEvents();
     }
     destroy() {
         this.unInitEvents();
-
-        this.datachannels.close();
         this.input.destroy();
+        this.datachannels.close();
         this.datachannels.destroy();
         this.streams.destroy();     
    
@@ -244,7 +242,7 @@ export class Peer extends Cmds.Common.CommandRooter implements IPeer  {
     }     
 
     getConfig(): Config {
-        Services.Cmds.StreamWebrtcEvents.dispatchEventCommand(this, null, Cmds.ECommandId.stream_webrtc_ongetconfig)
+        Services.Cmds.StreamWebrtcEvents.dispatchEventCommand(this, null, null, Cmds.ECommandId.stream_webrtc_ongetconfig)
         return this.config;
     }    
     getRtc(create: boolean = true): RTCPeerConnection {

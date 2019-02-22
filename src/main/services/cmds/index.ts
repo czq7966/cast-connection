@@ -21,6 +21,7 @@ export * from './stream-webtrc-candidate'
 export * from './stream-webtrc-ready'
 export * from './stream-webtrc-events'
 export * from './stream-webtrc-streams'
+export * from './stream-webtrc-resolution'
 
 export * from './stream-webrtc-io-datachannels'
 export * from './stream-webrtc-io-input'
