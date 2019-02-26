@@ -52,7 +52,7 @@ export class Client {
             url = url || this.url || "";
             url = url[url.length - 1] !== '/' ? url : url.substr(0, url.length - 1);            
             this.url = url || this.url;
-            this.socket = io(this.url, {
+            this.socket = io.connect(this.url, {
                 autoConnect: false,
                 reconnection: false,
                 transports: ['websocket']

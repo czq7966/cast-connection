@@ -49,11 +49,12 @@ export class Connection extends Cmds.Common.Base {
     unInitEvents() {
     }
 
-    login(): Promise<any> {
+    login(user?: Cmds.IUser): Promise<any> {
+        user = user || {id: null};
         let instanceId = this.instanceId;
-        let promise = Services.Cmds.Login.login(instanceId, {id: Cmds.Common.Helper.uuid()});
+        let promise = Services.Cmds.Login.login(instanceId, user);
         return promise;
-    }    
+    }       
     isLogin() {
         let instanceId = this.instanceId;
         return Services.Cmds.Login.isLogin(instanceId);

@@ -169,24 +169,24 @@ export class Gesture extends Base implements IGesture {
                 point.y = p.y;
                 valid = true;
 
-                if (evt.type === InputDts.EInputDeviceTouchType.touchmove) {
-                    let prePoint = this.getPreviousTouchPoint(point.id)
-                    if (prePoint) {
-                        let delta = point.timestamp - prePoint.timestamp;
-                        p = this.calcInputEventDeltaXY({x: prePoint.x, y: prePoint.y}, {x: point.x, y: point.y}, 1);
-                        if (p.y <=5 && p.y >=-5 ) return;
-                        valid = false;
-                        point.deltaX = 0;
-                        point.deltaY = p.y;
-                    }    
-                }    
-            }            
+                // if (evt.type === InputDts.EInputDeviceTouchType.touchmove) {
+                //     let prePoint = this.getPreviousTouchPoint(point.id)
+                //     if (prePoint) {
+                //         let delta = point.timestamp - prePoint.timestamp;
+                //         p = this.calcInputEventDeltaXY({x: prePoint.x, y: prePoint.y}, {x: point.x, y: point.y}, 1);
+                //         if (p.y <=5 && p.y >=-5 ) return;
+                //         valid = false;
+                //         point.deltaX = 0;
+                //         point.deltaY = p.y;
+                //     }    
+                // }    
+            }          
         })        
 
         if (valid) {
-            this.previousTouchEvent = null;            
-            if (evt.type === InputDts.EInputDeviceTouchType.touchmove) 
-                this.previousTouchEvent = evt;
+            // this.previousTouchEvent = null;            
+            // if (evt.type === InputDts.EInputDeviceTouchType.touchmove) 
+            //     this.previousTouchEvent = evt;
             this.input.dispatchEvent(evt)
         }
 

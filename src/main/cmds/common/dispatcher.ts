@@ -39,12 +39,13 @@ export class Dispatcher extends Base {
     static sendCommand(cmd: ICommand, ...args: any[]): Promise<any> {
         return new Promise((resolve, reject) => {
             this.cmdTimeout.addCmd(cmd.data);
+            let sessionId = cmd.data.sessionId;
             this.dispatcher.getInstance<IDispatcher>(cmd.instanceId, true).sendCommand(cmd.data, ...args)
             .then(msg => {                
                 resolve(msg);
             })
             .catch(err => {
-                this.cmdTimeout.delCmd(cmd.data.sessionId);
+                sessionId && this.cmdTimeout.delCmd(sessionId);
                 reject(err)
             })
         })
