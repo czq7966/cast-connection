@@ -49,9 +49,10 @@ export class Connection extends Cmds.Common.Base {
     unInitEvents() {
     }
 
-    login(user?: Cmds.IUser): Promise<any> {
+    login(user?: Cmds.IUser, url?: string): Promise<any> {
         user = user || {id: null};
         let instanceId = this.instanceId;
+        url && (this.signaler.url = url)
         let promise = Services.Cmds.Login.login(instanceId, user);
         return promise;
     }       

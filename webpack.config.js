@@ -31,29 +31,11 @@ module.exports = env => {
     );
 
     if (env.production) { //生产模式
-        plugins.push(new DtsPlugin({dtsDir: path.resolve(distDir, '../dts', 'main')}));    //生成dts文件        
+        // plugins.push(new DtsPlugin({dtsDir: path.resolve(distDir, '../dts', 'src/main')}));    //生成dts文件        
         minimizer.push(
             new UglifyJsPlugin()
         )
-    } else {
-        entry["test/index.dev"] = "./src/test/index.ts";
-        plugins.push(
-            new HtmlWebpackPlugin({
-                template: './src/test/index.html',
-                path: distDir,
-                filename: 'test/index.html'
-            })
-        );   
-        plugins.push(
-            new CopyWebpackPlugin([
-                {
-                    from: path.resolve(__dirname, 'src', 'test/libs'),
-                    to: 'test/libs',
-                }                     
-            ])
-        )             
-    }
-
+    } 
 
 
     return {

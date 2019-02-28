@@ -13,7 +13,7 @@ tsconfig.json
 src
 
 # dist
-dist/dts
+# dist/dts
 dist/test
 dist/cjs/dts
 dist/cjs/test

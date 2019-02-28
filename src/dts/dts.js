@@ -1,6 +1,6 @@
 const path = require('path')
 const dts = require('dts-bundle');
-const dtsDir = path.resolve(__dirname, '../../dist/dts/main')
+const dtsDir = path.resolve(__dirname, '../../dist/dts/src/main')
 const entry = "dts.d.ts"
 const headerPath =  path.resolve(__dirname, 'header.txt')
 

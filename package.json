@@ -1,15 +1,15 @@
 {
-  "name": "adhoc-cast-connection",
-  "version": "0.2.0",
+  "name": "@sdp.nd/adhoc-cast-connection",
+  "version": "2.0.3",
   "description": "nd adhoc cast connection",
   "main": "index.js",
   "scripts": {
-    "build:cjs": " webpack --env.cjs && webpack --env.production --env.cjs ",
-    "build:umd": " webpack --env.umd && webpack --env.production --env.umd ",
-    "build:amd": " webpack --env.amd && webpack --env.production --env.amd ",
+    "build:cjs": " webpack --env.production --env.cjs ",
+    "build:umd": " webpack --env.production --env.umd ",
+    "build:amd": " webpack --env.production --env.amd ",
     "build": "npm run clean && npm run build:cjs && npm run build:umd ",
     "watch": "npm run clean && webpack --watch --progress --env.umd",
-    "clean": "rimraf index.d.ts && rimraf ./dist",
+    "clean": "rimraf dist",
     "dev": "npm run watch",
     "dts": "node ./src/dts/dts.js"
   },

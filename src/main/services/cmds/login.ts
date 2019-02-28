@@ -37,7 +37,7 @@ export class Login extends Cmds.Common.Base {
                     reject(data);
                 }    
             }
-            cmd.sendCommand();   
+            cmd.sendCommand().catch(err => reject(err));   
             cmd.destroy();
             cmd = null;     
         })
