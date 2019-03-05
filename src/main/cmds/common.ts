@@ -19,3 +19,10 @@ Common.CommandTypes.RegistCommandType({
     ReqClass: CommandReq,
     RespClass: CommandResp
 })
+
+Common.CommandTypes.RegistCommandType({
+    cmdId: Dts.ECommandId.custom,
+    name: '自定义指令',
+    ReqClass: CommandReq,
+    RespClass: CommandResp
+})

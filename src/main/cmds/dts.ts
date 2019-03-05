@@ -24,6 +24,8 @@ export enum ECommandId {
  
 
     none = 'none',
+    custom = 'custom',
+    
     adhoc_login = 'adhoc_login',
     adhoc_logout = 'adhoc_logout',
     adhoc_hello = 'adhoc_hello',
