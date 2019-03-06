@@ -30,6 +30,7 @@ export interface ICommandData<T> extends ICommandBaseData  {
     //Events
     onResp?: Function
     onRespTimeout?: Function
+    timeout?: number
 
     //extra
     extra?: any

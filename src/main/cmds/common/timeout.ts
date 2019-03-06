@@ -47,7 +47,7 @@ export class CmdTimeout extends Base {
             let hander = setTimeout(() => {
                 this.delCmd(sid, true, false);
                 this.eventEmitter.emit(sid +  CmdTimeoutSubfix.onTimeout, cmd);
-            }, defaultRespTimeout);
+            }, cmd.timeout || defaultRespTimeout);
 
             this.timers.add(sid, cmd);
             this.timeoutHandlers.add(sid, hander as any)            
