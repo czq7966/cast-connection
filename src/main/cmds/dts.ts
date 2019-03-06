@@ -21,7 +21,13 @@ export enum ECommandId {
     network_reconnecting = 'network_reconnecting',
     network_ping = 'network_ping',
     network_pong = 'network_pong',
- 
+
+    admin_config_update = "admin_config_update",
+    admin_config_get = "admin_config_get",
+    admin_namespace_close = "admin_namespace_close",
+    admin_namespace_open = "admin_namespace_open",
+    admin_namespace_reset = "admin_namespace_reset",
+    admin_namespace_status = "admin_namespace_status", 
 
     none = 'none',
     custom = 'custom',
@@ -114,15 +120,18 @@ export enum EUserState {
 export interface IRoom {
     id: string
     sim?: string
+    extra?: any
 }
 
 export interface ICommandReqDataProps {
     user?: IUser 
+    extra?: any
 }
 export interface ICommandRespDataProps {
     result: boolean
     msg?: string
     user?: IUser
+    extra?: any
 }
 
 //  Command Room Open Req Props
