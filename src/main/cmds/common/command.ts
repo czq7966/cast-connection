@@ -100,18 +100,19 @@ export class Command<T extends any> extends Base implements ICommand {
     }    
 
 
-    copyProperties(props: Object | string) {
+    copyProperties(props: Object | string): Command<T> {
         props && (typeof props == 'object') && (props = JSON.stringify(props))
         props && (this.data.props = JSON.parse(props as string));
+        return this;
     }
 
-    assignData(data: Dts.ICommandData<any>, merge?: boolean) {
+    assignData(data: Dts.ICommandData<any>, merge?: boolean): Command<T>  {
         if (merge) {
             this.data = Object.assign(this.data, data);
         } else {
             this.data = Object.assign({}, data) as any;
         }
-        
+        return this        
     }
 
     sendCommand(...args: any[]): Promise<any> {     
