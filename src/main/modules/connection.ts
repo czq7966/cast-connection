@@ -70,10 +70,8 @@ export class Connection extends Cmds.Common.Base {
         }
     }
 
-    //temp
-    joinRoom(query: any): Promise<any> {
-        return;
-    }    
-    close(){}
+    disconnect(){
+        this.signaler.disconnect();
+    }
 
 }
