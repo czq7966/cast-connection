@@ -15,7 +15,7 @@ export class RoomClose extends Cmds.Common.Base {
                     user: user
                 },
                 onResp: (cmdResp: Cmds.CommandRoomCloseResp) => {
-                    Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
+                    Cmds.Common.EDCoder.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
                     if (cmdResp.data.respResult) {
                         resolve(cmdResp.data);    
                     } else {

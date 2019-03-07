@@ -1,5 +1,5 @@
 import { Base, IBaseConstructorParams, IBase, IBaseClass } from "./base";
-import { Dispatcher } from "./dispatcher";
+import { EDCoder } from "./edcoder";
 import * as Dts from "./dts";
 
 
@@ -120,14 +120,14 @@ export class Command<T extends any> extends Base implements ICommand {
         this.data.to.type = this.data.to.type || 'server';
         this.data.to.id = this.data.to.id || '';
         this.data.cmdId = this.data.cmdId || ((this as any).constructor as ICommandClass).defaultCommandId;
-        return Dispatcher.sendCommand(this, ...args);
+        return EDCoder.sendCommand(this, ...args);
     }
     sendCommandForResp(...args: any[]): Promise<any> {    
         return new Promise((resolve, reject) => {
             let onResp = (cmdResp: ICommand) => {                
                 let data = cmdResp.data;
                 if (data.respResult) {
-                    Dispatcher.dispatch(cmdResp , Dts.ECommandDispatchEvents.onDispatched);
+                    EDCoder.dispatch(cmdResp , Dts.ECommandDispatchEvents.onDispatched);
                     resolve(data);
                 } else {
                     reject(data)

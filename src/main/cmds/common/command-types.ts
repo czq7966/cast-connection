@@ -55,4 +55,7 @@ export class CommandTypes {
         return;
     
     }    
+    static encode(cmd: ICommand): Dts.ICommandData<any> {
+        return cmd.data
+    }
 }

@@ -17,7 +17,7 @@ export class RoomOpen extends Cmds.Common.Base {
                 onResp: (cmdResp: Cmds.CommandRoomOpenResp) => {
                     let data = cmdResp.data;
                     data.props.user.states = Cmds.Common.Helper.StateMachine.set(data.props.user.states, Cmds.EUserState.roomOwner);
-                    Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
+                    Cmds.Common.EDCoder.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
                     if (cmdResp.data.respResult) {
                         resolve(cmdResp.data);    
                     } else {

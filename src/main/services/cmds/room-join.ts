@@ -16,7 +16,7 @@ export class RoomJoin extends Cmds.Common.Base {
                 },
                 onResp: (cmdResp: Cmds.CommandRoomJoinResp) => {
                     let data = cmdResp.data;
-                    Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
+                    Cmds.Common.EDCoder.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
                     if (data.respResult) {
                         resolve(data);    
                     } else {

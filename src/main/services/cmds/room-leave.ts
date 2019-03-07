@@ -16,7 +16,7 @@ export class RoomLeave extends Cmds.Common.Base {
                 },
                 onResp: (respCmd: Cmds.CommandRoomLeaveResp) => {
                     let data = respCmd.data;
-                    Cmds.Common.Dispatcher.dispatch(respCmd , Cmds.ECommandDispatchEvents.onDispatched);
+                    Cmds.Common.EDCoder.dispatch(respCmd , Cmds.ECommandDispatchEvents.onDispatched);
                     if (data.respResult) {
                         resolve(data);    
                     } else {

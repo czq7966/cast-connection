@@ -22,7 +22,7 @@ export class Login extends Cmds.Common.Base {
                         let instance = cmdResp.getInstance<Cmds.CommandLoginResp>();                        
                         instance.assignData(data);
                         Hello.hello(instanceId, data.props.user);
-                        Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
+                        Cmds.Common.EDCoder.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
                         resolve(data);
                     } else {
                         console.error('login error', cmdResp.data.respMsg);

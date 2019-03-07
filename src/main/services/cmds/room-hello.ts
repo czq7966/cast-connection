@@ -18,7 +18,7 @@ export class RoomHello extends Cmds.Common.Base {
                 },            
                 onResp: toUser? (cmdResp: Cmds.CommandRoomHelloResp) => {
                     let data = cmdResp.data;
-                    Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
+                    Cmds.Common.EDCoder.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
                     resolve(data);    
                 } : null ,
                 onRespTimeout: toUser? (data: Cmds.ICommandData<Cmds.ICommandRoomHelloRespDataProps>) => {

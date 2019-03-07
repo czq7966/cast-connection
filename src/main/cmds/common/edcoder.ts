@@ -11,7 +11,7 @@ export interface IDispatcher extends IBase {
 }
 
 
-export class Dispatcher extends Base {  
+export class EDCoder extends Base {  
     static dispatcher: IBaseClass
     static cmdTimeout: CmdTimeout = new CmdTimeout()
     static setDispatcher(dispatcher: IBaseClass, isServer: boolean) {
@@ -37,9 +37,10 @@ export class Dispatcher extends Base {
 
     static sendCommand(cmd: ICommand, ...args: any[]): Promise<any> {
         return new Promise((resolve, reject) => {
-            this.cmdTimeout.addCmd(cmd.data);
-            let sessionId = cmd.data.sessionId;
-            this.dispatcher.getInstance<IDispatcher>(cmd.instanceId, true).sendCommand(cmd.data, ...args)
+            let data = CommandTypes.encode(cmd);
+            this.cmdTimeout.addCmd(data);
+            let sessionId = data.sessionId;
+            this.dispatcher.getInstance<IDispatcher>(cmd.instanceId, true).sendCommand(data, ...args)
             .then(msg => {                
                 resolve(msg);
             })

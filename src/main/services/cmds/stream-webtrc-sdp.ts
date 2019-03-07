@@ -17,7 +17,7 @@ export class StreamWebrtcSdp {
                 onResp: (cmdResp: Cmds.CommandStreamWebrtcSdpResp) => {                
                     let data = cmdResp.data;
                     if (data.respResult) {
-                        Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
+                        Cmds.Common.EDCoder.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
                         resolve(data);
                     } else {
                         console.error('login error', cmdResp.data.respMsg);

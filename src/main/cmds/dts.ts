@@ -7,6 +7,11 @@ export var CommandID = Common.ECommandEvents.CommandID;
 
 
 export enum ECommandId {
+    //other
+    none = 'none',
+    custom = 'custom',
+
+    //network
     network_connect = 'network_connect',
     network_connect_error = 'network_connect_error',
     network_connect_timeout = 'network_connect_timeout',
@@ -22,6 +27,7 @@ export enum ECommandId {
     network_ping = 'network_ping',
     network_pong = 'network_pong',
 
+    //admin
     admin_config_update = "admin_config_update",
     admin_config_get = "admin_config_get",
     admin_namespace_close = "admin_namespace_close",
@@ -29,9 +35,7 @@ export enum ECommandId {
     admin_namespace_reset = "admin_namespace_reset",
     admin_namespace_status = "admin_namespace_status", 
 
-    none = 'none',
-    custom = 'custom',
-    
+    //room
     adhoc_login = 'adhoc_login',
     adhoc_logout = 'adhoc_logout',
     adhoc_hello = 'adhoc_hello',
@@ -44,13 +48,15 @@ export enum ECommandId {
     room_changeid = 'room_changeid',
     room_join_or_open = 'room_join_or_open',
 
-    user_state_onchange = 'user_state_onchange',
-
     stream_room_open = 'stream_room_open',
     stream_room_join = 'stream_room_join',
     stream_room_join_or_open = 'stream_room_join_or_open',
     stream_room_hello = 'stream_room_hello',
 
+    //user
+    user_state_onchange = 'user_state_onchange',
+
+    //webrtc
     stream_webrtc_offer = 'stream_webrtc_offer',
     stream_webrtc_answer = 'stream_webrtc_answer',
     stream_webrtc_sdp = 'stream_webrtc_sdp',    
@@ -83,7 +89,13 @@ export enum ECommandId {
     stream_webrtc_ondatachannelerror = 'stream_webrtc_ondatachannelerror',
     stream_webrtc_ondatachannelmessage = 'stream_webrtc_ondatachannelmessage',
     stream_webrtc_ondatachannelopen = 'stream_webrtc_ondatachannelopen',
-    stream_webrtc_ondatachanneladd = 'stream_webrtc_ondatachanneladd' 
+    stream_webrtc_ondatachanneladd = 'stream_webrtc_ondatachanneladd',
+
+    //chrome extension desktop capture
+    extension_capture_are_you_ready = 'extension_capture_are_you_ready',
+    extension_capture_get_custom_sourceId = 'extension_capture_get_custom_sourceId',
+    extension_capture_i_am_ready = 'extension_capture_i_am_ready',
+    extension_capture_on_choose_desktop_media = 'extension_capture_on_choose_desktop_media'    
 }
 
 
@@ -128,8 +140,6 @@ export interface ICommandReqDataProps {
     extra?: any
 }
 export interface ICommandRespDataProps {
-    // result: boolean
-    // msg?: string
     user?: IUser
     extra?: any
 }
