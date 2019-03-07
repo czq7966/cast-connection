@@ -18,22 +18,21 @@ export class Login extends Cmds.Common.Base {
                 },
                 onResp: (cmdResp: Cmds.CommandLoginResp) => {                
                     let data = cmdResp.data;
-                    if (data.props.result) {
+                    if (data.respResult) {
                         let instance = cmdResp.getInstance<Cmds.CommandLoginResp>();                        
                         instance.assignData(data);
                         Hello.hello(instanceId, data.props.user);
-                        // Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onBeforeDispatched);
                         Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
                         resolve(data);
                     } else {
-                        console.error('login error', cmdResp.data.props.msg);
+                        console.error('login error', cmdResp.data.respMsg);
                         reject(data)
                     }
                 },
                 onRespTimeout: (data:  Cmds.ICommandData<Cmds.ICommandLoginRespDataProps>) => {
                     console.log('onTimeout', data)
-                    data.props.result = false;
-                    data.props.msg = 'time out!'                    
+                    data.respResult = false;
+                    data.respMsg = 'time out!'                    
                     reject(data);
                 }    
             }

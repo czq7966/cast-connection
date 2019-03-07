@@ -27,3 +27,10 @@ export * from './stream-webrtc-io-datachannels'
 export * from './stream-webrtc-io-input'
 
 export * from './user-state-onchange'
+
+export * from './admin-config-get'
+export * from './admin-config-update'
+export * from './admin-namespace-close'
+export * from './admin-namespace-open'
+export * from './admin-namespace-reset'
+export * from './admin-namespace-status'

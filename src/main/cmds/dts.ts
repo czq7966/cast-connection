@@ -128,8 +128,8 @@ export interface ICommandReqDataProps {
     extra?: any
 }
 export interface ICommandRespDataProps {
-    result: boolean
-    msg?: string
+    // result: boolean
+    // msg?: string
     user?: IUser
     extra?: any
 }

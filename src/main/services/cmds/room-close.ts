@@ -15,17 +15,16 @@ export class RoomClose extends Cmds.Common.Base {
                     user: user
                 },
                 onResp: (cmdResp: Cmds.CommandRoomCloseResp) => {
-                    // Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onBeforeDispatched);
                     Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
-                    if (cmdResp.data.props.result) {
+                    if (cmdResp.data.respResult) {
                         resolve(cmdResp.data);    
                     } else {
                         reject(cmdResp.data)
                     } 
                 },
                 onRespTimeout: (data: Cmds.ICommandData<Cmds.ICommandRoomCloseRespDataProps>) => {
-                    data.props.result = false;
-                    data.props.msg = 'time out!';                    
+                    data.respResult = false;
+                    data.respMsg = 'time out!';                    
                     reject(data);    
                 }
             }
@@ -48,7 +47,7 @@ export class RoomClose extends Cmds.Common.Base {
             resp(rooms: Modules.IRooms, cmd: Cmds.CommandRoomCloseResp) {
                 console.log(Tag, 'Rooms', 'onAfterRoot', 'Resp', cmd.data)                    
                 let data = cmd.data;
-                if (data.props.result) {                    
+                if (data.respResult) {                    
                     rooms.delRoom(data.props.user.room.id);
                 } 
             }          
@@ -67,7 +66,7 @@ export class RoomClose extends Cmds.Common.Base {
             resp(room: Modules.IRoom, cmd: Cmds.CommandRoomCloseResp) {
                 console.log(Tag, 'Room', room.item.id , 'onAfterRoot', 'Resp', cmd.data)
                 let data = cmd.data;
-                if (data.props.result && room.item.id === data.props.user.room.id) {                    
+                if (data.respResult && room.item.id === data.props.user.room.id) {                    
                     room.clearUser();
                 } 
             }            

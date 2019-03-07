@@ -17,17 +17,16 @@ export class RoomOpen extends Cmds.Common.Base {
                 onResp: (cmdResp: Cmds.CommandRoomOpenResp) => {
                     let data = cmdResp.data;
                     data.props.user.states = Cmds.Common.Helper.StateMachine.set(data.props.user.states, Cmds.EUserState.roomOwner);
-                    // Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onBeforeDispatched);
                     Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
-                    if (cmdResp.data.props.result) {
+                    if (cmdResp.data.respResult) {
                         resolve(cmdResp.data);    
                     } else {
                         reject(cmdResp.data)
                     }                    
                 },
                 onRespTimeout: (data: Cmds.ICommandData<Cmds.ICommandRoomOpenRespDataProps>) => {
-                    data.props.result = false;
-                    data.props.msg = 'time out!'
+                    data.respResult = false;
+                    data.respMsg = 'time out!'
                     reject(data)    
                 }
             }
@@ -45,7 +44,7 @@ export class RoomOpen extends Cmds.Common.Base {
             resp(rooms: Modules.IRooms, cmd: Cmds.CommandRoomOpenResp) {
                 console.log(Tag, 'Rooms', 'onBeforeRoot', 'Resp', cmd.data)
                 let data = cmd.data;                
-                if (data.props.result) {
+                if (data.respResult) {
                     let room = rooms.getRoom(data.props.user.room);
                     let pRoom =  room.getParent();
                     pRoom && room.eventRooter.setParent(pRoom.subEventRooter)
@@ -59,7 +58,7 @@ export class RoomOpen extends Cmds.Common.Base {
             resp(room: Modules.IRoom, cmd: Cmds.CommandRoomOpenResp) {
                 console.log(Tag, 'Room', room.item.id , 'onBeforeRoot', 'Resp', cmd.data)
                 let data = cmd.data;                
-                if (data.props.result && room.item.id === data.props.user.room.id) {
+                if (data.respResult && room.item.id === data.props.user.room.id) {
                     let user = data.props.user
                     let us = Object.assign({}, user);
                     us.room = room.item;

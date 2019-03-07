@@ -17,15 +17,15 @@ export class RoomLeave extends Cmds.Common.Base {
                 onResp: (respCmd: Cmds.CommandRoomLeaveResp) => {
                     let data = respCmd.data;
                     Cmds.Common.Dispatcher.dispatch(respCmd , Cmds.ECommandDispatchEvents.onDispatched);
-                    if (data.props.result) {
+                    if (data.respResult) {
                         resolve(data);    
                     } else {
                         reject(data)
                     } 
                 },
                 onRespTimeout: (data: Cmds.ICommandData<Cmds.ICommandRoomLeaveRespDataProps>) => {
-                    data.props.result = false;
-                    data.props.msg = 'time out!';                    
+                    data.respResult = false;
+                    data.respMsg = 'time out!';                    
                     reject(data);    
                 }
             }
@@ -76,7 +76,7 @@ export class RoomLeave extends Cmds.Common.Base {
             resp(room: Modules.IRoom, cmd: Cmds.CommandRoomLeaveResp) {
                 console.log(Tag, 'Room', room.item.id , 'onAfterRoot', 'Resp', cmd.data)
                 let data = cmd.data;
-                if (data.props.result && room.item.id === data.props.user.room.id) {                    
+                if (data.respResult && room.item.id === data.props.user.room.id) {                    
                     let me = room.me();                    
                     if (me && me.item.id === data.props.user.id) {
                         room.clearUser();

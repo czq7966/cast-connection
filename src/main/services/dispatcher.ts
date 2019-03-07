@@ -48,6 +48,7 @@ export class Dispatcher extends Cmds.Common.CommandRooter implements IDispatcher
         Cmds.Common.Dispatcher.onCommand(cmd, this);
     }
     sendCommand(cmd: Cmds.ICommandData<any>): Promise<any> {
+        if (cmd.props === undefined) cmd.props = {};
         console.warn('SendCommand', cmd)
         return this.signaler.sendCommand(cmd) 
     }

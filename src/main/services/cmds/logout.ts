@@ -16,15 +16,15 @@ export class Logout extends Cmds.Common.Base {
                 },
                 onResp: (cmdResp: Cmds.CommandLogoutResp) => {
                     Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
-                    if (cmdResp.data.props.result) {
+                    if (cmdResp.data.respResult) {
                         resolve(cmdResp.data);    
                     } else {
                         reject(cmdResp.data)
                     } 
                 },
                 onRespTimeout: (data: Cmds.ICommandData<Cmds.ICommandLogoutRespDataProps>) => {
-                    data.props.result = false;
-                    data.props.msg = 'time out!';                    
+                    data.respResult = false;
+                    data.respMsg = 'time out!';                    
                     reject(data);    
                 }   
             }

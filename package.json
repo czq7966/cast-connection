@@ -1,6 +1,6 @@
 {
   "name": "@sdp.nd/adhoc-cast-connection",
-  "version": "2.0.3",
+  "version": "2.0.5",
   "description": "nd adhoc cast connection",
   "main": "index.js",
   "scripts": {

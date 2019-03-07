@@ -122,5 +122,27 @@ export class Command<T extends any> extends Base implements ICommand {
         this.data.cmdId = this.data.cmdId || ((this as any).constructor as ICommandClass).defaultCommandId;
         return Dispatcher.sendCommand(this, ...args);
     }
-  
+    sendCommandForResp(...args: any[]): Promise<any> {    
+        return new Promise((resolve, reject) => {
+            let onResp = (cmdResp: ICommand) => {                
+                let data = cmdResp.data;
+                if (data.respResult) {
+                    Dispatcher.dispatch(cmdResp , Dts.ECommandDispatchEvents.onDispatched);
+                    resolve(data);
+                } else {
+                    reject(data)
+                }
+            }
+            let onRespTimeout = (data:  Dts.ICommandData<any>) => {
+                console.log('onTimeout', data)
+                data.respResult = false;
+                data.respMsg = 'time out!'                    
+                reject(data);
+            } 
+
+            this.data.onResp = this.data.onResp || onResp
+            this.data.onRespTimeout = this.data.onRespTimeout || onRespTimeout;
+            this.sendCommand(...args).catch(err => reject(err));   
+        })
+    }      
 }

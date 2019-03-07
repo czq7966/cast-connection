@@ -18,13 +18,12 @@ export class RoomHello extends Cmds.Common.Base {
                 },            
                 onResp: toUser? (cmdResp: Cmds.CommandRoomHelloResp) => {
                     let data = cmdResp.data;
-                    // Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onBeforeDispatched);
                     Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
                     resolve(data);    
                 } : null ,
                 onRespTimeout: toUser? (data: Cmds.ICommandData<Cmds.ICommandRoomHelloRespDataProps>) => {
-                    data.props.result = false;
-                    data.props.msg = 'time out!'
+                    data.respResult = false;
+                    data.respMsg = 'time out!'
                     reject(data)    
                 }: null
     

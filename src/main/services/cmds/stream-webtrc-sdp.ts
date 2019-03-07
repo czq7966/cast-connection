@@ -16,18 +16,18 @@ export class StreamWebrtcSdp {
                 },
                 onResp: (cmdResp: Cmds.CommandStreamWebrtcSdpResp) => {                
                     let data = cmdResp.data;
-                    if (data.props.result) {
+                    if (data.respResult) {
                         Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
                         resolve(data);
                     } else {
-                        console.error('login error', cmdResp.data.props.msg);
+                        console.error('login error', cmdResp.data.respMsg);
                         reject(data)
                     }
                 },
                 onRespTimeout: (data:  Cmds.ICommandData<Cmds.ICommandRespDataProps>) => {
                     console.log('onTimeout', data)
-                    data.props.result = false;
-                    data.props.msg = 'time out!'                    
+                    data.respResult = false;
+                    data.respMsg = 'time out!'                    
                     reject(data);
                 }    
             }

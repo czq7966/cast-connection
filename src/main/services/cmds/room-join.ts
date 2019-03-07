@@ -16,17 +16,16 @@ export class RoomJoin extends Cmds.Common.Base {
                 },
                 onResp: (cmdResp: Cmds.CommandRoomJoinResp) => {
                     let data = cmdResp.data;
-                    // Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onBeforeDispatched);
                     Cmds.Common.Dispatcher.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
-                    if (data.props.result) {
+                    if (data.respResult) {
                         resolve(data);    
                     } else {
                         reject(data)
                     } 
                 },
                 onRespTimeout: (data: Cmds.ICommandData<Cmds.ICommandRoomJoinRespDataProps>) => {
-                    data.props.result = false;
-                    data.props.msg = 'time out!';                    
+                    data.respResult = false;
+                    data.respMsg = 'time out!';                    
                     reject(data);    
                 }
             }
@@ -44,7 +43,7 @@ export class RoomJoin extends Cmds.Common.Base {
             resp(rooms: Modules.IRooms, cmd: Cmds.CommandRoomJoinResp) {
                 console.log(Tag, 'Rooms', 'onBeforeRoot', 'Resp', cmd.data)
                 let data = cmd.data;
-                if (data.props.result) {
+                if (data.respResult) {
                     let room = rooms.getRoom(data.props.user.room);
                     let pRoom =  room.getParent();
                     pRoom && room.eventRooter.setParent(pRoom.subEventRooter)
@@ -58,7 +57,7 @@ export class RoomJoin extends Cmds.Common.Base {
             resp(room: Modules.IRoom, cmd: Cmds.CommandRoomJoinResp) {
                 console.log(Tag, 'Room' , room.item.id , 'onBeforeRoot', 'Resp', cmd.data);
                 let data = cmd.data;                
-                if (data.props.result && room.item.id === data.props.user.room.id) {                    
+                if (data.respResult && room.item.id === data.props.user.room.id) {                    
                     let user = data.props.user;
                     let us = Object.assign({}, user);
                     us.room = room.item;
