@@ -11,24 +11,32 @@ export interface IDispatcherConstructorParams extends Cmds.Common.IBaseConstruct
 export interface IDispatcher extends Cmds.Common.IDispatcher {
     signaler: Network.Signaler
     eventRooter: Cmds.Common.IEventRooter
-    dataRooter: Cmds.Common.IEventRooter;
-    dispatchFilter: Cmds.Common.IEventRooter;
+    recvFilter: Cmds.Common.IEventRooter;
+    sendFilter: Cmds.Common.IEventRooter;
     onCommand(cmd: Cmds.ICommandData<any>)
 }
 
-export class Dispatcher extends Cmds.Common.CommandRooter implements IDispatcher {
+export class Dispatcher extends Cmds.Common.Base implements IDispatcher {
     signaler: Network.Signaler
-    dispatchFilter: Cmds.Common.IEventRooter;
+    eventRooter: Cmds.Common.IEventRooter
+    recvFilter: Cmds.Common.IEventRooter;
+    sendFilter: Cmds.Common.IEventRooter;
     constructor(params: IDispatcherConstructorParams) {
         super(params);
         this.signaler = params.signaler;
-        this.dispatchFilter = new Cmds.Common.EventRooter();
+        this.eventRooter = new Cmds.Common.EventRooter();
+        this.recvFilter = new Cmds.Common.EventRooter();
+        this.sendFilter = new Cmds.Common.EventRooter();
         this.initEvents();
     }
     destroy() {
         this.unInitEvents();
-        this.dispatchFilter.destroy();
-        delete this.dispatchFilter;
+        this.eventRooter.destroy();
+        this.recvFilter.destroy();
+        this.sendFilter.destroy();
+        delete this.eventRooter;
+        delete this.recvFilter;
+        delete this.sendFilter;
         delete this.signaler;
         super.destroy();
     }
@@ -47,14 +55,14 @@ export class Dispatcher extends Cmds.Common.CommandRooter implements IDispatcher
     // Command
     onCommand = (cmd: Cmds.ICommandData<any>) => {
         console.warn('OnCommand', cmd)
-        let result = this.dataRooter.root(cmd) ;
+        let result = this.recvFilter.root(cmd) ;
         !Cmds.Common.Helper.StateMachine.isset(result, Cmds.Common.EEventEmitterEmit2Result.preventRoot) &&
         Cmds.Common.EDCoder.onCommand(cmd, this);
     }
     sendCommand(cmd: Cmds.ICommandData<any>): Promise<any> {
         console.warn('SendCommand', cmd)
         if (cmd.props === undefined) cmd.props = {};
-        let result = this.dispatchFilter.root(cmd) ;
+        let result = this.sendFilter.root(cmd) ;
         if (Cmds.Common.Helper.StateMachine.isset(result, Cmds.Common.EEventEmitterEmit2Result.preventRoot))
             return Promise.resolve();
         else 

@@ -5,7 +5,7 @@ var Tag = "Service-Cmds-StreamIOInput"
 export class StreamIOInput extends Cmds.Common.Base {
     static InputClient = {
         onAfterRoot: {
-            req(inputClient: Modules.IInputClient, cmd: Cmds.ICommandData<any>) {
+            req(inputClient: Modules.Dispatchers.IInputClientFilter, cmd: Cmds.ICommandData<any>) {
                 inputClient.sendCommand(cmd)            
             }                 
         },       

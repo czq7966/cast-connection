@@ -34,3 +34,5 @@ export * from './admin-namespace-close'
 export * from './admin-namespace-open'
 export * from './admin-namespace-reset'
 export * from './admin-namespace-status'
+
+export * from './extension-capture'

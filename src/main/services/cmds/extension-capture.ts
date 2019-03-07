@@ -1,8 +1,8 @@
-import * as Cmds from "../../../cmds";
+import * as Cmds from "../../cmds";
 
 var Tag = "Service-Cmds-ExtensionCapture"
 export class ExtensionCapture {
-    static isReady(instanceId: string): Promise<any> {
+    static areYouReady(instanceId: string): Promise<any> {
         let cmd = new Cmds.CommandReq({instanceId: instanceId})            
         cmd.data = {
             cmdId: Cmds.ECommandId.extension_capture_are_you_ready,

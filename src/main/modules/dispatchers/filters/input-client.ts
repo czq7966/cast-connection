@@ -1,12 +1,12 @@
 
-import * as Cmds from "../cmds";
-import * as Network from '../network'
-import * as Dispatchers from './dispatchers'
-import * as Services from '../services'
+import * as Cmds from "../../../cmds";
+import * as Network from '../../../network'
+import * as Services from '../../../services'
+import { IDispatcher, Dispatcher } from "../dispatcher";
 
-export interface IInputClient extends Cmds.Common.IBase {
+export interface IInputClientFilter extends Cmds.Common.IBase {
     wsClient: Network.IClient
-    dispatcher?: Dispatchers.IDispatcher
+    dispatcher?: IDispatcher
     sendCommand(cmd: Cmds.ICommandData<any>)
     setEnabled(enalbed: boolean)
 } 
@@ -15,15 +15,15 @@ export interface IInputClientConstructorParams extends Cmds.Common.IBaseConstruc
     url: string
 }
 
-export class InputClient extends Cmds.Common.CommandRooter implements IInputClient {
+export class InputClientFilter extends Cmds.Common.CommandRooter implements IInputClientFilter {
     wsClient: Network.IClient
-    dispatcher?: Dispatchers.IDispatcher
+    dispatcher?: IDispatcher
     enabled: boolean
     timeoutHandler: number
-    constructor(params: IInputClientConstructorParams, dispatcher?: Dispatchers.IDispatcher) {
+    constructor(params: IInputClientConstructorParams, dispatcher?: IDispatcher) {
         super(params);
         this.wsClient = new Network.Signaler(params.url);
-        this.dispatcher = dispatcher || Dispatchers.Dispatcher.getInstance(this.instanceId);
+        this.dispatcher = dispatcher || Dispatcher.getInstance(this.instanceId);
 
         this.initEvents();
     }     
@@ -37,12 +37,12 @@ export class InputClient extends Cmds.Common.CommandRooter implements IInputClie
     }
 
     initEvents() {
-        this.eventRooter.setParent(this.dispatcher.dataRooter);        
-        this.eventRooter.onAfterRoot.add(this.onAfterRoot)
+        this.dataRooter.setParent(this.dispatcher.recvFilter);        
+        this.dataRooter.onAfterRoot.add(this.onAfterRoot)
     }
     unInitEvents() {
-        this.eventRooter.onAfterRoot.remove(this.onAfterRoot)
-        this.eventRooter.setParent();   
+        this.dataRooter.onAfterRoot.remove(this.onAfterRoot)
+        this.dataRooter.setParent();   
 
         clearTimeout(this.timeoutHandler) 
     }

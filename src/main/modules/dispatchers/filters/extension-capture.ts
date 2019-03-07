@@ -16,7 +16,7 @@ export class ExtensionCaptureFilter extends Cmds.Common.CommandRooter {
     }
 
     initEvents() {
-        this.eventRooter.setParent(this.dispatcher.dispatchFilter);        
+        this.eventRooter.setParent(this.dispatcher.sendFilter);        
         this.eventRooter.onAfterRoot.add(this.onAfterRoot)
     }
     unInitEvents() {
@@ -32,7 +32,7 @@ export class ExtensionCaptureFilter extends Cmds.Common.CommandRooter {
             case Cmds.ECommandId.extension_capture_get_custom_sourceId:
             case Cmds.ECommandId.extension_capture_i_am_ready:
             case Cmds.ECommandId.extension_capture_on_choose_desktop_media:
-                console.log()
+                console.log('aaaaaaaaaa', cmdId)
 
                 return Cmds.Common.EEventEmitterEmit2Result.preventRoot;
                 break;
