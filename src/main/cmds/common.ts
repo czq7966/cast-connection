@@ -16,7 +16,13 @@ export class CommandResp extends Common.Command<Dts.ICommandRespDataProps>{}
     Dts.ECommandId.admin_namespace_close,
     Dts.ECommandId.admin_namespace_open,
     Dts.ECommandId.admin_namespace_reset,
-    Dts.ECommandId.admin_namespace_status
+    Dts.ECommandId.admin_namespace_status,
+
+    Dts.ECommandId.extension_capture_are_you_ready,
+    Dts.ECommandId.extension_capture_get_custom_sourceId,
+    Dts.ECommandId.extension_capture_i_am_ready,
+    Dts.ECommandId.extension_capture_on_choose_desktop_media,
+
 ].forEach(commanid => {
     Common.CommandTypes.RegistCommandType({
         cmdId: commanid,
@@ -25,26 +31,3 @@ export class CommandResp extends Common.Command<Dts.ICommandRespDataProps>{}
         RespClass: CommandCommon
     })
 })
-
-
-
-// Common.CommandTypes.RegistCommandType({
-//     cmdId: Dts.ECommandId.network_disconnect,
-//     name: '网络断开',
-//     ReqClass: CommandCommon,
-//     RespClass: CommandCommon
-// })
-
-// Common.CommandTypes.RegistCommandType({
-//     cmdId: Dts.ECommandId.user_state_onchange,
-//     name: '用户状态变更',
-//     ReqClass: CommandReq,
-//     RespClass: CommandResp
-// })
-
-// Common.CommandTypes.RegistCommandType({
-//     cmdId: Dts.ECommandId.custom,
-//     name: '自定义指令',
-//     ReqClass: CommandReq,
-//     RespClass: CommandResp
-// })

@@ -1,11 +1,12 @@
 import { IRoom, Room } from "./room";
 import * as Cmds from "../cmds";
 import * as Services from '../services'
+import * as Dispatchers from './dispatchers'
 
 
 export interface IRooms extends Cmds.Common.IBase {
     items: Cmds.Common.Helper.KeyValue<IRoom>;
-    dispatcher: Services.IDispatcher;  
+    dispatcher: Dispatchers.IDispatcher;  
     eventRooter: Cmds.Common.IEventRooter
     getRoom(room: Cmds.IRoom | string): IRoom;
     removeRoom(roomid: string): IRoom;
@@ -16,11 +17,11 @@ export interface IRooms extends Cmds.Common.IBase {
 
 export class Rooms extends Cmds.Common.CommandRooter implements IRooms {
     items: Cmds.Common.Helper.KeyValue<IRoom>;
-    dispatcher: Services.IDispatcher;
+    dispatcher: Dispatchers.IDispatcher;
 
-    constructor(instanceId: string, dispatcher?:Services. IDispatcher ) {
+    constructor(instanceId: string, dispatcher?: Dispatchers.IDispatcher ) {
         super(instanceId);
-        this.dispatcher = dispatcher || Services.Dispatcher.getInstance(instanceId);
+        this.dispatcher = dispatcher || Dispatchers.Dispatcher.getInstance(instanceId);
         this.items = new Cmds.Common.Helper.KeyValue();
         this.initEvents();
     }

@@ -1,6 +1,7 @@
 import * as Network from '../network'
 import * as Services from '../services'
 import * as Cmds from "../cmds/index";
+import * as Dispatchers from './dispatchers'
 import { Rooms } from './rooms';
 import { InputClient } from './input-client';
 
@@ -10,7 +11,7 @@ export interface IConnectionConstructorParams extends Cmds.Common.IBaseConstruct
 export class Connection extends Cmds.Common.Base {    
     signaler: Network.Signaler;
     rooms: Rooms;
-    dispatcher: Services.Dispatcher
+    dispatcher: Dispatchers.Dispatcher
     inputClient: InputClient
 
     constructor(params: IConnectionConstructorParams) {
@@ -19,11 +20,11 @@ export class Connection extends Cmds.Common.Base {
 
         this.signaler = new Network.Signaler(params.url);
         
-        let pms: Services.IDispatcherConstructorParams = {
+        let pms: Dispatchers.IDispatcherConstructorParams = {
             instanceId: this.instanceId,
             signaler: this.signaler,
         }
-        this.dispatcher = Services.Dispatcher.getInstance(pms) 
+        this.dispatcher = Dispatchers.Dispatcher.getInstance(pms) 
         this.rooms = new Rooms(this.instanceId, this.dispatcher);     
         
         this.inputClient = new InputClient({

@@ -1,11 +1,12 @@
 
 import * as Cmds from "../cmds";
 import * as Network from '../network'
+import * as Dispatchers from './dispatchers'
 import * as Services from '../services'
 
 export interface IInputClient extends Cmds.Common.IBase {
     wsClient: Network.IClient
-    dispatcher?:Services. IDispatcher
+    dispatcher?: Dispatchers.IDispatcher
     sendCommand(cmd: Cmds.ICommandData<any>)
     setEnabled(enalbed: boolean)
 } 
@@ -16,13 +17,13 @@ export interface IInputClientConstructorParams extends Cmds.Common.IBaseConstruc
 
 export class InputClient extends Cmds.Common.CommandRooter implements IInputClient {
     wsClient: Network.IClient
-    dispatcher?:Services. IDispatcher
+    dispatcher?: Dispatchers.IDispatcher
     enabled: boolean
     timeoutHandler: number
-    constructor(params: IInputClientConstructorParams, dispatcher?:Services. IDispatcher) {
+    constructor(params: IInputClientConstructorParams, dispatcher?: Dispatchers.IDispatcher) {
         super(params);
         this.wsClient = new Network.Signaler(params.url);
-        this.dispatcher = dispatcher || Services.Dispatcher.getInstance(this.instanceId);
+        this.dispatcher = dispatcher || Dispatchers.Dispatcher.getInstance(this.instanceId);
 
         this.initEvents();
     }     

@@ -1,6 +1,6 @@
-import * as Network from '../network'
-import * as Dts from "../declare";
-import * as Cmds from '../cmds/index'
+import * as Network from '../../network'
+import * as Dts from "../../declare";
+import * as Cmds from '../../cmds/index'
 
 
 
@@ -12,22 +12,23 @@ export interface IDispatcher extends Cmds.Common.IDispatcher {
     signaler: Network.Signaler
     eventRooter: Cmds.Common.IEventRooter
     dataRooter: Cmds.Common.IEventRooter;
+    dispatchFilter: Cmds.Common.IEventRooter;
     onCommand(cmd: Cmds.ICommandData<any>)
 }
 
 export class Dispatcher extends Cmds.Common.CommandRooter implements IDispatcher {
     signaler: Network.Signaler
-    sendFilter: Cmds.Common.IEventRooter;
+    dispatchFilter: Cmds.Common.IEventRooter;
     constructor(params: IDispatcherConstructorParams) {
         super(params);
         this.signaler = params.signaler;
-        this.sendFilter = new Cmds.Common.EventRooter();
+        this.dispatchFilter = new Cmds.Common.EventRooter();
         this.initEvents();
     }
     destroy() {
         this.unInitEvents();
-        this.sendFilter.destroy();
-        delete this.sendFilter;
+        this.dispatchFilter.destroy();
+        delete this.dispatchFilter;
         delete this.signaler;
         super.destroy();
     }
@@ -53,7 +54,7 @@ export class Dispatcher extends Cmds.Common.CommandRooter implements IDispatcher
     sendCommand(cmd: Cmds.ICommandData<any>): Promise<any> {
         console.warn('SendCommand', cmd)
         if (cmd.props === undefined) cmd.props = {};
-        let result = this.sendFilter.root(cmd) ;
+        let result = this.dispatchFilter.root(cmd) ;
         if (Cmds.Common.Helper.StateMachine.isset(result, Cmds.Common.EEventEmitterEmit2Result.preventRoot))
             return Promise.resolve();
         else 

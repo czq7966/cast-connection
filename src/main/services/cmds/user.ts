@@ -1,6 +1,6 @@
 import * as Cmds from "../../cmds";
+import * as Modules from "../../modules"
 import { Hello } from "./hello";
-import { Dispatcher } from "../dispatcher";
 
 var Tag = "Service-Cmds-User"
 export class User {
@@ -37,7 +37,7 @@ export class User {
                 user: user
             }
         }        
-        Dispatcher.getInstance<Dispatcher>(instanceId, false).onCommand(data);
+        Modules.Dispatchers.Dispatcher.getInstance<Modules.Dispatchers.Dispatcher>(instanceId, false).onCommand(data);
     }
     static dispatchCommand(instanceId: string, user: Cmds.IUser, userExtra: any,  dataExtra: any, cmdId: Cmds.ECommandId) {
         user = Object.assign({}, user);
@@ -49,6 +49,6 @@ export class User {
             },
             extra: dataExtra
         }
-        Dispatcher.getInstance<Dispatcher>(instanceId, false).onCommand(data);
+        Modules.Dispatchers.Dispatcher.getInstance<Modules.Dispatchers.Dispatcher>(instanceId, false).onCommand(data);
     }     
 }
