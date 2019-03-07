@@ -43,15 +43,15 @@ export class StreamWebrtcSdp {
         let cmd =  new Cmds.CommandStreamWebrtcSdpResp({instanceId: instanceId});
         let user = Object.assign({}, toUser);
         user.extra = sdp;
-        let respData = Object.assign({}, data, {
+        let respData: Cmds.ICommandData<Cmds.ICommandRespDataProps> = Object.assign({}, data, {
             type: Cmds.ECommandType.resp,
             from: null,
             to: data.from,
             props: {
-                result: msg ? false : true,
-                msg: msg,
                 user: user
-            }
+            },
+            respResult: msg ? false : true,
+            respMsg: msg,            
         })
         cmd.data = respData;
         let promise = cmd.sendCommand();        
