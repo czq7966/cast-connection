@@ -2,7 +2,7 @@ import './events-ex';
 import { EventEmitter } from "events";
 
 export interface IClass {
-    new(params?: any) : Object
+    new(...args: any[]) : Object
 }
 
 export interface IBase {

@@ -4,6 +4,11 @@ export * from './common/dts'
 export var Command_stream_webrtc_on_prefix = 'stream_webrtc_on';
 export var CommandID = Common.ECommandEvents.CommandID;
 
+export enum ECommandServerId {
+    signaler = 'signaler_server',
+    extension_capture = 'extension_capture',
+    input_client = 'input_client'
+}
 
 
 export enum ECommandId {
@@ -94,8 +99,6 @@ export enum ECommandId {
     //chrome extension desktop capture
     extension_capture_are_you_ready = 'extension_capture_are_you_ready',
     extension_capture_get_custom_sourceId = 'extension_capture_get_custom_sourceId',
-    extension_capture_i_am_ready = 'extension_capture_i_am_ready',
-    extension_capture_on_choose_desktop_media = 'extension_capture_on_choose_desktop_media'    
 }
 
 
@@ -134,14 +137,22 @@ export interface IRoom {
     sim?: string
     extra?: any
 }
-
-export interface ICommandReqDataProps {
-    user?: IUser 
+export interface ICommandDataProps {
     extra?: any
 }
-export interface ICommandRespDataProps {
+
+export interface ICommandReqDataProps extends ICommandDataProps {
+    user?: IUser 
+
+}
+export interface ICommandRespDataProps extends ICommandDataProps{
     user?: IUser
-    extra?: any
+}
+
+export interface IDesktopMediaStream {
+    sourceId: string
+    canRequestAudioTrack?: boolean,
+    stream?: MediaStream
 }
 
 //  Command Room Open Req Props

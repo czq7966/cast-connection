@@ -3,46 +3,37 @@ import * as Cmds from "../../../cmds";
 import * as Network from '../../../network'
 import * as Services from '../../../services'
 import { IDispatcher, Dispatcher } from "../dispatcher";
+import { DispatcherFilter, IDispatcherFilter } from "../dispatcher-filter";
 
-export interface IInputClientFilter extends Cmds.Common.IBase {
+export interface IInputClientFilter extends IDispatcherFilter {
     wsClient: Network.IClient
-    dispatcher?: IDispatcher
-    sendCommand(cmd: Cmds.ICommandData<any>)
     setEnabled(enalbed: boolean)
 } 
 
-export interface IInputClientConstructorParams extends Cmds.Common.IBaseConstructorParams {
-    url: string
-}
-
-export class InputClientFilter extends Cmds.Common.CommandRooter implements IInputClientFilter {
+export class InputClientFilter extends DispatcherFilter implements IInputClientFilter {
     wsClient: Network.IClient
-    dispatcher?: IDispatcher
     enabled: boolean
     timeoutHandler: number
-    constructor(params: IInputClientConstructorParams, dispatcher?: IDispatcher) {
-        super(params);
-        this.wsClient = new Network.Signaler(params.url);
-        this.dispatcher = dispatcher || Dispatcher.getInstance(this.instanceId);
-
+    constructor(dispatcher: IDispatcher, url: string) {
+        super(dispatcher);
+        this.wsClient = new Network.Signaler(url);
         this.initEvents();
     }     
     destroy() {
         this.unInitEvents();
         this.wsClient.destroy();
         delete this.wsClient;
-        delete this.dispatcher;
         delete this.timeoutHandler;
         super.destroy();
     }
 
     initEvents() {
-        this.dataRooter.setParent(this.dispatcher.recvFilter);        
-        this.dataRooter.onAfterRoot.add(this.onAfterRoot)
+        this.recvRooter.setParent(this.dispatcher.recvFilter);        
+        this.recvRooter.onAfterRoot.add(this.onAfterRoot_recv)
     }
     unInitEvents() {
-        this.dataRooter.onAfterRoot.remove(this.onAfterRoot)
-        this.dataRooter.setParent();   
+        this.recvRooter.onAfterRoot.remove(this.onAfterRoot_recv)
+        this.recvRooter.setParent();   
 
         clearTimeout(this.timeoutHandler) 
     }
@@ -65,7 +56,7 @@ export class InputClientFilter extends Cmds.Common.CommandRooter implements IInp
             this.timeoutHandler = 0;
         }
     }
-    onAfterRoot = (data: Cmds.ICommandData<any>): any => {
+    onAfterRoot_recv = (data: Cmds.ICommandData<any>): any => {
         let cmdId = data.cmdId;
         switch(cmdId) {
             case Cmds.ECommandId.stream_webrtc_io_input:     
@@ -77,7 +68,7 @@ export class InputClientFilter extends Cmds.Common.CommandRooter implements IInp
                 break;            
         }
     }
-    sendCommand(cmd: Cmds.ICommandData<any>) {
+    sendCommand(cmd: Cmds.ICommandData<any>): Promise<any> {
         if (this.enabled) {
             if (this.wsClient.connected()) {
                 this.wsClient.sendCommand(cmd)
@@ -88,6 +79,7 @@ export class InputClientFilter extends Cmds.Common.CommandRooter implements IInp
                 this.setEnabled(this.enabled)
             }
         }
+        return;
     }
 
     

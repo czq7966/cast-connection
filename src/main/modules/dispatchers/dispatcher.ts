@@ -1,6 +1,7 @@
 import * as Network from '../../network'
 import * as Dts from "../../declare";
 import * as Cmds from '../../cmds/index'
+import { IDispatcherFilter } from './dispatcher-filter';
 
 
 
