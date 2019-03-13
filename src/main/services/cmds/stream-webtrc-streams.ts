@@ -6,14 +6,14 @@ import { StreamWebrtcSdp } from './stream-webtrc-sdp'
 
 var Tag = "Service-Cmds-StreamWebrtcEvents"
 export class StreamWebrtcStreams {
-    static sendingStream(streams: Modules.Webrtc.IStreams, stream: MediaStream) {
+    static sendingStream(streams: Modules.Webrtc.IStreams, stream: MediaStream): Promise<any> {
         stream && ServiceModules.Webrtc.Streams.addSendStream(streams, stream);
         let mRoom = streams.peer.user.room;
         let mpRoom = ServiceModules.Room.getParent(mRoom)
         let instanceId = streams.instanceId;        
         let mUser = mpRoom.getUser(streams.peer.user.item.id)
         streams.sends.count() > 0 ? mUser.states.set(Cmds.EUserState.stream_room_sending) : mUser.states.reset(Cmds.EUserState.stream_room_sending);
-        User.syncHello(instanceId, mUser.item);
+        return User.syncHello(instanceId, mUser.item);
     }
     static sendStream(streams: Modules.Webrtc.IStreams, stream: MediaStream): Promise<any> {
         let mUser = streams.peer.user;

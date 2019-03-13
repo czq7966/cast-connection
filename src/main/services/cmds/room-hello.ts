@@ -36,7 +36,7 @@ export class RoomHello extends Cmds.Common.Base {
         
     }
  
-    static respHello(reqCmd: Cmds.CommandRoomHelloReq, user: Cmds.IUser, respCmd?: Cmds.Common.ICommand) {
+    static respHello(reqCmd: Cmds.CommandRoomHelloReq, user: Cmds.IUser, respCmd?: Cmds.Common.ICommand): Promise<any> {
         let data = reqCmd.data;
         let instanceId = reqCmd.instanceId;
         let cmd = respCmd || new Cmds.CommandRoomHelloResp({instanceId: instanceId});
@@ -48,9 +48,10 @@ export class RoomHello extends Cmds.Common.Base {
             }
         })
         cmd.data = respData;
-        cmd.sendCommand();        
+        let promise = cmd.sendCommand();        
         !respCmd && cmd.destroy();
         cmd = null;
+        return promise;
     }     
 
     static Room = {

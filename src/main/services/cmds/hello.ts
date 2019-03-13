@@ -10,12 +10,13 @@ export class Hello extends Cmds.Common.Base {
         cmd.destroy();
         cmd = null;
     }
-    static respHello(reqCmd: Cmds.CommandHelloReq, user: Cmds.IUser) {
+    static respHello(reqCmd: Cmds.CommandHelloReq, user: Cmds.IUser): Promise<any> {
         let instanceId = reqCmd.instanceId;
         let cmd = new Cmds.CommandHelloResp({instanceId: instanceId});
-        RoomHello.respHello(reqCmd, user, cmd)
+        let promise = RoomHello.respHello(reqCmd, user, cmd)
         cmd.destroy();
         cmd = null;
+        return promise;
     }        
     static Room = {
         onBeforeRoot: {

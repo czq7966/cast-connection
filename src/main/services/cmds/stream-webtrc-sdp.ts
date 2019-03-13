@@ -93,6 +93,7 @@ export class StreamWebrtcSdp {
                 })
             })
             .catch(err => {
+                StreamWebrtcSdp.resp(reqCmd, user, null, err)
                 reject(err)
             })
         })

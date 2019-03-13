@@ -5,9 +5,12 @@ import * as Dispatchers from './dispatchers'
 import { Rooms } from './rooms';
 
 export interface IConnectionConstructorParams extends Cmds.Common.IBaseConstructorParams {
-    url: string
+    signalerBase: string
+    namespace: string
 }
 export class Connection extends Cmds.Common.Base {    
+    signalerBase: string
+    namespace: string
     signaler: Network.Signaler;
     rooms: Rooms;
     dispatcher: Dispatchers.IDispatcher
@@ -15,9 +18,11 @@ export class Connection extends Cmds.Common.Base {
     constructor(params: IConnectionConstructorParams) {
         super(params);
         this.instanceId = this.instanceId || Cmds.Common.Helper.uuid();
+        this.namespace = params.namespace
+        this.signalerBase = params.signalerBase;
         this.dispatcherFitlers = new Cmds.Common.Helper.KeyValue<Dispatchers.IDispatcherFilter>()
 
-        this.signaler = new Network.Signaler(params.url);        
+        this.signaler = new Network.Signaler();        
         let pms: Dispatchers.IDispatcherConstructorParams = {
             instanceId: this.instanceId,
             signaler: this.signaler,
@@ -58,10 +63,12 @@ export class Connection extends Cmds.Common.Base {
         })
     }    
 
-    login(user?: Cmds.IUser, url?: string): Promise<any> {
+    login(user?: Cmds.IUser, namespace?: string, signalerBase?: string): Promise<any> {
+        this.namespace = namespace || this.namespace;
+        this.signalerBase = signalerBase || this.signalerBase;
         user = user || {id: null};
         let instanceId = this.instanceId;
-        url && (this.signaler.url = url)
+        this.signaler.url = this.getSignalerUrl();
         let promise = Services.Cmds.Login.login(instanceId, user);
         return promise;
     }       
@@ -82,5 +89,10 @@ export class Connection extends Cmds.Common.Base {
     disconnect(){
         this.signaler.disconnect();
     }
-
+    getSignalerUrl(): string {
+        let base = this.signalerBase;
+        base = base[base.length - 1] === '/' ? base.substr(0, base.length - 1) : base;
+        let nsp = this.namespace;
+        return base + '/' + nsp
+    }
 }

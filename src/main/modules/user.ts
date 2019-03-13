@@ -16,6 +16,9 @@ export interface IUser extends Cmds.Common.ICommandRooter {
     room: IRoom;
     peer: Webrtc.IPeer;
     getPeer(): Webrtc.IPeer
+    isSendingStream(): boolean
+    sendStream(stream: MediaStream): Promise<any> 
+    getStreamRoom(): IRoom
 }
 
 export class User extends Cmds.Common.CommandRooter implements IUser  {
@@ -144,5 +147,48 @@ export class User extends Cmds.Common.CommandRooter implements IUser  {
     delPeer() {
         this.peer && this.peer.destroy();
         delete this.peer;
+    }
+    isSendingStream(): boolean {
+        return this.states.isset(Cmds.EUserState.stream_room_sending)
+    }
+    sendStream(stream: MediaStream): Promise<any> {
+        if (this.isSendingStream() ) {
+            return Promise.reject({result: false, msg: "stream is sending"})
+        } else if (!stream) {
+            let mStreamRoom = Services.Modules.User.getStreamRoom(this);
+            if (mStreamRoom) {
+                let mUser = mStreamRoom.me();                                
+                return Services.Cmds.StreamWebrtcStreams.sendingStream(mUser.getPeer().streams, null);   
+            } else {
+                return Promise.resolve()
+            }
+        } else {
+            return new Promise((resolve, reject) => {
+                Services.Cmds.StreamRoomOpen.open(this.instanceId, this.item)
+                .then(() => {
+                    let mStreamRoom = Services.Modules.User.getStreamRoom(this);
+                    let mUser = mStreamRoom.me();                    
+                    Services.Cmds.StreamWebrtcStreams.sendingStream(mUser.getPeer().streams, stream)
+                    .then((data) => {
+                        let onInactive = () => {
+                            stream.removeEventListener('inactive', onInactive)
+                            this.notDestroyed && 
+                            Services.Cmds.StreamWebrtcStreams.sendingStream(mUser.getPeer().streams, null);   
+                        } 
+                        stream.addEventListener('inactive', onInactive);
+                        resolve(data)
+                    })
+                    .catch(err => {
+                        reject(err)
+                    })
+                })
+                .catch(err => {
+                    reject(err)
+                })
+            })
+        }
+    }
+    getStreamRoom(): IRoom {
+        return Services.Modules.User.getStreamRoom(this);
     }
 }

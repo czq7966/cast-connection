@@ -6,7 +6,7 @@ export class ExtensionCapture {
         let cmd = new Cmds.CommandReq({instanceId: instanceId})            
         cmd.data = {
             cmdId: Cmds.ECommandId.extension_capture_are_you_ready,
-            respTimeout: 2 * 1000
+            respTimeout: 1 * 1000
         }
         let promise = cmd.sendCommandForResp();
         cmd.destroy();

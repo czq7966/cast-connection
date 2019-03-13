@@ -63,8 +63,8 @@ export class InputElement implements IInputElement {
         if (type ) {
             let event: InputDts.IMouseEvent = {
                 type: type,
-                x:  ev.clientX,
-                y:  ev.clientY,
+                x:  ev.offsetX,
+                y:  ev.offsetY,
                 deltaX: (ev as WheelEvent).deltaX,
                 deltaY: (ev as WheelEvent).deltaY,
                 destX: (ev.target as HTMLVideoElement).offsetWidth,

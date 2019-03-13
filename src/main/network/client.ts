@@ -57,6 +57,7 @@ export class Client {
                 reconnection: false,
                 transports: ['websocket']
             });        
+            this.socket.compress(true);
             this.initEvents(this.socket);
 
             this.socket.on(Dts.EClientSocketEvents.connect, () => {

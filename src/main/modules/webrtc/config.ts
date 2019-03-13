@@ -24,11 +24,33 @@ export class Config {
                     'stun:adhoc-turn.101.com:3478',
                     'stun:adhoc-turn.101.com:3478?transport=udp',
                 ]
-            }             
+            },      
+            {
+                'urls': [
+                    'turn:webrtcweb.com:7788', // coTURN 7788+8877
+                    'turn:webrtcweb.com:4455?transport=udp', // restund udp
+
+                    'turn:webrtcweb.com:8877?transport=udp', // coTURN udp
+                    'turn:webrtcweb.com:8877?transport=tcp', // coTURN tcp
+                ],
+                'username': 'muazkh',
+                'credential': 'muazkh'
+            },
+              
+            // {
+            //     urls: ['turn:numb.viagenie.ca'],
+            //     credential: 'muazkh',
+            //     username: 'webrtc@live.com'
+            // },
+            // {
+            //     urls: ['turn:turn.bistri.com:80'],
+            //     credential: 'homeo',
+            //     username: 'homeo'                         
+            // }
             // {
             //     'urls': [
             //         'stun:webrtcweb.com:7788', // coTURN
-            //         // 'stun:webrtcweb.com:7788?transport=udp', // coTURN
+            //         'stun:webrtcweb.com:7788?transport=udp', // coTURN
             //     ],
             //     'username': 'muazkh',
             //     'credential': 'muazkh'

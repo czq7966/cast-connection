@@ -23,10 +23,10 @@ export class User {
     static getStreamRoomId(user: Cmds.IUser) {
         return user.room.id + Cmds.RoomIdSeparator + Cmds.ERoomPrefix.stream + user.id;
     }
-    static syncHello(instanceId: string, user: Cmds.IUser) {
+    static syncHello(instanceId: string, user: Cmds.IUser): Promise<any> {
         let reqCmd = new Cmds.CommandHelloReq({instanceId: instanceId});
         reqCmd.data.from = {type: 'room', id: user.room.id};
-        Hello.respHello(reqCmd, user);
+        return Hello.respHello(reqCmd, user);
     }
     static onStateChange(instanceId: string, user: Cmds.IUser, values: Cmds.Common.Helper.IStateChangeValues) {
         user = Object.assign({}, user);

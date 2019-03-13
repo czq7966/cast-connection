@@ -246,7 +246,8 @@ export class Peer extends Cmds.Common.CommandRooter implements IPeer  {
         return this.config;
     }    
     getRtc(create: boolean = true): RTCPeerConnection {
-        if (!this.rtc && create) {
+        if (create && (!this.rtc || this.rtc.connectionState == 'closed' || this.rtc.signalingState == 'closed' ) ) {
+            this.delRtc();
             switch(Config.platform) {
                 case EPlatform.reactnative:
                     this.rtc = new WebRTC.RTCPeerConnection(this.getConfig().rtcConfig)
