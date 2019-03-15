@@ -24,7 +24,25 @@ export class Config {
                     'stun:adhoc-turn.101.com:3478',
                     'stun:adhoc-turn.101.com:3478?transport=udp',
                 ]
-            },      
+            },    
+            // {
+            //     'urls': [
+            //         // 'turn:192.168.252.87:3478',
+            //         'turn:192.168.252.87:3478?transport=udp',
+            //     ],
+            //     'username': 'test',
+            //     'credential': 'test'   
+            // },           
+            // {
+            //     'urls': [
+            //         // 'turn:adhoc-turn.101.com:3478',
+            //         'turn:adhoc-turn.101.com:3478?transport=tcp',
+            //         // 'turn:adhoc-turn.101.com:3478?transport=udp',
+            //     ],
+            //     'username': 'u1',
+            //     'credential': 'p1'                
+
+            // },                
             {
                 'urls': [
                     'turn:webrtcweb.com:7788', // coTURN 7788+8877

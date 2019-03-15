@@ -3,7 +3,7 @@ import * as Services from '../../services'
 import * as IO from './io'
 import { IUser } from "./../user";
 import { Config, EPlatform } from "./config";
-import { Streams } from "./streams";
+import { Streams, IStreams } from "./streams";
 
 import { WebRTC } from "./webrtc";
 
@@ -31,9 +31,9 @@ export enum ERTCPeerEvents {
 export interface IPeer extends Cmds.Common.ICommandRooter {
     config: Config;
     user: IUser
-    streams: Streams;
-    datachannels: IO.DataChannels;
-    input: IO.Input;  
+    streams: IStreams;
+    datachannels: IO.IDataChannels;
+    input: IO.IInput;  
     rtc: RTCPeerConnection
     getRtc(create?: boolean): RTCPeerConnection
     delRtc()
@@ -46,9 +46,9 @@ var Tag = "ModulePeer"
 export class Peer extends Cmds.Common.CommandRooter implements IPeer  {
     config: Config;
     user: IUser
-    streams: Streams;
-    datachannels: IO.DataChannels;
-    input: IO.Input;
+    streams: IStreams;
+    datachannels: IO.IDataChannels;
+    input: IO.IInput;
     rtc: RTCPeerConnection
     private _rtcevents;
     constructor(user: IUser) {

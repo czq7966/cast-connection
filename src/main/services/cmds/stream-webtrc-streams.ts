@@ -21,12 +21,15 @@ export class StreamWebrtcStreams {
         let peer = mUser.peer;
         let mMe = mRoom.me();
         if (mMe.item.id === mUser.item.id) {
-            console.warn('Can not send stream to self!')
-            
+            let msg = 'Can not send stream to self!';
+            console.warn(msg)
+            return Promise.reject(msg)            
         } else {
-            ServiceModules.Webrtc.Streams.addSendStream(streams, stream);            
-            (peer.getRtc() as any).addStream(stream);
-            peer.createDataChannels();
+            if (!streams.sends.exist(stream.id)) {
+                ServiceModules.Webrtc.Streams.addSendStream(streams, stream);            
+                (peer.getRtc() as any).addStream(stream);
+                peer.createDataChannels();
+            }
             let promise = StreamWebrtcSdp.offer(mUser);            
             return promise;
         }

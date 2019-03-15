@@ -4,7 +4,7 @@ import * as Services from '../../../services'
 import * as InputDts from './input.dts'
 import { Gesture } from "./gesture";
 import { DataChannel, EDataChannelLabel, EDataChannelEvents } from './datachannel';
-import { InputElement } from './input-source';
+import { InputElement, IInputElement } from './input-source';
 import { IPeer } from "../peer";
 
 
@@ -16,6 +16,7 @@ export interface IInput extends  Cmds.Common.ICommandRooter {
     touchMode: InputDts.EInputDevice        
     datachannel: DataChannel
     gesture: Gesture
+    inputElement: IInputElement
     dispatchEvent(event: InputDts.IInputEvent)
     inputEvent(event: InputDts.IInputEvent )
     sendEvent(event: InputDts.IInputEvent): Promise<any>

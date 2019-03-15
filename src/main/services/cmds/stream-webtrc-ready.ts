@@ -5,7 +5,7 @@ import { StreamWebrtcStreams } from './stream-webtrc-streams'
 
 var Tag = "Service-Cmds-StreamWebrtcReady"
 export class StreamWebrtcReady {
-    static ready(instanceId: string, toUser: Cmds.IUser, fromUser?: Cmds.IUser): Promise<any> {
+    static ready(instanceId: string, toUser: Cmds.IUser, fromUser?: Cmds.IUser, iceRestart?: boolean): Promise<any> {
         let cmd = new Cmds.CommandReq({instanceId: instanceId})
         fromUser = fromUser || ServiceModules.Rooms.getRoom(instanceId, toUser.room.id).me().item;
         let user = Object.assign({}, fromUser);
@@ -14,6 +14,9 @@ export class StreamWebrtcReady {
             to: {type: 'user', id: toUser.id},
             props: {
                 user: user
+            },
+            extra: {
+                iceRestart: iceRestart
             }
         }
         let promise = cmd.sendCommand();   

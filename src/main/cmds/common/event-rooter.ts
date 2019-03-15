@@ -57,7 +57,7 @@ export class EventRooter extends Base implements IEventRooter {
 
     }
     destroy() {
-        this.parent && this.parent.eventEmitter.removeListener(EEventRooterEvents.onRoot, this.root)
+        this.parent && this.parent.notDestroyed && this.parent.eventEmitter.removeListener(EEventRooterEvents.onRoot, this.root)
         delete this.parent;
         delete this.onAfterRoot;
         delete this.onBeforeRoot;
@@ -65,9 +65,9 @@ export class EventRooter extends Base implements IEventRooter {
         super.destroy()
     }
     setParent(parent?: IEventRooter) {
-        this.parent && this.parent.eventEmitter.removeListener(EEventRooterEvents.onRoot, this.root);
+        this.parent && this.parent.notDestroyed && this.parent.eventEmitter.removeListener(EEventRooterEvents.onRoot, this.root);
         this.parent = parent;
-        this.parent && this.parent.eventEmitter.addListener(EEventRooterEvents.onRoot, this.root);
+        this.parent && this.parent.notDestroyed && this.parent.eventEmitter.addListener(EEventRooterEvents.onRoot, this.root);
     }
 
 

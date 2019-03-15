@@ -8,7 +8,9 @@ var Tag = "Service-Module-Peer"
 export class Peer{
     static createOffer(peer: Modules.Webrtc.IPeer): Promise<any> {        
         return new Promise((resolve, reject) => {
-            peer.getRtc().createOffer({
+            let rtc = peer.getRtc();            
+            rtc.createOffer({
+                iceRestart: true,
                 offerToReceiveAudio: true,
                 offerToReceiveVideo: true
             }).then((sdp) => {
@@ -21,7 +23,7 @@ export class Peer{
                     sdp.sdp = Helper.SdpHelper.setVideoBitrates(sdp.sdp, {start: bandwidth, min:bandwidth, max: bandwidth})
                 }
                 // sdp.sdp = sdpHelper.disableNACK(sdp.sdp);
-                peer.getRtc().setLocalDescription(sdp)
+                rtc.setLocalDescription(sdp)
                 .then(() => {
                     resolve(sdp)
                 })           

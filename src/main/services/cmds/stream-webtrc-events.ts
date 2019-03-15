@@ -2,6 +2,7 @@ import * as Cmds from "../../cmds";
 import * as Modules from '../../modules'
 import * as ServiceModules from '../modules/index'
 import {StreamWebrtcCandidate } from './stream-webtrc-candidate'
+import { StreamWebrtcReady } from "./stream-webtrc-ready";
 
 var Tag = "Service-Cmds-StreamWebrtcEvents"
 export class StreamWebrtcEvents {
@@ -26,6 +27,9 @@ export class StreamWebrtcEvents {
                         case Cmds.ECommandId.stream_webrtc_onicecandidate:
                             StreamWebrtcEvents.onCommand_peer_icecandidate(peer, args[0]);
                             break;  
+                        case Cmds.ECommandId.stream_webrtc_onconnectionstatechange:   
+                            StreamWebrtcEvents.onCommand_peer_connectionstatechange(peer);
+                            break;                               
                         case Cmds.ECommandId.stream_webrtc_oniceconnectionstatechange:   
                             StreamWebrtcEvents.onCommand_peer_iceconnectionstatechange(peer);
                             break;   
@@ -116,13 +120,25 @@ export class StreamWebrtcEvents {
         }
         return StreamWebrtcCandidate.candidate(peer.instanceId, toUser.item, peer.user.item, data);
     }
+    static onCommand_peer_connectionstatechange = (peer: Modules.Webrtc.IPeer) => {
+        let rtc = peer.getRtc(false);
+        if (rtc) {
+            let state = rtc.connectionState;
+            console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_onconnectionstatechange', state); 
+        }
+    }    
     static onCommand_peer_iceconnectionstatechange = (peer: Modules.Webrtc.IPeer) => {
         let rtc = peer.getRtc(false);
         if (rtc) {
             let state = rtc.iceConnectionState;
             console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_oniceconnectionstatechange', state); 
-            if (state == 'disconnected' || state == 'failed') 
-                rtc.close();
+            if (state === 'failed' && rtc.connectionState !== 'closed' && rtc.signalingState !== 'closed') {
+                if (peer.streams.recvs.count() > 0) {
+                    console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_oniceconnectionstatechange', 'Ice Restart'); 
+                    let toUser = peer.user.room.owner()
+                    StreamWebrtcReady.ready(peer.instanceId, toUser.item, peer.user.item, true)
+                }
+            }
         }
     }
     static onCommand_peer_signalingstatechange = (peer: Modules.Webrtc.IPeer) => {
