@@ -33,27 +33,26 @@ export class Config {
             //     'username': 'test',
             //     'credential': 'test'   
             // },           
-            // {
-            //     'urls': [
-            //         // 'turn:adhoc-turn.101.com:3478',
-            //         'turn:adhoc-turn.101.com:3478?transport=tcp',
-            //         // 'turn:adhoc-turn.101.com:3478?transport=udp',
-            //     ],
-            //     'username': 'u1',
-            //     'credential': 'p1'                
-
-            // },                
             {
                 'urls': [
-                    'turn:webrtcweb.com:7788', // coTURN 7788+8877
-                    'turn:webrtcweb.com:4455?transport=udp', // restund udp
-
-                    'turn:webrtcweb.com:8877?transport=udp', // coTURN udp
-                    'turn:webrtcweb.com:8877?transport=tcp', // coTURN tcp
+                    'turn:adhoc-turn.101.com:3478',
+                    // 'turn:adhoc-turn.101.com:3478?transport=tcp',
+                    // 'turn:adhoc-turn.101.com:3478?transport=udp',
                 ],
-                'username': 'muazkh',
-                'credential': 'muazkh'
-            },
+                'username': 'u1',
+                'credential': 'p1' 
+            },                
+            // {
+            //     'urls': [
+            //         'turn:webrtcweb.com:7788', // coTURN 7788+8877
+            //         'turn:webrtcweb.com:4455?transport=udp', // restund udp
+
+            //         'turn:webrtcweb.com:8877?transport=udp', // coTURN udp
+            //         'turn:webrtcweb.com:8877?transport=tcp', // coTURN tcp
+            //     ],
+            //     'username': 'muazkh',
+            //     'credential': 'muazkh'
+            // },
               
             // {
             //     urls: ['turn:numb.viagenie.ca'],

@@ -75,10 +75,12 @@ export class Dispatcher extends Cmds.Common.Base implements IDispatcher {
     }
 
     // Network
-    onDisconnect = () => {
+    onDisconnect = (...args: any[]) => {
+        console.log(...args)
         let data: Cmds.ICommandData<any> = {
             cmdId: Cmds.ECommandId.network_disconnect,
-            props: {}
+            props: {},
+            extra: args
         }
         this.onCommand(data);
     }
