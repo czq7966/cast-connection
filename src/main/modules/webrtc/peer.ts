@@ -113,7 +113,10 @@ export class Peer extends Cmds.Common.CommandRooter implements IPeer  {
                 Services.Cmds.StreamWebrtcCandidate.Peer.onBeforeRoot.req(this, cmd as any );
                 break;
             case Cmds.ECommandId.stream_webrtc_ready:
-                Services.Cmds.StreamWebrtcReady.Peer.onBeforeRoot.req(this, cmd as any );
+                type === Cmds.ECommandType.req ?
+                    Services.Cmds.StreamWebrtcReady.Peer.onBeforeRoot.req(this, cmd as any ): 
+                type === Cmds.ECommandType.resp ?
+                    Services.Cmds.StreamWebrtcReady.Peer.onBeforeRoot.resp(this, cmd as any ): null
                 break;                                 
             default:
         
