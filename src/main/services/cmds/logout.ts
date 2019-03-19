@@ -39,12 +39,12 @@ export class Logout extends Cmds.Common.Base {
     static Rooms = {
         onAfterRoot: {
             req(rooms: Modules.IRooms, cmd: Cmds.CommandRoomLeaveReq) {
-                console.log(Tag, 'Rooms', 'onAfterRoot', 'Req', cmd.data);
+                adhoc_cast_connection_console.log(Tag, 'Rooms', 'onAfterRoot', 'Req', cmd.data);
                 RoomLeave.Rooms.onAfterRoot.req(rooms, cmd);
 
             },            
             resp(rooms: Modules.IRooms, cmd: Cmds.CommandRoomLeaveResp) {
-                console.log(Tag, 'Rooms', 'onAfterRoot', 'Resp', cmd.data);
+                adhoc_cast_connection_console.log(Tag, 'Rooms', 'onAfterRoot', 'Resp', cmd.data);
                 RoomLeave.Rooms.onAfterRoot.resp(rooms, cmd);
                 rooms.clearRoom();
                 Cmds.CommandLoginResp.getInstance<Cmds.CommandLoginResp>(rooms.instanceId).data = {}
@@ -55,7 +55,7 @@ export class Logout extends Cmds.Common.Base {
     static Room = {
         onAfterRoot: {
             req(room: Modules.IRoom, cmd: Cmds.CommandLogoutReq) {
-                console.log(Tag, 'Room', room.item.id, 'onAfterRoot', 'Req', cmd.data)
+                adhoc_cast_connection_console.log(Tag, 'Room', room.item.id, 'onAfterRoot', 'Req', cmd.data)
                 let user = cmd.data.props.user;
                 let me = room.me();
                 if (me && user.id === me.item.id) {
@@ -65,7 +65,7 @@ export class Logout extends Cmds.Common.Base {
                 }
             },
             resp(room: Modules.IRoom, cmd: Cmds.CommandLogoutResp) {
-                console.log(Tag, 'Room', room.item.id, 'onAfterRoot', 'Resp', cmd.data)
+                adhoc_cast_connection_console.log(Tag, 'Room', room.item.id, 'onAfterRoot', 'Resp', cmd.data)
                 let user = cmd.data.props.user;
                 let me = room.me();
                 if (me && user.id === me.item.id) {
@@ -80,10 +80,10 @@ export class Logout extends Cmds.Common.Base {
     static User = {
         onAfterRoot: {
             req(user: Modules.IUser, cmd: Cmds.CommandLogoutReq) {
-                console.log(Tag, 'User', user.item.id, 'onAfterRoot', 'Req', cmd.data)
+                adhoc_cast_connection_console.log(Tag, 'User', user.item.id, 'onAfterRoot', 'Req', cmd.data)
             },  
             resp(user: Modules.IUser, cmd: Cmds.CommandLogoutReq) {
-                console.log(Tag, 'User', user.item.id, 'onAfterRoot', 'Resp', cmd.data)
+                adhoc_cast_connection_console.log(Tag, 'User', user.item.id, 'onAfterRoot', 'Resp', cmd.data)
             },      
         }
     }
@@ -91,11 +91,11 @@ export class Logout extends Cmds.Common.Base {
     static Peer = {
         onAfterRoot: {
             req(peer: Modules.Webrtc.IPeer, cmd: Cmds.CommandLogoutReq) {
-                console.log(Tag, 'Peer', peer.user.item.id, 'onAfterRoot', 'Req', cmd.data)
+                adhoc_cast_connection_console.log(Tag, 'Peer', peer.user.item.id, 'onAfterRoot', 'Req', cmd.data)
                 peer.rtc && peer.getRtc().close();
             },  
             resp(peer: Modules.Webrtc.IPeer, cmd: Cmds.CommandLogoutReq) {
-                console.log(Tag, 'Peer', peer.user.item.id, 'onAfterRoot', 'Resp', cmd.data)
+                adhoc_cast_connection_console.log(Tag, 'Peer', peer.user.item.id, 'onAfterRoot', 'Resp', cmd.data)
                 peer.rtc && peer.getRtc().close();
             },      
         }
@@ -104,12 +104,12 @@ export class Logout extends Cmds.Common.Base {
     static Streams = {
         onAfterRoot: {
             req(streams: Modules.Webrtc.IStreams, cmd: Cmds.CommandLogoutReq) {
-                console.log(Tag, 'Streams', streams.peer.user.item.id, 'onAfterRoot', 'Req', cmd.data)
+                adhoc_cast_connection_console.log(Tag, 'Streams', streams.peer.user.item.id, 'onAfterRoot', 'Req', cmd.data)
                 streams.sends.clear();
                 streams.recvs.clear();
             },  
             resp(streams: Modules.Webrtc.IStreams, cmd: Cmds.CommandLogoutReq) {
-                console.log(Tag, 'Streams', streams.peer.user.item.id, 'onAfterRoot', 'Resp', cmd.data)
+                adhoc_cast_connection_console.log(Tag, 'Streams', streams.peer.user.item.id, 'onAfterRoot', 'Resp', cmd.data)
                 streams.sends.clear();
                 streams.recvs.clear();
             },      

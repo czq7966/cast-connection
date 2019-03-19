@@ -48,8 +48,8 @@ export class CommandTypes {
             return command
         }else {        
             command = _decode(Command);
-            console.error('CommandTypes 未注册 ' + cmdData.cmdId)
-            console.log(cmdData)
+            adhoc_cast_connection_console.error('CommandTypes 未注册 ' + cmdData.cmdId)
+            adhoc_cast_connection_console.log(cmdData)
             
         }
         return;

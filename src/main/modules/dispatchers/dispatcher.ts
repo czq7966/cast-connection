@@ -55,13 +55,13 @@ export class Dispatcher extends Cmds.Common.Base implements IDispatcher {
 
     // Command
     onCommand = (cmd: Cmds.ICommandData<any>) => {
-        console.warn('OnCommand', cmd)
+        adhoc_cast_connection_console.warn('OnCommand', cmd)
         let result = this.recvFilter.root(cmd) ;
         !Cmds.Common.Helper.StateMachine.isset(result, Cmds.Common.EEventEmitterEmit2Result.preventRoot) &&
         Cmds.Common.EDCoder.onCommand(cmd, this);
     }
     sendCommand(cmd: Cmds.ICommandData<any>): Promise<any> {
-        console.warn('SendCommand', cmd)
+        adhoc_cast_connection_console.warn('SendCommand', cmd)
         if (cmd.props === undefined) cmd.props = {};
         let result = this.sendFilter.root(cmd) ;
         if (Cmds.Common.Helper.StateMachine.isset(result, Cmds.Common.EEventEmitterEmit2Result.preventRoot))
@@ -76,7 +76,7 @@ export class Dispatcher extends Cmds.Common.Base implements IDispatcher {
 
     // Network
     onDisconnect = (...args: any[]) => {
-        console.log(...args)
+        adhoc_cast_connection_console.log(...args)
         let data: Cmds.ICommandData<any> = {
             cmdId: Cmds.ECommandId.network_disconnect,
             props: {},

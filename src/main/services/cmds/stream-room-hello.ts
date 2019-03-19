@@ -24,7 +24,7 @@ export class StreamRoomHello extends Cmds.Common.Base {
     static Room = {
         onBeforeRoot: {
             req(room: Modules.IRoom, cmd: Cmds.CommandRoomHelloReq) {
-                console.log(Tag, 'Room', room.item.id , 'onBeforeRoot', 'Req', cmd.data)
+                adhoc_cast_connection_console.log(Tag, 'Room', room.item.id , 'onBeforeRoot', 'Req', cmd.data)
                 let data = cmd.data;
                 if (room.item.id === data.props.user.room.id) {
                     let respCmd = new Cmds.CommandStreamRoomHelloResp({instanceId: room.instanceId});
@@ -34,7 +34,7 @@ export class StreamRoomHello extends Cmds.Common.Base {
                 }                  
             },            
             resp(room: Modules.IRoom, cmd: Cmds.CommandRoomHelloResp) {
-                console.log(Tag, 'Room', room.item.id , 'onBeforeRoot', 'Resp', cmd.data)
+                adhoc_cast_connection_console.log(Tag, 'Room', room.item.id , 'onBeforeRoot', 'Resp', cmd.data)
                 let data = cmd.data;
                 if (room.item.id === data.props.user.room.id) {
                     RoomHello.Room.onBeforeRoot.resp(room, cmd)

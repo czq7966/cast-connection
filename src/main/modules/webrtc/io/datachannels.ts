@@ -78,7 +78,7 @@ export class DataChannels extends Cmds.Common.CommandRooter implements IDataChan
         if (rtcchannel) {
             let channel = this.getDataChannel(rtcchannel.label);
             if (channel && channel.rtcdatachannel === rtcchannel) {
-                console.log('data channel had exists ' + rtcchannel.label)
+                adhoc_cast_connection_console.log('data channel had exists ' + rtcchannel.label)
             } else {
                 this.addDataChannel(new DataChannel(this, rtcchannel))
             }

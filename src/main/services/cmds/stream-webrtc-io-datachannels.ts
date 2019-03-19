@@ -21,7 +21,7 @@ export class StreamIODataChannels extends Cmds.Common.Base {
         },  
         onAfterRoot: {
             req(datachannels: Modules.Webrtc.IO.IDataChannels, cmd: Cmds.CommandReq) {
-                console.log(Tag, 'DataChannels', datachannels.peer.user.item, 'onAfterRoot', 'Req', cmd.data);
+                adhoc_cast_connection_console.log(Tag, 'DataChannels', datachannels.peer.user.item, 'onAfterRoot', 'Req', cmd.data);
                 let data = cmd.data;
                 let cmdId = data.cmdId;
                 switch(cmdId) {
@@ -35,11 +35,11 @@ export class StreamIODataChannels extends Cmds.Common.Base {
         },         
     }       
     static onCommand_datachannel(datachannels: Modules.Webrtc.IO.IDataChannels, ev: RTCDataChannelEvent) {
-        console.log(Tag, 'DataChannels', datachannels.peer.user.item, 'onCommand_datachannel', 'Req');        
+        adhoc_cast_connection_console.log(Tag, 'DataChannels', datachannels.peer.user.item, 'onCommand_datachannel', 'Req');        
         datachannels.onDataChannel(ev)
     }
     static onCommand_datachannelclose(datachannels: Modules.Webrtc.IO.IDataChannels, label: string) {
-        console.log(Tag, 'DataChannels', datachannels.peer.user.item, 'onCommand_datachannelclose', 'Req');        
+        adhoc_cast_connection_console.log(Tag, 'DataChannels', datachannels.peer.user.item, 'onCommand_datachannelclose', 'Req');        
         datachannels.closeDataChannel(label)
     }    
 }

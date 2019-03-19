@@ -20,12 +20,12 @@ export class StreamWebrtcSdp {
                         Cmds.Common.EDCoder.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
                         resolve(data);
                     } else {
-                        console.error('login error', cmdResp.data.respMsg);
+                        adhoc_cast_connection_console.error('login error', cmdResp.data.respMsg);
                         reject(data)
                     }
                 },
                 onRespTimeout: (data:  Cmds.ICommandData<Cmds.ICommandRespDataProps>) => {
-                    console.log('onTimeout', data)
+                    adhoc_cast_connection_console.log('onTimeout', data)
                     data.respResult = false;
                     data.respMsg = 'time out!'                    
                     reject(data);
@@ -104,14 +104,14 @@ export class StreamWebrtcSdp {
             req(mUser: Modules.IUser, cmd: Cmds.CommandStreamWebrtcSdpReq) {
                 let data = cmd.data;
                 if (mUser.item.id === data.props.user.id && mUser.item.room.id === data.props.user.room.id) {
-                    console.log(Tag, 'User', mUser.item.room.id , 'onBeforeRoot', 'Req', cmd.data);
+                    adhoc_cast_connection_console.log(Tag, 'User', mUser.item.room.id , 'onBeforeRoot', 'Req', cmd.data);
                     mUser.getPeer();
                 }                  
             },
             resp(mUser: Modules.IUser, cmd: Cmds.CommandStreamWebrtcSdpResp) {
                 let data = cmd.data;
                 if (mUser.item.id === data.props.user.id && mUser.item.room.id === data.props.user.room.id) {
-                    console.log(Tag, 'User', mUser.item.room.id , 'onBeforeRoot', 'Resp', cmd.data);
+                    adhoc_cast_connection_console.log(Tag, 'User', mUser.item.room.id , 'onBeforeRoot', 'Resp', cmd.data);
                 }                  
             }                      
         },        
@@ -123,7 +123,7 @@ export class StreamWebrtcSdp {
                 let mUser = peer.user;
                 let user = data.props.user;
                 if (mUser.item.id === user.id && mUser.item.room.id === user.room.id) {
-                    console.log(Tag, 'Peer', mUser.item.room.id , 'onBeforeRoot', 'Req', cmd.data);                    
+                    adhoc_cast_connection_console.log(Tag, 'Peer', mUser.item.room.id , 'onBeforeRoot', 'Req', cmd.data);                    
                     let sdp = user.extra;
                     ServiceModules.Webrtc.Peer.setOffer(peer, sdp)
                     .then(() => {
@@ -147,7 +147,7 @@ export class StreamWebrtcSdp {
                 let mUser = peer.user;
                 let user = data.props.user;
                 if (mUser.item.id === user.id && mUser.item.room.id === user.room.id) {
-                    console.log(Tag, 'Peer', mUser.item.room.id , 'onBeforeRoot', 'Resp', cmd.data);
+                    adhoc_cast_connection_console.log(Tag, 'Peer', mUser.item.room.id , 'onBeforeRoot', 'Resp', cmd.data);
                     let sdp = user.extra;
                     ServiceModules.Webrtc.Peer.setAnswer(peer, sdp);
                 }                   

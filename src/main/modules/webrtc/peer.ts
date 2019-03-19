@@ -215,7 +215,7 @@ export class Peer extends Cmds.Common.CommandRooter implements IPeer  {
             Object.keys(ERTCPeerEvents).forEach(key => {
                 let value = events[key];
                 let event = (...args: any[]) => {
-                    // console.log('PeerEvent:', value, ...args)
+                    // adhoc_cast_connection_console.log('PeerEvent:', value, ...args)
                     let user = Object.assign({}, this.user.item);
                     user.extra = args;
                     let cmdId = Cmds.Command_stream_webrtc_on_prefix + value; 

@@ -6,7 +6,7 @@ export class StreamIODataChannel {
     static DataChannel = {
         onAfterRoot: {
             req(datachannel: Modules.Webrtc.IO.IDataChannel, cmd: Cmds.CommandReq) {
-                console.log(Tag, 'DataChannel', datachannel.datachannels.peer.user.item.id, 'onAfterRoot', 'Req', cmd.data);
+                adhoc_cast_connection_console.log(Tag, 'DataChannel', datachannel.datachannels.peer.user.item.id, 'onAfterRoot', 'Req', cmd.data);
                 let data = cmd.data;
                 let cmdId = data.cmdId;
                 let user = data.props.user;

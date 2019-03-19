@@ -9,7 +9,7 @@ export class UserStateOnChange {
             req(mUser: Modules.IUser, cmd: Cmds.CommandReq) {
                 let data = cmd.data;
                 if (mUser.item.id === data.props.user.id && mUser.item.room.id === data.props.user.room.id) {
-                    console.log(Tag, 'User', mUser.item.room.id , 'onBeforeRoot', 'Req', cmd.data);
+                    adhoc_cast_connection_console.log(Tag, 'User', mUser.item.room.id , 'onBeforeRoot', 'Req', cmd.data);
                     let user = cmd.data.props.user;
                     let states = user.extra as Cmds.Common.Helper.IStateChangeValues;
                     

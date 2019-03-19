@@ -22,7 +22,7 @@ export class StreamWebrtcStreams {
         let mMe = mRoom.me();
         if (mMe.item.id === mUser.item.id) {
             let msg = 'Can not send stream to self!';
-            console.warn(msg)
+            adhoc_cast_connection_console.warn(msg)
             return Promise.reject(msg)            
         } else {
             if (!streams.sends.exist(stream.id)) {

@@ -7,7 +7,7 @@ export class StreamRoomLeave extends Cmds.Common.Base {
         room = room;
         let promise = RoomLeave.leave(instanceId, room);
         promise.then((data: Cmds.ICommandData<Cmds.ICommandRoomLeaveRespDataProps>) => {   
-            console.log(Tag) 
+            adhoc_cast_connection_console.log(Tag) 
         })
         return promise;
     }

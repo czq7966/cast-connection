@@ -28,11 +28,11 @@ export class Peer{
                     resolve(sdp)
                 })           
                 .catch((err) => {
-                    console.error(err)
+                    adhoc_cast_connection_console.error(err)
                     reject(err)
                 })             
             }).catch((err) => {
-                console.error(err)
+                adhoc_cast_connection_console.error(err)
                 reject(err)
             })
         })
@@ -58,11 +58,11 @@ export class Peer{
                     resolve(sdp)
                 })           
                 .catch((err) => {
-                    console.error(err)
+                    adhoc_cast_connection_console.error(err)
                     reject(err)
                 })             
             }).catch((err) => {
-                console.error(err)
+                adhoc_cast_connection_console.error(err)
                 reject(err)
             })
         })
@@ -71,18 +71,18 @@ export class Peer{
         return new Promise((resolve, reject) => {
             let rtc = peer.getRtc() as any;
             let createAnswerSuccess = (sdp) => {
-                console.log('createAnswerSuccess', sdp)
+                adhoc_cast_connection_console.log('createAnswerSuccess', sdp)
                 let setLocalDescriptionSuccess = () => {
                     resolve(sdp)
                 }
                 let setLocalDescriptionFailed = (err) => {
-                    console.log('createAnswerFailed', err)
+                    adhoc_cast_connection_console.log('createAnswerFailed', err)
                     reject(err);
                 }
                 rtc.setLocalDescription(sdp, setLocalDescriptionSuccess, setLocalDescriptionFailed)
             }
             let createAnswerFailed = (err) => {
-                console.log('createAnswerFailed', err)
+                adhoc_cast_connection_console.log('createAnswerFailed', err)
                 reject(err)
             }
             rtc.createAnswer(createAnswerSuccess, createAnswerFailed);
@@ -102,14 +102,14 @@ export class Peer{
     }   
     static setOffer_browser(peer: Modules.Webrtc.IPeer, data: any): Promise<any> {
         return new Promise((resolve, reject) => {
-            console.log(Tag, 'setOffer_browser')
+            adhoc_cast_connection_console.log(Tag, 'setOffer_browser')
             let rtc = peer.getRtc() as any;
             let setRemoteDescriptionSuccess = () => {
-                console.log('setRemoteDescriptionSuccess');
+                adhoc_cast_connection_console.log('setRemoteDescriptionSuccess');
                 resolve()
             }
             let setRemoteDescriptionFailed = (err) => {
-                console.log('setRemoteDescriptionFailed', err)
+                adhoc_cast_connection_console.log('setRemoteDescriptionFailed', err)
                 reject(err)    
             }
             rtc.setRemoteDescription(data, setRemoteDescriptionSuccess, setRemoteDescriptionFailed)
@@ -117,13 +117,13 @@ export class Peer{
     } 
     static setOffer_reactnative(peer: Modules.Webrtc.IPeer, data: any): Promise<any> {
         return new Promise((resolve, reject) => {
-            console.log(Tag, 'setOffer_reactnative');
+            adhoc_cast_connection_console.log(Tag, 'setOffer_reactnative');
             peer.getRtc().setRemoteDescription(new Modules.Webrtc.WebRTC.RTCSessionDescription(data))
             .then(() => {
                 resolve()        
             })
             .catch(err => {
-                console.log('Error',err)
+                adhoc_cast_connection_console.log('Error',err)
                 reject()
             })
         })
@@ -141,13 +141,13 @@ export class Peer{
     }   
     static setAnswer_browser(peer: Modules.Webrtc.IPeer, data: any): Promise<any> {
         return new Promise((resolve, reject) => {
-            console.log(Tag, 'setAnswer_browser')
+            adhoc_cast_connection_console.log(Tag, 'setAnswer_browser')
             let rtc = peer.getRtc() as any;
             let setRemoteDescriptionSuccess = () => {
                 resolve()
             }
             let setRemoteDescriptionFailed = (err) => {
-                console.log('setRemoteDescriptionFailed', err)
+                adhoc_cast_connection_console.log('setRemoteDescriptionFailed', err)
                 reject(err)    
             }
             rtc.setRemoteDescription(data, setRemoteDescriptionSuccess, setRemoteDescriptionFailed)
@@ -156,13 +156,13 @@ export class Peer{
     }    
     static setAnswer_reactnative(peer: Modules.Webrtc.IPeer, data: any): Promise<any> {
         return new Promise((resolve, reject) => {
-            console.log(Tag, 'setAnswer_reactnative')
+            adhoc_cast_connection_console.log(Tag, 'setAnswer_reactnative')
             peer.getRtc().setRemoteDescription(new Modules.Webrtc.WebRTC.RTCSessionDescription(data))
             .then(() => {
                 resolve()
             })
             .catch(err => {
-                console.log('Error',err)
+                adhoc_cast_connection_console.log('Error',err)
                 reject(err)
             })
         })
@@ -182,13 +182,13 @@ export class Peer{
     static setCandidate_browser(peer: Modules.Webrtc.IPeer, data: any) {
         peer.getRtc().addIceCandidate(data)
         .catch(err => {
-            console.log('add Ic eCandidate error:', err)
+            adhoc_cast_connection_console.log('add Ic eCandidate error:', err)
         })
     }    
     static setCandidate_reactnative(peer: Modules.Webrtc.IPeer, data: any) {
         peer.getRtc().addIceCandidate(new Modules.Webrtc.WebRTC.RTCIceCandidate(data))
         .catch(err => {
-            console.log('add IceCandidate error:', err)
+            adhoc_cast_connection_console.log('add IceCandidate error:', err)
         })
     }       
 

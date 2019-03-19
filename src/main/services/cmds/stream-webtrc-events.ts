@@ -88,7 +88,7 @@ export class StreamWebrtcEvents {
         peer.user.room.rooms.dispatcher.onCommand(data)        
     }
     static onCommand_peer_track(peer: Modules.Webrtc.IPeer, ev: RTCTrackEvent) {
-        console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_peer_track', peer.user); 
+        adhoc_cast_connection_console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_peer_track', peer.user); 
         let streams = ev.streams;
         streams.forEach(stream => {    
             !peer.streams.recvs.exist(stream.id) &&
@@ -96,19 +96,19 @@ export class StreamWebrtcEvents {
         })
     }
     static onCommand_peer_stream (peer: Modules.Webrtc.IPeer,ev: any)  {
-        console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_peer_stream', peer.user); 
+        adhoc_cast_connection_console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_peer_stream', peer.user); 
         let stream = ev.stream as MediaStream;
         !peer.streams.recvs.exist(stream.id) &&
         this.dispatchEventCommand(peer, stream, null, Cmds.ECommandId.stream_webrtc_onrecvstream);        
     }
     static onCommand_peer_addstream(peer: Modules.Webrtc.IPeer,ev: Event) {
-        console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_peer_addstream', peer.user); 
+        adhoc_cast_connection_console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_peer_addstream', peer.user); 
         let stream = ev['stream'] as MediaStream;
         !peer.streams.recvs.exist(stream.id) &&
         this.dispatchEventCommand(peer, stream, null, Cmds.ECommandId.stream_webrtc_onrecvstream);
     }   
     static onCommand_peer_icecandidate = (peer: Modules.Webrtc.IPeer, ev: RTCPeerConnectionIceEvent): Promise<any> => {
-        console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_peer_icecandidate', peer.user); 
+        adhoc_cast_connection_console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_peer_icecandidate', peer.user); 
         let data;
         if (ev.candidate) {
             data = ev.candidate.toJSON();
@@ -124,17 +124,17 @@ export class StreamWebrtcEvents {
         let rtc = peer.getRtc(false);
         if (rtc) {
             let state = rtc.connectionState;
-            console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_onconnectionstatechange', state); 
+            adhoc_cast_connection_console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_onconnectionstatechange', state); 
         }
     }    
     static onCommand_peer_iceconnectionstatechange = (peer: Modules.Webrtc.IPeer) => {
         let rtc = peer.getRtc(false);
         if (rtc) {
             let state = rtc.iceConnectionState;
-            console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_oniceconnectionstatechange', state); 
+            adhoc_cast_connection_console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_oniceconnectionstatechange', state); 
             if (state === 'failed' && rtc.connectionState !== 'closed' && rtc.signalingState !== 'closed') {
                 if (peer.streams.recvs.count() > 0) {
-                    console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_oniceconnectionstatechange', 'Ice Restart'); 
+                    adhoc_cast_connection_console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_oniceconnectionstatechange', 'Ice Restart'); 
                     let toUser = peer.user.room.owner()
                     StreamWebrtcReady.ready(peer.instanceId, toUser.item, peer.user.item, true)
                 }
@@ -145,16 +145,16 @@ export class StreamWebrtcEvents {
         let rtc = peer.getRtc(false);
         if (rtc) {
             let state = rtc.signalingState
-            console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_onsignalingstatechange', state); 
+            adhoc_cast_connection_console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_onsignalingstatechange', state); 
         }        
     }
     static onCommand_peer_sendstreaminactive = (peer: Modules.Webrtc.IPeer) => {
-        console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_peer_sendstreaminactive', peer.user); 
+        adhoc_cast_connection_console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_peer_sendstreaminactive', peer.user); 
         let rtc = peer.getRtc(false);
         rtc && rtc.close();
     } 
     static onCommand_peer_recvstreaminactive = (peer: Modules.Webrtc.IPeer) => {
-        console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_peer_recvstreaminactive', peer.user); 
+        adhoc_cast_connection_console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_peer_recvstreaminactive', peer.user); 
         let rtc = peer.getRtc(false);
         rtc && rtc.close();
     }   
@@ -164,15 +164,15 @@ export class StreamWebrtcEvents {
 
     // Streams
     static onCommand_streams_recvstream(streams: Modules.Webrtc.IStreams, stream: MediaStream) {
-        console.log(Tag, 'Streams', streams.peer.user.item.room.id , 'onCommand_streams_recvstream', streams.peer.user); 
+        adhoc_cast_connection_console.log(Tag, 'Streams', streams.peer.user.item.room.id , 'onCommand_streams_recvstream', streams.peer.user); 
         ServiceModules.Webrtc.Streams.addRecvStream(streams, stream);
     }       
     static onCommand_streams_sendstreaminactive = (streams: Modules.Webrtc.IStreams, stream: MediaStream) => {
-        console.log(Tag, 'Streams', streams.peer.user.item.room.id , 'onCommand_streams_sendstreaminactive', streams.peer.user); 
+        adhoc_cast_connection_console.log(Tag, 'Streams', streams.peer.user.item.room.id , 'onCommand_streams_sendstreaminactive', streams.peer.user); 
         ServiceModules.Webrtc.Streams.delSendStream(streams, stream.id);
     }    
     static onCommand_streams_recvstreaminactive = (streams: Modules.Webrtc.IStreams, stream: MediaStream) => {
-        console.log(Tag, 'Streams', streams.peer.user.item.room.id , 'onCommand_streams_recvstreaminactive', streams.peer.user); 
+        adhoc_cast_connection_console.log(Tag, 'Streams', streams.peer.user.item.room.id , 'onCommand_streams_recvstreaminactive', streams.peer.user); 
         ServiceModules.Webrtc.Streams.delRecvStream(streams, stream.id);
     }      
 }

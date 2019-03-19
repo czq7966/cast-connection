@@ -33,20 +33,20 @@ export class StreamIOInput extends Cmds.Common.Base {
     }  
     static onCommand_datachanneladd(input: Modules.Webrtc.IO.IInput, label: string) {
         if (Modules.Webrtc.IO.EDataChannelLabel.input === label) {
-            console.log(Tag, 'Input', input.peer.user.item, 'onCommand_datachanneladd', 'Req', label);                 
+            adhoc_cast_connection_console.log(Tag, 'Input', input.peer.user.item, 'onCommand_datachanneladd', 'Req', label);                 
             let datachannel = input.peer.datachannels.getDataChannel(label);
             input.setDataChannel(datachannel)
         }        
     }
     static onCommand_datachannelclose(input: Modules.Webrtc.IO.IInput, label: string) {        
         if (input.datachannel.rtcdatachannel.label === label) {
-            console.log(Tag, 'Input', input.peer.user.item, 'onCommand_datachannelclose', 'Req', label);     
+            adhoc_cast_connection_console.log(Tag, 'Input', input.peer.user.item, 'onCommand_datachannelclose', 'Req', label);     
             input.onDataChannelClose();
         }
     }           
     static onCommand_datachannelopen(input: Modules.Webrtc.IO.IInput, label: string) {        
         if (input.datachannel.rtcdatachannel.label === label) {
-            console.log(Tag, 'Input', input.peer.user.item, 'onCommand_datachannelopen', 'Req', label);     
+            adhoc_cast_connection_console.log(Tag, 'Input', input.peer.user.item, 'onCommand_datachannelopen', 'Req', label);     
             input.onDataChannelOpen();
         }
     }               

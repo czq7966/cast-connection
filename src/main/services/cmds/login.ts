@@ -25,12 +25,12 @@ export class Login extends Cmds.Common.Base {
                         Cmds.Common.EDCoder.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
                         resolve(data);
                     } else {
-                        console.error('login error', cmdResp.data.respMsg);
+                        adhoc_cast_connection_console.error('login error', cmdResp.data.respMsg);
                         reject(data)
                     }
                 },
                 onRespTimeout: (data:  Cmds.ICommandData<Cmds.ICommandLoginRespDataProps>) => {
-                    console.log('onTimeout', data)
+                    adhoc_cast_connection_console.log('onTimeout', data)
                     data.respResult = false;
                     data.respMsg = 'time out!'                    
                     reject(data);
@@ -44,7 +44,7 @@ export class Login extends Cmds.Common.Base {
     static Rooms = {
         onBeforeRoot: {
             resp(rooms: Modules.IRooms, cmd: Cmds.CommandLoginResp) {
-                console.log(Tag, 'Rooms', 'onBeforeRoot', 'Resp', cmd.data);
+                adhoc_cast_connection_console.log(Tag, 'Rooms', 'onBeforeRoot', 'Resp', cmd.data);
                 RoomJoin.Rooms.onBeforeRoot.resp(rooms, cmd);
             }
         }
@@ -52,7 +52,7 @@ export class Login extends Cmds.Common.Base {
     static Room = {
         onBeforeRoot: {
             resp(room: Modules.IRoom, cmd: Cmds.CommandLoginResp) {
-                console.log(Tag, 'Room', room.item.id , 'onBeforeRoot', 'Resp', cmd.data)
+                adhoc_cast_connection_console.log(Tag, 'Room', room.item.id , 'onBeforeRoot', 'Resp', cmd.data)
                 RoomJoin.Room.onBeforeRoot.resp(room, cmd);
             }
         }

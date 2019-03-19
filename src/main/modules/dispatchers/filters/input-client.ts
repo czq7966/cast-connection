@@ -73,7 +73,7 @@ export class InputClientFilter extends DispatcherFilter implements IInputClientF
             if (this.wsClient.connected()) {
                 this.wsClient.sendCommand(cmd)
                 .catch(err => {
-                    console.log(err)
+                    adhoc_cast_connection_console.log(err)
                 })
             } else {
                 this.setEnabled(this.enabled)

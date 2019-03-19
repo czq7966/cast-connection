@@ -9,7 +9,7 @@ export class StreamWebrtcResolution {
     static Streams = {
         onBeforeRoot: {
             req(streams: Modules.Webrtc.IStreams, cmd: Cmds.CommandReq) {
-                console.log(Tag, 'Streams', streams.peer.user.item, 'onBeforeRoot', 'Req', cmd.data)
+                adhoc_cast_connection_console.log(Tag, 'Streams', streams.peer.user.item, 'onBeforeRoot', 'Req', cmd.data)
                 let resolutions:  {[key: string]: Modules.Webrtc.IStreamResolution} = cmd.data.extra;
                 Object.keys(resolutions).forEach(key => {
                     streams.resolutions.add(key, resolutions[key])

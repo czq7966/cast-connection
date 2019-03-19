@@ -224,7 +224,7 @@
 //                 });
 
 //                 if (result.type !== 'local-candidate' && result.type !== 'remote-candidate' && result.type !== 'candidate-pair') {
-//                     // console.error('result', result);
+//                     // adhoc_cast_connection_console.error('result', result);
 //                 }
 //             });
 

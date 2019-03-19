@@ -41,7 +41,7 @@ export class RoomLeave extends Cmds.Common.Base {
     static Rooms = {
         onAfterRoot: {
             req(rooms: Modules.IRooms, cmd: Cmds.CommandRoomLeaveReq) {
-                console.log(Tag, 'Rooms', 'onAfterRoot', 'Req', cmd.data);
+                adhoc_cast_connection_console.log(Tag, 'Rooms', 'onAfterRoot', 'Req', cmd.data);
                 let data = cmd.data;                
                 let room = rooms.getRoom(data.props.user.room.id);
                 if (room && room.users.count() == 0) {                    
@@ -49,7 +49,7 @@ export class RoomLeave extends Cmds.Common.Base {
                 }    
             },            
             resp(rooms: Modules.IRooms, cmd: Cmds.CommandRoomLeaveResp) {
-                console.log(Tag, 'Rooms', 'onAfterRoot', 'Resp', cmd.data);
+                adhoc_cast_connection_console.log(Tag, 'Rooms', 'onAfterRoot', 'Resp', cmd.data);
                 let data = cmd.data;                
                 let room = rooms.getRoom(data.props.user.room.id);
                 if (room && room.users.count() == 0) {                    
@@ -62,7 +62,7 @@ export class RoomLeave extends Cmds.Common.Base {
     static Room = {
         onAfterRoot: {
             req(room: Modules.IRoom, cmd: Cmds.CommandRoomLeaveReq) {
-                console.log(Tag, 'Room', room.item.id ,'onAfterRoot', 'Req', cmd.data);
+                adhoc_cast_connection_console.log(Tag, 'Room', room.item.id ,'onAfterRoot', 'Req', cmd.data);
                 let data = cmd.data;
                 if (room.item.id === data.props.user.room.id) {                    
                     let me = room.me();                    
@@ -74,7 +74,7 @@ export class RoomLeave extends Cmds.Common.Base {
                 }
             },            
             resp(room: Modules.IRoom, cmd: Cmds.CommandRoomLeaveResp) {
-                console.log(Tag, 'Room', room.item.id , 'onAfterRoot', 'Resp', cmd.data)
+                adhoc_cast_connection_console.log(Tag, 'Room', room.item.id , 'onAfterRoot', 'Resp', cmd.data)
                 let data = cmd.data;
                 if (data.respResult && room.item.id === data.props.user.room.id) {                    
                     let me = room.me();                    
@@ -91,10 +91,10 @@ export class RoomLeave extends Cmds.Common.Base {
     static User = {
         onAfterRoot: {
             req(user: Modules.IUser, cmd: Cmds.CommandRoomCloseReq) {
-                console.log(Tag, 'User', user.item.id , 'onAfterRoot', 'Req', cmd.data)
+                adhoc_cast_connection_console.log(Tag, 'User', user.item.id , 'onAfterRoot', 'Req', cmd.data)
             },            
             resp(user: Modules.IUser, cmd: Cmds.CommandRoomCloseResp) {
-                console.log(Tag, 'User', user.item.id , 'onAfterRoot', 'Resp', cmd.data)
+                adhoc_cast_connection_console.log(Tag, 'User', user.item.id , 'onAfterRoot', 'Resp', cmd.data)
             }            
         }  
     }      
@@ -102,11 +102,11 @@ export class RoomLeave extends Cmds.Common.Base {
     static Peer = {
         onAfterRoot: {
             req(peer: Modules.Webrtc.IPeer, cmd: Cmds.CommandRoomCloseReq) {
-                console.log(Tag, 'Peer', peer.user.item.id , 'onAfterRoot', 'Req', cmd.data)
+                adhoc_cast_connection_console.log(Tag, 'Peer', peer.user.item.id , 'onAfterRoot', 'Req', cmd.data)
                 peer.rtc && peer.getRtc().close();
             },            
             resp(peer: Modules.Webrtc.IPeer, cmd: Cmds.CommandRoomCloseResp) {
-                console.log(Tag, 'Peer', peer.user.item.id , 'onAfterRoot', 'Resp', cmd.data)
+                adhoc_cast_connection_console.log(Tag, 'Peer', peer.user.item.id , 'onAfterRoot', 'Resp', cmd.data)
                 peer.rtc && peer.getRtc().close();
             }            
         }  
@@ -115,12 +115,12 @@ export class RoomLeave extends Cmds.Common.Base {
     static Streams = {
         onAfterRoot: {
             req(streams: Modules.Webrtc.IStreams, cmd: Cmds.CommandLogoutReq) {
-                console.log(Tag, 'Streams', streams.peer.user.item.id, 'onAfterRoot', 'Req', cmd.data)
+                adhoc_cast_connection_console.log(Tag, 'Streams', streams.peer.user.item.id, 'onAfterRoot', 'Req', cmd.data)
                 streams.sends.clear();
                 streams.recvs.clear();
             },  
             resp(streams: Modules.Webrtc.IStreams, cmd: Cmds.CommandLogoutReq) {
-                console.log(Tag, 'Streams', streams.peer.user.item.id, 'onAfterRoot', 'Resp', cmd.data)
+                adhoc_cast_connection_console.log(Tag, 'Streams', streams.peer.user.item.id, 'onAfterRoot', 'Resp', cmd.data)
                 streams.sends.clear();
                 streams.recvs.clear();
             },      

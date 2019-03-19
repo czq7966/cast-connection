@@ -134,7 +134,7 @@ export class Command<T extends any> extends Base implements ICommand {
                 }
             }
             let onRespTimeout = (data:  Dts.ICommandData<any>) => {
-                console.log('onTimeout', data)
+                adhoc_cast_connection_console.log('onTimeout', data)
                 data.respResult = false;
                 data.respMsg = 'time out!'                    
                 reject(data);

@@ -41,7 +41,7 @@ export class RoomJoin extends Cmds.Common.Base {
     static Rooms = {
         onBeforeRoot: {
             resp(rooms: Modules.IRooms, cmd: Cmds.CommandRoomJoinResp) {
-                console.log(Tag, 'Rooms', 'onBeforeRoot', 'Resp', cmd.data)
+                adhoc_cast_connection_console.log(Tag, 'Rooms', 'onBeforeRoot', 'Resp', cmd.data)
                 let data = cmd.data;
                 if (data.respResult) {
                     let room = rooms.getRoom(data.props.user.room);
@@ -55,7 +55,7 @@ export class RoomJoin extends Cmds.Common.Base {
     static Room = {
         onBeforeRoot: {
             resp(room: Modules.IRoom, cmd: Cmds.CommandRoomJoinResp) {
-                console.log(Tag, 'Room' , room.item.id , 'onBeforeRoot', 'Resp', cmd.data);
+                adhoc_cast_connection_console.log(Tag, 'Room' , room.item.id , 'onBeforeRoot', 'Resp', cmd.data);
                 let data = cmd.data;                
                 if (data.respResult && room.item.id === data.props.user.room.id) {                    
                     let user = data.props.user;

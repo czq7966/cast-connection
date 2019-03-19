@@ -3,6 +3,9 @@ export class Debug {
     public static log(...args: any[]) {
         this.enabled && console.log(...args);
     }
+    public static warn(...args: any[]) {
+        this.enabled && console.warn(...args);
+    }    
     public static dir(...args: any[]) {
         this.enabled && console.dir(...args);
     }
@@ -14,3 +17,6 @@ export class Debug {
     }
     
 }
+
+let _global = window || global 
+_global["adhoc_cast_connection_console"] = Debug

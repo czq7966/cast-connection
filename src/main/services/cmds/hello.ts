@@ -21,7 +21,7 @@ export class Hello extends Cmds.Common.Base {
     static Room = {
         onBeforeRoot: {
             req(room: Modules.IRoom, cmd: Cmds.CommandHelloReq) {
-                console.log(Tag, 'Room',  room.item.id ,'onBeforeRoot', 'Req', cmd.data); 
+                adhoc_cast_connection_console.log(Tag, 'Room',  room.item.id ,'onBeforeRoot', 'Req', cmd.data); 
                 let data = cmd.data;
                 if (room.item.id === data.props.user.room.id) {
                     let respCmd = new Cmds.CommandHelloResp({instanceId: room.instanceId});  
@@ -29,7 +29,7 @@ export class Hello extends Cmds.Common.Base {
                 }                
             },
             resp(room: Modules.IRoom, cmd: Cmds.CommandHelloResp) {
-                console.log(Tag, 'Room',  room.item.id ,'onBeforeRoot', 'Resp', cmd.data);                
+                adhoc_cast_connection_console.log(Tag, 'Room',  room.item.id ,'onBeforeRoot', 'Resp', cmd.data);                
                 let data = cmd.data;
                 if (room.item.id === data.props.user.room.id) {
                     RoomHello.Room.onBeforeRoot.resp(room, cmd);

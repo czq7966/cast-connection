@@ -83,7 +83,7 @@ export class Client {
             Object.keys(events).forEach(key => {
                 let value = events[key];
                 socket.on(value, (...args:any[]) => {
-                    // console.log('Client Event:', value, ...args)
+                    // adhoc_cast_connection_console.log('Client Event:', value, ...args)
                     if (value === Dts.EClientSocketEvents.error) {
                         this.eventEmitter.emit(Dts.EClientSocketEvents.message_error, ...args)
                     } else 
@@ -105,10 +105,10 @@ export class Client {
             .then(() => {
                 this.socket.emit(Dts.CommandID, cmd , (result: boolean) => {
                     if (result) {
-                        console.log('command success');
+                        adhoc_cast_connection_console.log('command success');
                         resolve()                    
                     } else {
-                        console.log('command failed' );
+                        adhoc_cast_connection_console.log('command failed' );
                         reject()
                     }
                 })  
@@ -126,10 +126,10 @@ export class Client {
     //         .then(() => {
     //             this.socket.emit(ECustomEvents.openRoom, query, (result: boolean, msg: any) => {
     //                 if (result) {
-    //                     console.log('open room success: ' + this.socket.id);
+    //                     adhoc_cast_connection_console.log('open room success: ' + this.socket.id);
     //                     resolve(msg)                    
     //                 } else {
-    //                     console.log('open room failed: ' + msg);
+    //                     adhoc_cast_connection_console.log('open room failed: ' + msg);
     //                     reject(msg)
     //                 }
     //             })  
@@ -147,10 +147,10 @@ export class Client {
     //         .then(() => {
     //             this.socket.emit(ECustomEvents.joinRoom, query, (result: boolean, msg: string) => {
     //                 if (result) {
-    //                     console.log('join room success: ' + msg);
+    //                     adhoc_cast_connection_console.log('join room success: ' + msg);
     //                     resolve(msg)                    
     //                 } else {
-    //                     console.log('join room failed: ' + msg);
+    //                     adhoc_cast_connection_console.log('join room failed: ' + msg);
     //                     reject(msg)
     //                 }
     //             })  
@@ -166,11 +166,11 @@ export class Client {
     //         return new Promise((resolve, reject) => {
     //                 this.socket.emit(ECustomEvents.leaveRoom, query, (result: boolean, msg: string) => {
     //                     if (result) {
-    //                         console.log('leave room success: ' + msg);
+    //                         adhoc_cast_connection_console.log('leave room success: ' + msg);
     //                         this.eventEmitter.emit(ECustomEvents.leaveRoom, query)
     //                         resolve(msg)                    
     //                     } else {
-    //                         console.log('leave room failed: ' + msg);
+    //                         adhoc_cast_connection_console.log('leave room failed: ' + msg);
     //                         reject(msg)
     //                     }
     //                 })  
@@ -185,10 +185,10 @@ export class Client {
     //         .then(() => {
     //             this.socket.emit(ECustomEvents.message, query, (result: boolean, msg: string) => {
     //                 if (result) {
-    //                     console.log('message success: ' + msg);
+    //                     adhoc_cast_connection_console.log('message success: ' + msg);
     //                     resolve(msg)                    
     //                 } else {
-    //                     console.log('message failed: ' + msg);
+    //                     adhoc_cast_connection_console.log('message failed: ' + msg);
     //                     reject(msg)
     //                 }
     //             })  

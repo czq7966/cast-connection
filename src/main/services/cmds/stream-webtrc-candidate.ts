@@ -30,12 +30,12 @@ export class StreamWebrtcCandidate {
                 let mUser = peer.user;
                 let user = data.props.user;
                 if (mUser.item.id === user.id && mUser.item.room.id === user.room.id) {
-                    console.log(Tag, 'Peer', mUser.item.room.id , 'onBeforeRoot', 'Req', cmd.data);                    
+                    adhoc_cast_connection_console.log(Tag, 'Peer', mUser.item.room.id , 'onBeforeRoot', 'Req', cmd.data);                    
                     let candidate = user.extra;
                     if (candidate) {
                         ServiceModules.Webrtc.Peer.setCandidate(peer, candidate);
                     } else {
-                        console.log(Tag, 'Peer', mUser.item.room.id , 'onBeforeRoot', 'Req', 'ice candidate complete');                    
+                        adhoc_cast_connection_console.log(Tag, 'Peer', mUser.item.room.id , 'onBeforeRoot', 'Req', 'ice candidate complete');                    
                     }                    
                 }                  
             }                  

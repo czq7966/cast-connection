@@ -11,3 +11,5 @@ export { Network }
 export { Modules }
 
 export * from './connection'
+
+adhoc_cast_connection_console.log('2222222222222222', adhoc_cast_connection_console)
