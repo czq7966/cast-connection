@@ -40,9 +40,24 @@ export class Streams{
             streams.recvs.del(id);
             streams.resolutions.del(id);
         } else {
-            streams.sends.keys().forEach(key => {
+            streams.recvs.keys().forEach(key => {
                 this.delRecvStream(streams, streams.sends.get(key).id)
             })
         }
     }      
+    static closeRecvStream(streams: Modules.Webrtc.IStreams, id?: string) {
+        if (id) {
+            let stream = streams.recvs.get(id);
+            if (stream) {
+                stream.getTracks().forEach(track => {
+                    track.stop();
+                })
+            }
+
+        } else {
+            streams.recvs.keys().forEach(key => {
+                this.closeRecvStream(streams, key)
+            })
+        }
+    }          
 }
