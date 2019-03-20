@@ -14,8 +14,9 @@ export class Peer{
                 offerToReceiveAudio: true,
                 offerToReceiveVideo: true
             }).then((sdp) => {
-                let codec = peer.config.codec || Modules.Webrtc.ECodecs.default;
-                let bandwidth = peer.config.bandwidth || 0;
+                let config = peer.getConfig('offer');
+                let codec = config.codec || Modules.Webrtc.ECodecs.default;
+                let bandwidth = config.bandwidth || 0;
                 if (codec !== Modules.Webrtc.ECodecs.default) {
                     sdp.sdp = Helper.SdpHelper.preferCodec(sdp.sdp, codec);
                 }

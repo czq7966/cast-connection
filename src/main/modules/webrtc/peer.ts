@@ -38,7 +38,7 @@ export interface IPeer extends Cmds.Common.ICommandRooter {
     getRtc(create?: boolean): RTCPeerConnection
     delRtc()
     createDataChannels()
-    getConfig(): Config
+    getConfig(extra?: any): Config
 }
 
 
@@ -244,8 +244,8 @@ export class Peer extends Cmds.Common.CommandRooter implements IPeer  {
         })
     }     
 
-    getConfig(): Config {
-        Services.Cmds.StreamWebrtcEvents.dispatchEventCommand(this, null, null, Cmds.ECommandId.stream_webrtc_ongetconfig)
+    getConfig(extra?: any): Config {
+        Services.Cmds.StreamWebrtcEvents.dispatchEventCommand(this, Cmds.ECommandId.stream_webrtc_ongetconfig, extra, null, null)
         return this.config;
     }    
     getRtc(create: boolean = true): RTCPeerConnection {

@@ -11,7 +11,7 @@ export class Streams{
         let onInactive = (ev) => {
             stream.removeEventListener('inactive', onInactive);              
             streams.notDestroyed && streams.sends.exist(stream.id) &&
-            ServiceCmds.StreamWebrtcEvents.dispatchEventCommand(streams.peer, stream, null, Cmds.ECommandId.stream_webrtc_onsendstreaminactive);
+            ServiceCmds.StreamWebrtcEvents.dispatchEventCommand(streams.peer, Cmds.ECommandId.stream_webrtc_onsendstreaminactive, null, null, stream);
         }
         stream.addEventListener('inactive', onInactive);           
     }
@@ -31,7 +31,7 @@ export class Streams{
         let onInactive = (ev) => {
             stream.removeEventListener('inactive', onInactive);              
             streams.notDestroyed &&  streams.recvs.exist(stream.id) &&
-            ServiceCmds.StreamWebrtcEvents.dispatchEventCommand(streams.peer, stream, null, Cmds.ECommandId.stream_webrtc_onrecvstreaminactive);
+            ServiceCmds.StreamWebrtcEvents.dispatchEventCommand(streams.peer, Cmds.ECommandId.stream_webrtc_onrecvstreaminactive, null, null, stream);
         }
         stream.addEventListener('inactive', onInactive);   
     }

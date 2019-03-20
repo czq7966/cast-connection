@@ -75,13 +75,14 @@ export class StreamWebrtcEvents {
         }      
     }   
 
-    static dispatchEventCommand(peer: Modules.Webrtc.IPeer, userExtra: any,  dataExtra: any, cmdId: Cmds.ECommandId) {
+    static dispatchEventCommand(peer: Modules.Webrtc.IPeer, cmdId: Cmds.ECommandId, dataExtra: any, propExtra: any, userExtra: any) {
         let user = Object.assign({}, peer.user.item);
         user.extra = userExtra;
         let data: Cmds.ICommandData<Cmds.ICommandReqDataProps> = {
             cmdId: cmdId,
             props: {
-                user: user
+                user: user,
+                extra: propExtra
             },
             extra: dataExtra
         }
@@ -92,20 +93,20 @@ export class StreamWebrtcEvents {
         let streams = ev.streams;
         streams.forEach(stream => {    
             !peer.streams.recvs.exist(stream.id) &&
-            this.dispatchEventCommand(peer, stream, null, Cmds.ECommandId.stream_webrtc_onrecvstream);
+            this.dispatchEventCommand(peer, Cmds.ECommandId.stream_webrtc_onrecvstream, null, null, stream);
         })
     }
     static onCommand_peer_stream (peer: Modules.Webrtc.IPeer,ev: any)  {
         adhoc_cast_connection_console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_peer_stream', peer.user); 
         let stream = ev.stream as MediaStream;
         !peer.streams.recvs.exist(stream.id) &&
-        this.dispatchEventCommand(peer, stream, null, Cmds.ECommandId.stream_webrtc_onrecvstream);        
+        this.dispatchEventCommand(peer, Cmds.ECommandId.stream_webrtc_onrecvstream, null, null, stream);        
     }
     static onCommand_peer_addstream(peer: Modules.Webrtc.IPeer,ev: Event) {
         adhoc_cast_connection_console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_peer_addstream', peer.user); 
         let stream = ev['stream'] as MediaStream;
         !peer.streams.recvs.exist(stream.id) &&
-        this.dispatchEventCommand(peer, stream, null, Cmds.ECommandId.stream_webrtc_onrecvstream);
+        this.dispatchEventCommand(peer, Cmds.ECommandId.stream_webrtc_onrecvstream, null, null, stream);
     }   
     static onCommand_peer_icecandidate = (peer: Modules.Webrtc.IPeer, ev: RTCPeerConnectionIceEvent): Promise<any> => {
         adhoc_cast_connection_console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_peer_icecandidate', peer.user); 

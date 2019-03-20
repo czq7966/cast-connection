@@ -8,7 +8,13 @@ export enum EPlatform {
     reactnative = 'reactnative',
     browser = 'browser'
 }
-export class Config {
+export interface IConfig {
+    bandwidth: number
+    codec: string
+    iceServers: RTCIceServer[]
+    rtcConfig: RTCConfiguration    
+}
+export class Config implements IConfig {
     static platform: EPlatform = EPlatform.browser;
     bandwidth: number
     codec: string

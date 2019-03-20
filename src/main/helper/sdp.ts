@@ -25,6 +25,12 @@ export interface IOpusAttributes {
     maxptime?: string
 }
 
+export interface IVp8Attributes {
+    max_fr: number
+    max_recv_width: number
+    max_recv_height: number
+}
+
 export class SdpHelper {
     static preferCodec(sdp: string, codecName: string) {
         var info = this.splitLines(sdp);
@@ -95,7 +101,7 @@ export class SdpHelper {
     }
 
 
-    static splitLines(sdp: string) {
+    static splitLines(sdp: string): ISdpInfo {
         var info: ISdpInfo  = {};
         sdp.split('\n').forEach(line => {
             if (line.indexOf('m=video') === 0) {
@@ -344,6 +350,74 @@ export class SdpHelper {
         sdp = sdpLines.join('\r\n');
         return sdp;
     }
+    static getFmtpAttributes(sdp: string, playloadName: string): Object {
+        let params = {};
+
+        var sdpLines = sdp.split('\r\n');
+        var index = this.findLine(sdpLines, 'a=rtpmap', playloadName);
+        var payload;
+        if (index) {
+            payload = this.getCodecPayloadType(sdpLines[index]);
+        }     
+        if (payload) {
+            var fmtpLineIndex = this.findLine(sdpLines, 'a=fmtp:' + payload.toString());
+            if (fmtpLineIndex !== null) {
+                let fmtpLine = sdpLines[index];
+                let fmtpSecs = fmtpLine.split(' ');
+                for (let idx = 1; idx < fmtpSecs.length; idx++) {
+                    const fmtpSec = fmtpSecs[idx];
+                    let fmtpParams = fmtpSec.split(';');
+                    fmtpParams.forEach(fmtpParam => {                    
+                        let param = fmtpParam.split('=')
+                        if (param.length == 2) {
+                            let key = param[0].trim()
+                            let value = param[1].trim()
+                            params[key] = value;
+                        }
+                    })                    
+                }    
+            }   
+        }     
+     
+        return params;
+    }
+    static setFmtpAttributes(sdp: string, playloadName: string, params: Object): string {
+        params = params || {};
+
+        var sdpLines = sdp.split('\r\n');
+
+        // vp8
+        var index = this.findLine(sdpLines, 'a=rtpmap', playloadName);
+        var payload;
+        if (index) {
+            payload = this.getCodecPayloadType(sdpLines[index]);
+        }
+
+        if (!payload) {
+            return sdp;
+        }
+
+        var fmtpLineIndex = this.findLine(sdpLines, 'a=fmtp:' + payload.toString());
+        let fmtpParams = [];
+        Object.keys(params).forEach(key => {
+            let value = params[key]
+            fmtpParams.push(key + '=' + value);
+        })
+        let appendNext = fmtpParams.join(';');
+
+        var fmtpLine = 'a=fmtp:' + payload.toString();
+        if (appendNext.length > 0)
+            fmtpLine += ' ' + appendNext;
+
+        if (fmtpLineIndex) {
+            sdpLines[fmtpLineIndex] = fmtpLine;
+        } else {
+            sdpLines[index] = sdpLines[index].concat('\r\n'+fmtpLine);    
+        }    
+
+        sdp = sdpLines.join('\r\n');
+        return sdp;
+    }    
 }
 
 // var sdpHelper = new SdpHelper()

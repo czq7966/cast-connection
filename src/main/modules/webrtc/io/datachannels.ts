@@ -92,7 +92,7 @@ export class DataChannels extends Cmds.Common.CommandRooter implements IDataChan
                 this.closeDataChannel(datachannel.rtcdatachannel.label);
                 datachannel.datachannels = this;
                 this.dataChannels[datachannel.rtcdatachannel.label] = datachannel;
-                Services.Cmds.StreamWebrtcEvents.dispatchEventCommand(this.peer, null, label, Cmds.ECommandId.stream_webrtc_ondatachanneladd)
+                Services.Cmds.StreamWebrtcEvents.dispatchEventCommand(this.peer, Cmds.ECommandId.stream_webrtc_ondatachanneladd, label, null, null)
             }
         }
     }
