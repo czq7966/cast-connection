@@ -84,6 +84,7 @@ export enum ECommandId {
     stream_webrtc_ontrack = 'stream_webrtc_ontrack',
     stream_webrtc_onstream = 'stream_webrtc_onstream',
     stream_webrtc_onaddstream = 'stream_webrtc_onaddstream',
+    stream_webrtc_onremovestream = 'stream_webrtc_onremovestream',
     stream_webrtc_onrecvstream = 'stream_webrtc_on_recvstream',
     stream_webrtc_onrecvstreaminactive = 'stream_webrtc_on_recvstreaminactive',
     stream_webrtc_onsendstreaminactive = 'stream_webrtc_on_sendstreaminactive',

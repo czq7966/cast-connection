@@ -20,6 +20,7 @@ export enum ERTCPeerEvents {
     ontrack = 'track',
     onstream = 'stream',
     onaddstream = 'addstream',
+    onremovestream = 'removestream',
     onrecvstream = '_recvstream',
     onrecvstreaminactive = '_recvstreaminactive',
     onsendstreaminactive = '_sendstreaminactive',

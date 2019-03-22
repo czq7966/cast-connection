@@ -59,5 +59,5 @@ export class Streams{
                 this.closeRecvStream(streams, key)
             })
         }
-    }          
+    }       
 }

@@ -18,7 +18,7 @@ export class StreamWebrtcReady {
             extra: {
                 iceRestart: iceRestart
             },
-            respTimeout: 15 * 1000
+            respTimeout: 13 * 1000
         }
         return Common.sendCommandForResp(instanceId, reqData)
     }

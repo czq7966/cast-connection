@@ -24,6 +24,13 @@ export class KeyValue<T> {
     keys(): string[] {
         return Object.keys(this.items);
     }
+    values(): T[] {
+        let values: T[] = []
+        this.keys().forEach(key => {
+            values.push(this.get(key))            
+        })      
+        return values;
+    }
     clear() {
         this.keys().forEach(key => {
             this.del(key)

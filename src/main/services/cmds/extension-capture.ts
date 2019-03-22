@@ -48,7 +48,14 @@ export class ExtensionCapture {
     static getCustomSourceStream(   instanceId: string, 
                                     options?: {
                                         sources?: string[], 
-                                        mandatory?:{frameRate?: number} 
+                                        mandatory?:{
+                                            maxWidth?: number
+                                            minWidth?: number
+                                            maxHeight?: number
+                                            minHeight?: number
+                                            maxFrameRate?: number
+                                            minFrameRate?: number
+                                        } 
                                     } 
                                 ): Promise<any> {
         return new Promise((resolve, reject) => {
@@ -57,8 +64,16 @@ export class ExtensionCapture {
             .then((data: Cmds.ICommandData<any>) => {
                 let media:  Cmds.IDesktopMediaStream = data.extra;
                 if (media && media.sourceId) {
-                    options.mandatory = options.mandatory || {};
-                    options.mandatory.frameRate = options.mandatory.frameRate || 20;
+                    let mandatory = Object.assign({}, options.mandatory || {}) as any;
+                    mandatory.maxWidth = mandatory.maxWidth || 1920;
+                    mandatory.minWidth = mandatory.minWidth || 1;
+                    mandatory.maxHeight = mandatory.maxHeight || 1080;
+                    mandatory.minHeight = mandatory.minHeight || 1;                    
+                    mandatory.maxFrameRate = mandatory.maxFrameRate || 20;
+                    mandatory.minFrameRate = mandatory.minFrameRate || 10;
+                    mandatory.chromeMediaSource = 'desktop';
+                    mandatory.chromeMediaSourceId = media.sourceId;
+                    
                     let constraints = {
                         audio: !( media.canRequestAudioTrack === true) ? false : {
                             mandatory: {
@@ -71,12 +86,7 @@ export class ExtensionCapture {
                             }]                        
                         },
                         video: {
-                            mandatory: {
-                                chromeMediaSource: 'desktop',
-                                chromeMediaSourceId: media.sourceId,
-                                minFrameRate: options.mandatory.frameRate / 2,
-                                maxFrameRate: options.mandatory.frameRate
-                            },
+                            mandatory: mandatory,
                             optional: []
                         }
                     }

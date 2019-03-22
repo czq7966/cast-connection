@@ -96,7 +96,7 @@ export class StreamWebrtcEvents {
             this.dispatchEventCommand(peer, Cmds.ECommandId.stream_webrtc_onrecvstream, null, null, stream);
         })
     }
-    static onCommand_peer_stream (peer: Modules.Webrtc.IPeer,ev: any)  {
+    static onCommand_peer_stream (peer: Modules.Webrtc.IPeer,ev: any)  {        
         adhoc_cast_connection_console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_peer_stream', peer.user); 
         let stream = ev.stream as MediaStream;
         !peer.streams.recvs.exist(stream.id) &&
@@ -138,6 +138,11 @@ export class StreamWebrtcEvents {
                     adhoc_cast_connection_console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_oniceconnectionstatechange', 'Ice Restart'); 
                     let toUser = peer.user.room.owner()
                     StreamWebrtcReady.ready(peer.instanceId, toUser.item, peer.user.item, true)
+                    .catch(err => {
+                        if (peer.notDestroyed) {
+                            rtc.close();
+                        }
+                    })
                 }
             }
         }

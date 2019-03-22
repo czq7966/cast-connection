@@ -17,5 +17,3 @@ switch(process.env.LIBRARY_TARGET) {
 
 export = exp;
 
-
-adhoc_cast_connection_console.log('1111111111111111111', adhoc_cast_connection_console)
