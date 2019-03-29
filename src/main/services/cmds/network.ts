@@ -1,5 +1,6 @@
 import * as Cmds from "../../cmds";
 import * as Modules from '../../modules'
+import { User } from "./user";
 
 
 var Tag = "Service-Cmds-Network"
@@ -49,6 +50,39 @@ export class Network extends Cmds.Common.Base {
         }                
     }
 
+    static InputClient = {
+        Connect: {
+            onBeforeRoot: {
+                req(rooms: Modules.IRooms, cmd: Cmds.CommandLogoutReq) {
+                    adhoc_cast_connection_console.log(Tag, 'InputClient Rooms', 'onBeforeRoot', 'Req', cmd.data)
+                    let room = rooms.getLoginRoom();
+                    if (room) {
+                        let user = room.owner()
+                        if (user) {
+                            user.states.set(Cmds.EUserState.input_client_connect)
+                            User.syncHello(rooms.instanceId, user.item);
+                        }
+                    }
+                }
+            }               
+
+        },
+        Disconnect: {
+            onBeforeRoot: {
+                req(rooms: Modules.IRooms, cmd: Cmds.CommandLogoutReq) {
+                    adhoc_cast_connection_console.log(Tag, 'InputClient Rooms', 'onBeforeRoot', 'Req', cmd.data)
+                    let room = rooms.getLoginRoom();
+                    if (room) {
+                        let user = room.owner()
+                        if (user) {
+                            user.states.reset(Cmds.EUserState.input_client_connect)
+                            User.syncHello(rooms.instanceId, user.item);
+                        }
+                    }
+                }
+            }  
+        }
+    }
 
   
 

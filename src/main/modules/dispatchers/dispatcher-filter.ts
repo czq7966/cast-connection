@@ -5,7 +5,7 @@ export interface IDispatcherFilter extends Cmds.Common.ICommandRooter {
     dispatcher: IDispatcher;
     recvRooter: Cmds.Common.IEventRooter
     sendRooter: Cmds.Common.IEventRooter
-    sendCommand(cmd: Cmds.ICommandData<any>)
+    sendCommand(cmd: Cmds.ICommandData<any>): Promise<any>
     onCommand(cmd: Cmds.ICommandData<any>)
 }
 export class DispatcherFilter extends Cmds.Common.CommandRooter implements IDispatcherFilter {

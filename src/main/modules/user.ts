@@ -19,6 +19,11 @@ export interface IUser extends Cmds.Common.ICommandRooter {
     isSendingStream(): boolean
     sendStream(stream: MediaStream): Promise<any> 
     getStreamRoom(): IRoom
+    syncHello():  Promise<any>
+    hasSendStream(): boolean
+    hasRedvStream(): boolean
+    hasStream(): boolean
+    leaveRoom(): Promise<any>
 }
 
 export class User extends Cmds.Common.CommandRooter implements IUser  {
@@ -190,5 +195,20 @@ export class User extends Cmds.Common.CommandRooter implements IUser  {
     }
     getStreamRoom(): IRoom {
         return Services.Modules.User.getStreamRoom(this);
+    }
+    syncHello(): Promise<any> {
+        return Services.Cmds.User.syncHello(this.instanceId, this.item)
+    }
+    hasSendStream(): boolean {
+        return this.peer.streams.sends.count() > 0
+    }
+    hasRedvStream(): boolean {
+        return this.peer.streams.recvs.count() > 0
+    }
+    hasStream(): boolean {
+        return this.hasRedvStream() || this.hasSendStream()
+    }
+    leaveRoom(): Promise<any> {
+        return Services.Cmds.RoomLeave.leave(this.instanceId, this.item.room)
     }
 }

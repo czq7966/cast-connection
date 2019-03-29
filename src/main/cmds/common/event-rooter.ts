@@ -77,13 +77,15 @@ export class EventRooter extends Base implements IEventRooter {
         let onRoot = EEventEmitterEmit2Result.none;
         let onAfterRoot = EEventEmitterEmit2Result.none;
 
-        onPreventRoot = (this.eventEmitter as any).emit2(EEventRooterEvents.onPreventRoot, ...args) as EEventEmitterEmit2Result;
-        if ((onPreventRoot & EEventEmitterEmit2Result.preventRoot) !== EEventEmitterEmit2Result.preventRoot) {
-            onBeforeRoot = (this.eventEmitter as any).emit2(EEventRooterEvents.onBeforeRoot, ...args) as EEventEmitterEmit2Result;
-            if ((onBeforeRoot & EEventEmitterEmit2Result.preventRoot) !== EEventEmitterEmit2Result.preventRoot) {
-                onRoot = (this.eventEmitter as any).emit2(EEventRooterEvents.onRoot, ...args) as EEventEmitterEmit2Result;
-                if ((onRoot & EEventEmitterEmit2Result.preventRoot) !== EEventEmitterEmit2Result.preventRoot) {
-                    onAfterRoot = (this.eventEmitter as any).emit2(EEventRooterEvents.onAfterRoot, ...args) as EEventEmitterEmit2Result;                
+        if (this.notDestroyed) {
+            onPreventRoot = (this.eventEmitter as any).emit2(EEventRooterEvents.onPreventRoot, ...args) as EEventEmitterEmit2Result;
+            if ((onPreventRoot & EEventEmitterEmit2Result.preventRoot) !== EEventEmitterEmit2Result.preventRoot) {
+                onBeforeRoot = (this.eventEmitter as any).emit2(EEventRooterEvents.onBeforeRoot, ...args) as EEventEmitterEmit2Result;
+                if ((onBeforeRoot & EEventEmitterEmit2Result.preventRoot) !== EEventEmitterEmit2Result.preventRoot) {
+                    onRoot = (this.eventEmitter as any).emit2(EEventRooterEvents.onRoot, ...args) as EEventEmitterEmit2Result;
+                    if ((onRoot & EEventEmitterEmit2Result.preventRoot) !== EEventEmitterEmit2Result.preventRoot) {
+                        onAfterRoot = (this.eventEmitter as any).emit2(EEventRooterEvents.onAfterRoot, ...args) as EEventEmitterEmit2Result;                
+                    }
                 }
             }
         }

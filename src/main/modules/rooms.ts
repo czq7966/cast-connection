@@ -9,6 +9,7 @@ export interface IRooms extends Cmds.Common.IBase {
     dispatcher: Dispatchers.IDispatcher;  
     eventRooter: Cmds.Common.IEventRooter
     getRoom(room: Cmds.IRoom | string): IRoom;
+    getLoginRoom(): IRoom
     removeRoom(roomid: string): IRoom;
     delRoom(roomid: string);
     existRoom(roomid: string): boolean
@@ -60,6 +61,12 @@ export class Rooms extends Cmds.Common.CommandRooter implements IRooms {
                 type === Cmds.ECommandType.resp ?
                     Services.Cmds.RoomJoin.Rooms.onBeforeRoot.resp(this, cmd as any) : null                    
                 break;
+            case Cmds.ECommandId.network_inputclient_connect:
+                Services.Cmds.Network.InputClient.Connect.onBeforeRoot.req(this, cmd as any)
+                break;
+            case Cmds.ECommandId.network_inputclient_disconnect:
+                Services.Cmds.Network.InputClient.Disconnect.onBeforeRoot.req(this, cmd as any)
+                break;                
             default:
                 break;
         }
@@ -97,7 +104,7 @@ export class Rooms extends Cmds.Common.CommandRooter implements IRooms {
     }    
 
     // Room
-    getRoom(room: Cmds.IRoom | string) {
+    getRoom(room: Cmds.IRoom | string): IRoom {
         if (typeof room === 'string') {
             return this.items.get(room)            
         } else {

@@ -31,6 +31,10 @@ export enum ECommandId {
     network_reconnecting = 'network_reconnecting',
     network_ping = 'network_ping',
     network_pong = 'network_pong',
+    //input client for touch back
+    network_inputclient_connect = 'network_inputclient_connect',
+    network_inputclient_connecting = 'network_inputclient_connecting',
+    network_inputclient_disconnect = 'network_inputclient_disconnect',
 
     //admin
     admin_config_update = "admin_config_update",
@@ -130,6 +134,8 @@ export enum EUserState {
     stream_room_sending =       0b10000,
     stream_turn_room_opened =   0b100000,
     stream_turn_room_sending =  0b1000000,
+    input_client_connect =      0b10000000,
+    touchback =                 0b100000000,
 }
 
 //群组数据

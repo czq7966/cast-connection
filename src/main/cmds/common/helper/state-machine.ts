@@ -69,7 +69,12 @@ export class StateMachine<T extends number> {
         this.states = newStates as T;
         let chgStates = oldStates ^ newStates;
         if (chgStates !== 0) {
-            this.onChange.events.emit(ChangeEventName, chgStates, oldStates, newStates)
+            let values: IStateChangeValues = {
+                chgStates: chgStates,
+                oldStates: oldStates,
+                newStates: newStates                
+            }
+            this.onChange.events.emit(ChangeEventName, values)
         }                
         return this.states
     }

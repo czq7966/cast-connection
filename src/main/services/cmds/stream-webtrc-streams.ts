@@ -12,7 +12,12 @@ export class StreamWebrtcStreams {
         let mpRoom = ServiceModules.Room.getParent(mRoom)
         let instanceId = streams.instanceId;        
         let mUser = mpRoom.getUser(streams.peer.user.item.id)
-        streams.sends.count() > 0 ? mUser.states.set(Cmds.EUserState.stream_room_sending) : mUser.states.reset(Cmds.EUserState.stream_room_sending);
+        if (streams.sends.count() > 0) {
+            mUser.states.set(Cmds.EUserState.stream_room_sending)
+        } else {
+            mUser.states.reset(Cmds.EUserState.stream_room_sending);
+            mUser.states.reset(Cmds.EUserState.touchback);
+        }
         return User.syncHello(instanceId, mUser.item);
     }
     static sendStream(streams: Modules.Webrtc.IStreams, stream: MediaStream): Promise<any> {

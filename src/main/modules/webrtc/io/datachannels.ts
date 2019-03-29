@@ -99,7 +99,8 @@ export class DataChannels extends Cmds.Common.CommandRooter implements IDataChan
     createDataChannel(label: string): DataChannel {
         if (this.peer && label) {
             let channel = this.getDataChannel(label);
-            if (!channel) {
+            let rtc = this.peer.getRtc()
+            if (!channel && rtc && rtc.createDataChannel) {
                 let rtcchannel = this.peer.getRtc().createDataChannel(label);
                 channel = new DataChannel(this, rtcchannel);
                 this.addDataChannel(channel);

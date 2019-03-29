@@ -15,6 +15,15 @@ export class Input{
         streams.sends.keys().forEach(key => {
             let stream = streams.sends.get(key);
             let resolution = streams.resolutions.get(stream.id);
+            if (!resolution) {
+                let videoTracks = stream.getVideoTracks();
+                if (videoTracks.length > 0) {
+                    let videoTrack = videoTracks[0]
+                    let capb = videoTrack.getCapabilities()
+                    resolution = {width: capb.width['max'] || capb.width, height: capb.height['max'] || capb.height}
+                    streams.resolutions.add(stream.id, resolution)                    
+                }
+            }
             if (resolution) {
                 evt.sourceX = resolution.width || evt.sourceX;
                 evt.sourceY = resolution.height || evt.sourceY;

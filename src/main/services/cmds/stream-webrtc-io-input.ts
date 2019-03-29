@@ -6,7 +6,8 @@ export class StreamIOInput extends Cmds.Common.Base {
     static InputClient = {
         onAfterRoot: {
             req(inputClient: Modules.Dispatchers.IInputClientFilter, cmd: Cmds.ICommandData<any>) {
-                inputClient.sendCommand(cmd)            
+                inputClient.sendCommand(cmd)
+                .catch(err => {})       
             }                 
         },       
     }

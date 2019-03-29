@@ -18,6 +18,10 @@ export class CommandResp extends Common.Command<Dts.ICommandRespDataProps>{}
     Dts.ECommandId.admin_namespace_reset,
     Dts.ECommandId.admin_namespace_status,
 
+    Dts.ECommandId.network_inputclient_connect,
+    Dts.ECommandId.network_inputclient_connecting,
+    Dts.ECommandId.network_inputclient_disconnect,
+
     Dts.ECommandId.extension_capture_are_you_ready,
     Dts.ECommandId.extension_capture_get_custom_sourceId,
 ].forEach(commanid => {

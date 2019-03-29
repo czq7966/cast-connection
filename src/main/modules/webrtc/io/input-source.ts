@@ -82,39 +82,42 @@ export class InputElement implements IInputElement {
         if (type) {       
             let touches: InputDts.ITouchPoint[] = [];          
             let changedTouches: InputDts.ITouchPoint[] = [];
+            let target = ev.target as HTMLVideoElement;
             for (let i = 0; i < ev.touches.length; i++) {
-                let touch = ev.touches[i];
-                touches.push({
-                    x: touch.clientX,
-                    y: touch.clientY,
+                let touch = ev.touches[i];                
+                let touchEvt = {
+                    x: touch.clientX - target.offsetLeft,
+                    y: touch.clientY - target.offsetTop,
                     radiusX: touch.radiusX,
                     radiusY: touch.radiusY,
                     rotationAngle: touch.rotationAngle,
                     force: touch.force,
                     id: touch.identifier,
                     timestamp: Date.now()
-                })
+                }
+                touches.push(touchEvt)
             }
             for (let i = 0; i < ev.changedTouches.length; i++) {
                 let touch = ev.changedTouches[i];
-                changedTouches.push({
-                    x: touch.clientX,
-                    y: touch.clientY,
+                let touchEvt = {
+                    x: touch.clientX - target.offsetLeft,
+                    y: touch.clientY - target.offsetTop,
                     radiusX: touch.radiusX,
                     radiusY: touch.radiusY,
                     rotationAngle: touch.rotationAngle,
                     force: touch.force,
                     id: touch.identifier,
                     timestamp: Date.now()
-                })
+                }
+                changedTouches.push(touchEvt)
             }            
             
             let event: InputDts.ITouchEvent = {
                 type: type,
                 touches: touches,
                 changedTouches: changedTouches,
-                destX: (ev.target as HTMLVideoElement).offsetWidth,
-                destY: (ev.target as HTMLVideoElement).offsetHeight,
+                destX: target.offsetWidth,
+                destY: target.offsetHeight,
             }
             this.input.sendEvent(event)
             ev.preventDefault();            
