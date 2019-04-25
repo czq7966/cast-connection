@@ -112,7 +112,10 @@ export class StreamWebrtcEvents {
         adhoc_cast_connection_console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_peer_icecandidate', peer.user); 
         let data;
         if (ev.candidate) {
-            data = ev.candidate.toJSON();
+            if (ev.candidate.toJSON)
+                data = ev.candidate.toJSON();
+            else 
+                data = ev.candidate;
         }
         let toUser = peer.user;
         let me = peer.user.room.me();

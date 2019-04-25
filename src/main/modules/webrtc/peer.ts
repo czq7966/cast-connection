@@ -254,6 +254,7 @@ export class Peer extends Cmds.Common.CommandRooter implements IPeer  {
             this.delRtc();
             switch(Config.platform) {
                 case EPlatform.reactnative:
+                case EPlatform.node:
                     this.rtc = new WebRTC.RTCPeerConnection(this.getConfig().rtcConfig)
                     break;
                 default :
@@ -266,7 +267,7 @@ export class Peer extends Cmds.Common.CommandRooter implements IPeer  {
     }    
     delRtc() {
         this.unInitRTCEvents(this.rtc);
-        this.rtc && this.rtc.close();        
+        this.rtc && this.rtc.signalingState != 'closed' && this.rtc.close();        
         delete this.rtc;
     }
     createDataChannels() {

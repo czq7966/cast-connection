@@ -6,7 +6,8 @@ export enum ECodecs {
 }
 export enum EPlatform {
     reactnative = 'reactnative',
-    browser = 'browser'
+    browser = 'browser',
+    node = 'node'
 }
 export interface IConfig {
     bandwidth: number
@@ -101,4 +102,14 @@ export class Config implements IConfig {
             iceTransportPolicy: "all"
         }
     }
+
+    static setPlatform(platform: EPlatform, webrtc?: any) {
+        switch(platform) {
+            case EPlatform.node:
+                global['MediaStream'] = webrtc.MediaStream;
+            default:
+                this.platform = platform;
+        }
+        
+    }    
 }

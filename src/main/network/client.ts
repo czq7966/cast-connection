@@ -55,7 +55,8 @@ export class Client {
             this.socket = io.connect(this.url, {
                 autoConnect: false,
                 reconnection: false,
-                transports: ['websocket']
+                transports: ['websocket'],
+                rejectUnauthorized: true
             });        
             this.socket.compress(true);
             this.initEvents(this.socket);

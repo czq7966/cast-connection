@@ -54,6 +54,7 @@ export class Room extends Cmds.Common.CommandRooter implements IRoom {
         this.item = Object.assign({}, item);
         this.users = new Cmds.Common.Helper.KeyValue();
         this.subEventRooter = new Cmds.Common.EventRooter();
+        this.eventRooter.eventEmitter.setMaxListeners(61);
         this.initEvents();
     }
     destroy() {                

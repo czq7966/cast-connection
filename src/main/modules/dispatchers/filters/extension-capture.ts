@@ -16,10 +16,10 @@ export class ExtensionCaptureMessage extends Cmds.Common.CommandRooter implement
         super.destroy()
     }   
     initEvents() {
-        window && window.addEventListener('message', this.onEventMessage)
+        !Cmds.Common.Helper.HostInfo.IsNode && window && window.addEventListener('message', this.onEventMessage)
     }
     unInitEvents() {
-        window && window.removeEventListener('message', this.onEventMessage)        
+        !Cmds.Common.Helper.HostInfo.IsNode && window && window.removeEventListener('message', this.onEventMessage)        
     }
     onEventMessage = (evt: MessageEvent) => {
         if (evt.source === window) {
@@ -47,7 +47,7 @@ export class ExtensionCaptureMessage extends Cmds.Common.CommandRooter implement
             msg = Object.assign({}, msg)
             delObjFunc(msg)            
         }
-        window && window.postMessage(msg, '*')
+        !Cmds.Common.Helper.HostInfo.IsNode && window && window.postMessage(msg, '*')
     }
 }
 export interface IExtensionCaptureFilter extends IDispatcherFilter {

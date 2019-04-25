@@ -1,14 +1,23 @@
-var isMobileDevice = !!(/Android|webOS|iPhone|iPad|iPod|BB10|BlackBerry|IEMobile|Opera Mini|Mobile|mobile/i.test(navigator.userAgent || ''));
+var isNode = !!(process && process.argv0 && process.argv0 == 'node')
+var isMobileDevice = !isNode && !!(/Android|webOS|iPhone|iPad|iPod|BB10|BlackBerry|IEMobile|Opera Mini|Mobile|mobile/i.test(navigator.userAgent || ''));
 
-var isEdge = navigator.userAgent.indexOf('Edge') !== -1 && (!!navigator.msSaveOrOpenBlob || !!navigator.msSaveBlob);
+var isEdge = !isNode &&  navigator.userAgent.indexOf('Edge') !== -1 && (!!navigator.msSaveOrOpenBlob || !!navigator.msSaveBlob);
 
-var isOpera = !!window["opera"] || navigator.userAgent.indexOf(' OPR/') >= 0;
-var isFirefox = typeof window["InstallTrigger"] !== 'undefined';
-var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-var isChrome = !!window["chrome"] && !isOpera;
-var isIE = typeof document !== 'undefined' && !!document["documentMode"] && !isEdge;
+var isOpera = !isNode &&  (!!window["opera"] || navigator.userAgent.indexOf(' OPR/') >= 0);
+var isFirefox = !isNode &&  typeof window["InstallTrigger"] !== 'undefined';
+var isSafari = !isNode &&  /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+var isChrome = !isNode &&  !!window["chrome"] && !isOpera;
+var isIE = !isNode &&  typeof document !== 'undefined' && !!document["documentMode"] && !isEdge;
 
-function getBrowserInfo() {
+function getHostInfo() {
+    if (isNode) {
+        return {
+            fullVersion: 0,
+            version: 0,
+            name: 0,
+            isPrivateBrowsing: false
+        };
+    }
     var nVer = navigator.appVersion;
     var nAgt = navigator.userAgent;
     var browserName = navigator.appName;
@@ -109,9 +118,10 @@ function getBrowserInfo() {
     };
 }
 
-var info = getBrowserInfo();
+var info = getHostInfo();
 
-export class BrowserInfo {
+export class HostInfo {
+    static IsNode = isNode;
     static IsMobileDevice = isMobileDevice;
     static IsEdge = isEdge;    
     static IsOpera = isOpera;

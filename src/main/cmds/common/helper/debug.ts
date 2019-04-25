@@ -1,3 +1,5 @@
+import { HostInfo } from "./host-info";
+
 export class Debug {
     public static enabled = false;
     public static log(...args: any[]) {
@@ -17,6 +19,9 @@ export class Debug {
     }
     
 }
-
-let _global = window || global 
+let _global
+if (HostInfo.IsNode)
+    _global = global
+else 
+    _global = window
 _global["adhoc_cast_connection_console"] = Debug
