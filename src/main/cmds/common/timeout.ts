@@ -57,12 +57,12 @@ export class CmdTimeout extends Base {
     }
     delCmd(sid: string, removeResp: boolean = true , removeTimeout: boolean = true ) {
         let cmd = this.timers.del(sid);  
-        let handler = this.timers.del(sid) as any;
+        let handler = this.timeoutHandlers.del(sid) as any;
         if (cmd) {
             removeResp && cmd.onResp && this.eventEmitter.removeListener(sid + CmdTimeoutSubfix.onResp, cmd.onResp as any);
             removeTimeout && cmd.onRespTimeout && this.eventEmitter.removeListener(sid + CmdTimeoutSubfix.onTimeout, cmd.onRespTimeout as any);
             if (handler) {
-                delete cmd.extra.timeoutHandler;
+                // delete cmd.extra.timeoutHandler;
                 clearTimeout(handler);
             }
         }
