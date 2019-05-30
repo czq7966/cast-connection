@@ -64,6 +64,8 @@ export enum ECommandId {
 
     //user
     user_state_onchange = 'user_state_onchange',
+    user_get = "user_get",
+    user_set = "user_set",
 
     //webrtc
     stream_webrtc_offer = 'stream_webrtc_offer',

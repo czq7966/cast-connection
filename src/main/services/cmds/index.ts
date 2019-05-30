@@ -27,6 +27,8 @@ export * from './stream-webrtc-io-datachannels'
 export * from './stream-webrtc-io-input'
 
 export * from './user-state-onchange'
+export * from './user-get'
+export * from './user-set'
 
 export * from './admin-config-get'
 export * from './admin-config-update'
