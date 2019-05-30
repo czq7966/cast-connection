@@ -7,3 +7,4 @@ declare var adhoc_cast_connection_console : {
 }
 
 declare var global: any;
+declare var IsNode: boolean;

@@ -1,4 +1,4 @@
-var isNode = !!(process && process.argv0 && process.argv0 == 'node')
+var isNode = !!(IsNode);
 var isMobileDevice = !isNode && !!(/Android|webOS|iPhone|iPad|iPod|BB10|BlackBerry|IEMobile|Opera Mini|Mobile|mobile/i.test(navigator.userAgent || ''));
 
 var isEdge = !isNode &&  navigator.userAgent.indexOf('Edge') !== -1 && (!!navigator.msSaveOrOpenBlob || !!navigator.msSaveBlob);
