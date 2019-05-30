@@ -8,9 +8,12 @@ export class CommandResp extends Common.Command<Dts.ICommandRespDataProps>{}
 
 
 [
-    Dts.ECommandId.network_disconnect,
-    Dts.ECommandId.user_state_onchange,
     Dts.ECommandId.custom,
+
+    Dts.ECommandId.user_state_onchange,
+    Dts.ECommandId.user_get,
+    Dts.ECommandId.user_set,
+
     Dts.ECommandId.admin_config_get,
     Dts.ECommandId.admin_config_update,
     Dts.ECommandId.admin_namespace_close,
@@ -18,6 +21,7 @@ export class CommandResp extends Common.Command<Dts.ICommandRespDataProps>{}
     Dts.ECommandId.admin_namespace_reset,
     Dts.ECommandId.admin_namespace_status,
 
+    Dts.ECommandId.network_disconnect,
     Dts.ECommandId.network_inputclient_connect,
     Dts.ECommandId.network_inputclient_connecting,
     Dts.ECommandId.network_inputclient_disconnect,
