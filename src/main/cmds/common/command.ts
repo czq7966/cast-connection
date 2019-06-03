@@ -122,11 +122,12 @@ export class Command<T extends any> extends Base implements ICommand {
         this.data.cmdId = this.data.cmdId || ((this as any).constructor as ICommandClass).defaultCommandId;
         return EDCoder.sendCommand(this, ...args);
     }
-    sendCommandForResp(...args: any[]): Promise<any> {    
+    sendCommandForResp(beforeDispatch?: Function, ...args: any[]): Promise<any> {    
         return new Promise((resolve, reject) => {
             let onResp = (cmdResp: ICommand) => {                
                 let data = cmdResp.data;
                 if (data.respResult) {
+                    if (!!beforeDispatch) beforeDispatch(cmdResp);
                     EDCoder.dispatch(cmdResp , Dts.ECommandDispatchEvents.onDispatched);
                     resolve(data);
                 } else {
