@@ -1,6 +1,5 @@
 import { EventEmitter } from 'events';
-
-export var DefaultFactorySignalerName = "DefaultFactorySignaler";
+import { Client } from './client';
 
 export interface ISignaler {
     eventEmitter: EventEmitter;
@@ -21,6 +20,7 @@ export interface ISignalerClass {
 
 
 export class SignalerFactory {
+    static DefaultSignalerName: string = "adhoc-cast-connection:network:signaler";
     static classes: {[name:string] : ISignalerClass } = {};
     static register(name: string, iClass: ISignalerClass) {
         if (!!iClass)
@@ -30,7 +30,7 @@ export class SignalerFactory {
         delete this.classes[name];
     }
     static create(name: string, ...args: any[]): ISignaler {        
-        name = !!name ? name : DefaultFactorySignalerName;
+        name = !!name ? name : this.DefaultSignalerName;
         let instance: ISignaler;
         let iClass = this.classes[name];
         if (!!iClass) {
@@ -41,3 +41,4 @@ export class SignalerFactory {
 
 }
 
+SignalerFactory.register(SignalerFactory.DefaultSignalerName, Client);

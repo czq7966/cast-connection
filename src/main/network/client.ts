@@ -1,7 +1,7 @@
 import * as io from 'socket.io-client'
 import * as Dts from '../declare';
 import { EventEmitter } from 'events';
-import { ISignaler, SignalerFactory, DefaultFactorySignalerName } from './signaler';
+import { ISignaler} from './signaler';
 export interface IClient extends ISignaler {
     socket: SocketIOClient.Socket;
 }
@@ -118,5 +118,3 @@ export class Client implements IClient {
         })
     }   
 }
-
-SignalerFactory.register(DefaultFactorySignalerName, Client);
