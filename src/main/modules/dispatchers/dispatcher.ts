@@ -6,11 +6,11 @@ import { IDispatcherFilter } from './dispatcher-filter';
 
 
 export interface IDispatcherConstructorParams extends Cmds.Common.IBaseConstructorParams {
-    signaler: Network.Signaler
+    signaler: Network.ISignaler
 }
 
 export interface IDispatcher extends Cmds.Common.IDispatcher {
-    signaler: Network.Signaler
+    signaler: Network.ISignaler
     eventRooter: Cmds.Common.IEventRooter
     recvFilter: Cmds.Common.IEventRooter;
     sendFilter: Cmds.Common.IEventRooter;
@@ -18,7 +18,7 @@ export interface IDispatcher extends Cmds.Common.IDispatcher {
 }
 
 export class Dispatcher extends Cmds.Common.Base implements IDispatcher {
-    signaler: Network.Signaler
+    signaler: Network.ISignaler
     eventRooter: Cmds.Common.IEventRooter
     recvFilter: Cmds.Common.IEventRooter;
     sendFilter: Cmds.Common.IEventRooter;

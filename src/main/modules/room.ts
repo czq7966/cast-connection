@@ -15,7 +15,7 @@ export interface IRoomParams {
     roomid: string
     password: string
     max?: number
-    Signaler?: Network.Signaler
+    Signaler?: Network.ISignaler
 }
 // export interface IRoom extends IBase, IRoomParams {
 //     users: {[id: string]: IUser}

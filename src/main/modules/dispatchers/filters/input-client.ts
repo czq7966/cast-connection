@@ -7,17 +7,17 @@ import { IDispatcher, Dispatcher } from "../dispatcher";
 import { DispatcherFilter, IDispatcherFilter } from "../dispatcher-filter";
 
 export interface IInputClientFilter extends IDispatcherFilter {
-    wsClient: Network.IClient
+    wsClient: Network.ISignaler
     setEnabled(enalbed: boolean)
 } 
 
 export class InputClientFilter extends DispatcherFilter implements IInputClientFilter {
-    wsClient: Network.IClient
+    wsClient: Network.ISignaler
     enabled: boolean
     timeoutHandler: number
     constructor(dispatcher: IDispatcher, url: string) {
         super(dispatcher);
-        this.wsClient = new Network.Signaler(url);
+        this.wsClient = Network.SignalerFactory.create(null, url);
         this.initEvents();
     }     
     destroy() {

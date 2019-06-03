@@ -1,13 +1,18 @@
-import { Client } from './client'; 
+import { EventEmitter } from 'events';
 
 export var DefaultFactorySignalerName = "DefaultFactorySignaler";
+
 export interface ISignaler {
-    destroy();
-    id(): string;
-    connected(): boolean;
-    connect(url?: string): Promise<any>;
-    disconnect();
-    connecting(): boolean;
+    eventEmitter: EventEmitter;
+    destroy()
+    id(): string 
+    getUrl(): string;    
+    setUrl(value: string);    
+    connected(): boolean
+    connecting(): boolean 
+    connect(url?: string): Promise<any>
+    disconnect()
+    sendCommand(cmd: any): Promise<any>
 }
 
 export interface ISignalerClass {
@@ -24,7 +29,7 @@ export class SignalerFactory {
     static unRegister(name: string) {
         delete this.classes[name];
     }
-    static create(name?: string, ...args: any[]): ISignaler {        
+    static create(name: string, ...args: any[]): ISignaler {        
         name = !!name ? name : DefaultFactorySignalerName;
         let instance: ISignaler;
         let iClass = this.classes[name];
@@ -36,9 +41,3 @@ export class SignalerFactory {
 
 }
 
-
-export class Signaler extends Client implements ISignaler {
-    
-};
-
-SignalerFactory.register(DefaultFactorySignalerName, Signaler);

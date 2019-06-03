@@ -7,22 +7,26 @@ import { Rooms } from './rooms';
 export interface IConnectionConstructorParams extends Cmds.Common.IBaseConstructorParams {
     signalerBase: string
     namespace: string
+    factorySignaler?: string;
+    notInitDispatcherFilters?: boolean;
 }
 export class Connection extends Cmds.Common.Base {    
+    params: IConnectionConstructorParams;
     signalerBase: string
     namespace: string
-    signaler: Network.Signaler;
+    signaler: Network.ISignaler;
     rooms: Rooms;
     dispatcher: Dispatchers.IDispatcher
     dispatcherFitlers: Cmds.Common.Helper.KeyValue<Dispatchers.IDispatcherFilter>
     constructor(params: IConnectionConstructorParams) {
         super(params);
+        this.params = Object.assign({}, params);
         this.instanceId = this.instanceId || Cmds.Common.Helper.uuid();
         this.namespace = params.namespace
         this.signalerBase = params.signalerBase;
         this.dispatcherFitlers = new Cmds.Common.Helper.KeyValue<Dispatchers.IDispatcherFilter>()
 
-        this.signaler = new Network.Signaler();        
+        this.signaler = Network.SignalerFactory.create(params.factorySignaler);
         let pms: Dispatchers.IDispatcherConstructorParams = {
             instanceId: this.instanceId,
             signaler: this.signaler,
@@ -43,13 +47,16 @@ export class Connection extends Cmds.Common.Base {
         delete this.signaler;
         delete this.rooms;
         delete this.dispatcherFitlers;
+        delete this.params;
         super.destroy();
     }
     initEvents() {
-        this.initDispatcherFilters()
+        if (!this.params.notInitDispatcherFilters)
+            this.initDispatcherFilters()
     }
     unInitEvents() {
-        this.unInitDispatcherFilters()        
+        if (!this.params.notInitDispatcherFilters)
+            this.unInitDispatcherFilters()        
     }
     initDispatcherFilters() {
         this.dispatcherFitlers.add(Dispatchers.InputClientFilter.name, new Dispatchers.InputClientFilter(this.dispatcher, "http://localhost:23670"))
@@ -68,7 +75,7 @@ export class Connection extends Cmds.Common.Base {
         this.signalerBase = signalerBase || this.signalerBase;
         user = user || {id: null};
         let instanceId = this.instanceId;
-        this.signaler.url = this.getSignalerUrl();
+        this.signaler.setUrl(this.getSignalerUrl());
         let promise = Services.Cmds.Login.login(instanceId, user);
         return promise;
     }       
