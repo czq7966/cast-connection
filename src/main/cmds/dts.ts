@@ -148,15 +148,11 @@ export interface IRoom {
 }
 export interface ICommandDataProps {
     extra?: any
-}
-
-export interface ICommandReqDataProps extends ICommandDataProps {
     user?: IUser 
+}
 
-}
-export interface ICommandRespDataProps extends ICommandDataProps{
-    user?: IUser
-}
+export interface ICommandReqDataProps extends ICommandDataProps {}
+export interface ICommandRespDataProps extends ICommandDataProps{}
 
 export interface IDesktopMediaStream {
     sourceId: string
