@@ -4,11 +4,12 @@ import { RoomHello } from "./room-hello";
 
 var Tag = 'Service-Cmds-Hello';
 export class Hello extends Cmds.Common.Base {
-    static hello(instanceId: string, fromUser: Cmds.IUser, toUser?: Cmds.IUser) {
+    static hello(instanceId: string, fromUser: Cmds.IUser, toUser?: Cmds.IUser): Promise<any> {
         let cmd = new Cmds.CommandHelloReq({instanceId: instanceId});
-        RoomHello.hello(instanceId, fromUser, toUser, cmd)
+        let promise = RoomHello.hello(instanceId, fromUser, toUser, cmd)
         cmd.destroy();
         cmd = null;
+        return promise;
     }
     static respHello(reqCmd: Cmds.CommandHelloReq, user: Cmds.IUser): Promise<any> {
         let instanceId = reqCmd.instanceId;
