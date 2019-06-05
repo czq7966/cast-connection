@@ -9,6 +9,7 @@ export interface IConnectionConstructorParams extends Cmds.Common.IBaseConstruct
     namespace: string
     factorySignaler?: string;
     notInitDispatcherFilters?: boolean;
+    parent?: Object;
 }
 export class Connection extends Cmds.Common.Base {    
     params: IConnectionConstructorParams;
