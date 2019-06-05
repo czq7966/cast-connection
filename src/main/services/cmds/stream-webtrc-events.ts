@@ -128,6 +128,11 @@ export class StreamWebrtcEvents {
         let rtc = peer.getRtc(false);
         if (rtc) {
             let state = rtc.connectionState;
+            if (state == 'connected') 
+                peer.user.states.set(Cmds.EUserState.stream_room_sending)
+            else 
+                peer.user.states.reset(Cmds.EUserState.stream_room_sending);
+            
             adhoc_cast_connection_console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_onconnectionstatechange', state); 
         }
     }    
