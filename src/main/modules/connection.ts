@@ -94,6 +94,12 @@ export class Connection extends Cmds.Common.Base {
         }
     }
 
+    connect(namespace?: string, signalerBase?: string): Promise<any> {
+        this.namespace = namespace || this.namespace;
+        this.signalerBase = signalerBase || this.signalerBase;
+        this.signaler.setUrl(this.getSignalerUrl());        
+        return this.signaler.connect();
+    }
     disconnect(){
         this.signaler.disconnect();
     }
