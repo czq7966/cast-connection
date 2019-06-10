@@ -36,6 +36,7 @@ export interface IRoom extends Cmds.Common.IBase {
     subEventRooter: Cmds.Common.IEventRooter
     getParent(): IRoom
     getUser(user: Cmds.IUser | string): IUser
+    getUserBySid(sid: string): IUser
     delUser(id: string)
     clearUser()    
     me(): IUser
@@ -227,6 +228,16 @@ export class Room extends Cmds.Common.CommandRooter implements IRoom {
             }
         }
     }    
+    getUserBySid(sid: string): IUser {
+        let result: IUser;
+        this.users.values().some(user => {
+            if (user.item.sid == sid) {
+                result = user;
+                return true;    
+            }
+        });        
+        return result;
+    }
     removeUser(id: string): IUser {
         return this.users.del(id)
     }
