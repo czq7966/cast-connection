@@ -36,7 +36,7 @@ export interface IRoom extends Cmds.Common.IBase {
     subEventRooter: Cmds.Common.IEventRooter
     getParent(): IRoom
     getUser(user: Cmds.IUser | string): IUser
-    getUserBySid(sid: string): IUser
+    getUserBySid(sid: string, isRegex?: boolean): IUser
     delUser(id: string)
     clearUser()    
     me(): IUser
@@ -228,10 +228,11 @@ export class Room extends Cmds.Common.CommandRooter implements IRoom {
             }
         }
     }    
-    getUserBySid(sid: string): IUser {
+    getUserBySid(sid: string, isRegex?: boolean): IUser {
         let result: IUser;
+        let regEx = new RegExp(sid, 'g');
         this.users.values().some(user => {
-            if (user.item.sid == sid) {
+            if (user.item.sid == sid || isRegex && regEx.test(user.item.sid)) {
                 result = user;
                 return true;    
             }
