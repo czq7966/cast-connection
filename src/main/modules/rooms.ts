@@ -36,13 +36,34 @@ export class Rooms extends Cmds.Common.CommandRooter implements IRooms {
 
     initEvents() {
         this.eventRooter.setParent(this.dispatcher.eventRooter);        
+        this.eventRooter.onPreventRoot.add(this.onPreventRoot)
         this.eventRooter.onBeforeRoot.add(this.onBeforeRoot)
         this.eventRooter.onAfterRoot.add(this.onAfterRoot)
     }
     unInitEvents() {
+        this.eventRooter.onPreventRoot.remove(this.onPreventRoot)        
         this.eventRooter.onBeforeRoot.remove(this.onBeforeRoot)
         this.eventRooter.onAfterRoot.remove(this.onAfterRoot)
         this.eventRooter.setParent();        
+    }
+
+    onPreventRoot = (cmd: Cmds.Common.ICommand): any  => {
+        let cmdId = cmd.data.cmdId;
+        let type = cmd.data.type;
+        switch(cmdId) {
+            case Cmds.ECommandId.adhoc_logout:
+                if (type === Cmds.ECommandType.req) {
+                    let mRoom = this.getLoginRoom();
+                    if (mRoom) {
+                        let props = cmd.data.props as Cmds.ICommandDataProps;
+                        if (mRoom.me().item.id == props.user.id) {
+                            console.warn("kicked off!!!");
+                            return Cmds.Common.EEventEmitterEmit2Result.preventRoot;
+                        }
+                    }
+                }
+                break;
+        }
     }
 
     onBeforeRoot = (cmd: Cmds.Common.ICommand): any  => {
