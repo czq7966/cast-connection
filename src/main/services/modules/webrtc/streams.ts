@@ -69,7 +69,7 @@ export class Streams{
             let videoTrack = videoTracks[0]
             if (videoTrack.getCapabilities) {
                 let capb = videoTrack.getCapabilities();
-                resolution = {width: capb.width && capb.width['max'] || capb.width, height: capb.height && capb.height['max'] || capb.height}
+                resolution = {width: (capb.width && capb.width['max'] || capb.width) as any, height: (capb.height && capb.height['max'] || capb.height) as any}
             }
         }        
         return resolution;
