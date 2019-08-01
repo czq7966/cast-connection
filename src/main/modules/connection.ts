@@ -60,7 +60,7 @@ export class Connection extends Cmds.Common.Base {
             this.unInitDispatcherFilters()        
     }
     initDispatcherFilters() {
-        this.dispatcherFitlers.add(Dispatchers.InputClientFilter.name, new Dispatchers.InputClientFilter(this.dispatcher, "http://localhost:23670"))
+        // this.dispatcherFitlers.add(Dispatchers.InputClientFilter.name, new Dispatchers.InputClientFilter(this.dispatcher, "http://localhost:23670"))
         this.dispatcherFitlers.add(Dispatchers.ExtensionCaptureFilter.name, new Dispatchers.ExtensionCaptureFilter(this.dispatcher))
     }
     unInitDispatcherFilters() {

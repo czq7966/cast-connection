@@ -6,6 +6,24 @@ export enum EEventEmitterEmit2Result {
   preventRoot =               0b10,
 }
 
+export class SubEventEmitter {
+  emitter: EventEmitter;
+  event: string
+  constructor(event: string, emitter: EventEmitter) {
+      this.event = event
+      this.emitter = emitter;
+  }
+  destroy() {
+      delete this.event;
+      delete this.emitter;
+  }
+  add(fn: (...args: any[]) => any) {
+      this.emitter.addListener(this.event, fn)
+  }
+  remove(fn: (...args: any[]) => any) {
+      this.emitter.removeListener(this.event, fn)
+  }    
+}
 
 (EventEmitter.prototype as any).emit2 = function(type) {
     var er, handler, len, args, i, listeners, preventRoot, preventDefault;

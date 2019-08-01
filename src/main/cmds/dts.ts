@@ -106,6 +106,8 @@ export enum ECommandId {
     //chrome extension desktop capture
     extension_capture_are_you_ready = 'extension_capture_are_you_ready',
     extension_capture_get_custom_sourceId = 'extension_capture_get_custom_sourceId',
+    extension_capture_on_io_input = 'extension_capture_on_io_input',
+    extension_capture_is_touch_back_supported = 'extension_capture_is_touch_back_supported',
 }
 
 

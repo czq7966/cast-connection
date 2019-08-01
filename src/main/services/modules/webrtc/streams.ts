@@ -8,6 +8,7 @@ var Tag = "Service-Module-Streams"
 export class Streams{
     static addSendStream(streams: Modules.Webrtc.IStreams, stream: MediaStream) {
         streams.sends.add(stream.id, stream);
+        streams.resolutions.add(stream.id, this.getStreamResolution(stream));
         let onInactive = (ev) => {
             stream.removeEventListener('inactive', onInactive);              
             streams.notDestroyed && streams.sends.exist(stream.id) &&
@@ -59,5 +60,18 @@ export class Streams{
                 this.closeRecvStream(streams, key)
             })
         }
-    }       
+    }    
+    
+    static getStreamResolution(stream: MediaStream): Modules.Webrtc.IStreamResolution {
+        let resolution: Modules.Webrtc.IStreamResolution;
+        let videoTracks = stream.getVideoTracks();
+        if (videoTracks.length > 0) {
+            let videoTrack = videoTracks[0]
+            if (videoTrack.getCapabilities) {
+                let capb = videoTrack.getCapabilities();
+                resolution = {width: capb.width && capb.width['max'] || capb.width, height: capb.height && capb.height['max'] || capb.height}
+            }
+        }        
+        return resolution;
+    }
 }

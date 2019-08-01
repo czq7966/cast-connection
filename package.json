@@ -1,6 +1,6 @@
 {
-  "name": "@sdp.nd/adhoc-cast-connection",
-  "version": "2.1.6",
+  "name": "adhoc-cast-connection",
+  "version": "2.2.1",
   "description": "nd adhoc cast connection",
   "main": "index.js",
   "scripts": {
@@ -37,7 +37,6 @@
     "webrtc-adapter": "^6.4.6"
   },
   "dependencies": {
-    "socket.io-client": "2.1.1",
-    "wrtc": "^0.3.7"
+    "socket.io-client": "2.1.1"
   }
 }

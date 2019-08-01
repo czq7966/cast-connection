@@ -28,6 +28,7 @@ export class CommandResp extends Common.Command<Dts.ICommandRespDataProps>{}
 
     Dts.ECommandId.extension_capture_are_you_ready,
     Dts.ECommandId.extension_capture_get_custom_sourceId,
+    Dts.ECommandId.extension_capture_is_touch_back_supported,
 ].forEach(commanid => {
     Common.CommandTypes.RegistCommandType({
         cmdId: commanid,

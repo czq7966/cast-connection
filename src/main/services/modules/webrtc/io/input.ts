@@ -19,9 +19,11 @@ export class Input{
                 let videoTracks = stream.getVideoTracks();
                 if (videoTracks.length > 0) {
                     let videoTrack = videoTracks[0]
-                    let capb = videoTrack.getCapabilities();
-                    resolution = {width: capb.width && capb.width['max'] || capb.width, height: capb.height && capb.height['max'] || capb.height}
-                    streams.resolutions.add(stream.id, resolution)                    
+                    if (videoTrack.getCapabilities) {
+                        let capb = videoTrack.getCapabilities();
+                        resolution = {width: capb.width && capb.width['max'] || capb.width, height: capb.height && capb.height['max'] || capb.height}
+                        streams.resolutions.add(stream.id, resolution)                    
+                    }
                 }
             }
             if (resolution) {
