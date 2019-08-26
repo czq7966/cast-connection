@@ -20,6 +20,7 @@ export class CommandResp extends Common.Command<Dts.ICommandRespDataProps>{}
     Dts.ECommandId.admin_namespace_open,
     Dts.ECommandId.admin_namespace_reset,
     Dts.ECommandId.admin_namespace_status,
+    Dts.ECommandId.admin_users_get,
 
     Dts.ECommandId.network_disconnect,
     Dts.ECommandId.network_inputclient_connect,

@@ -43,6 +43,7 @@ export enum ECommandId {
     admin_namespace_open = "admin_namespace_open",
     admin_namespace_reset = "admin_namespace_reset",
     admin_namespace_status = "admin_namespace_status", 
+    admin_users_get = "admin_users_get", 
 
     //room
     adhoc_login = 'adhoc_login',
