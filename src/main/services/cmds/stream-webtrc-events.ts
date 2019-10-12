@@ -158,7 +158,13 @@ export class StreamWebrtcEvents {
     static onCommand_peer_signalingstatechange = (peer: Modules.Webrtc.IPeer) => {
         let rtc = peer.getRtc(false);
         if (rtc) {
-            let state = rtc.signalingState
+            let state = rtc.signalingState;
+            if (!rtc.connectionState) {
+                if (state == 'stable') 
+                    peer.user.states.set(Cmds.EUserState.stream_room_sending)
+                else 
+                    peer.user.states.reset(Cmds.EUserState.stream_room_sending);
+            }
             adhoc_cast_connection_console.log(Tag, 'Peer', peer.user.item.room.id , 'onCommand_onsignalingstatechange', state); 
         }        
     }
