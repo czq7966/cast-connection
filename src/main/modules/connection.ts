@@ -7,6 +7,7 @@ import { Rooms } from './rooms';
 export interface IConnectionConstructorParams extends Cmds.Common.IBaseConstructorParams {
     signalerBase: string
     namespace: string
+    path?: string
     factorySignaler?: string;
     notInitDispatcherFilters?: boolean;
     parent?: Object;
@@ -76,7 +77,7 @@ export class Connection extends Cmds.Common.Base {
         this.signalerBase = signalerBase || this.signalerBase;
         user = user || {id: null};
         let instanceId = this.instanceId;
-        this.signaler.setUrl(this.getSignalerUrl());
+        this.signaler.setUrl(this.getSignalerUrl(), this.params.path);
         let promise = Services.Cmds.Login.login(instanceId, user);
         return promise;
     }       
@@ -97,7 +98,7 @@ export class Connection extends Cmds.Common.Base {
     connect(namespace?: string, signalerBase?: string): Promise<any> {
         this.namespace = namespace || this.namespace;
         this.signalerBase = signalerBase || this.signalerBase;
-        this.signaler.setUrl(this.getSignalerUrl());        
+        this.signaler.setUrl(this.getSignalerUrl(), this.params.path);        
         return this.signaler.connect();
     }
     disconnect(){

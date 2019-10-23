@@ -10,11 +10,13 @@ export class Client implements IClient {
     eventEmitter: EventEmitter;
     socket: SocketIOClient.Socket;
     _url: string;
+    _path: string;    
     _connecting: boolean;
 
-    constructor(url?: string) {
+    constructor(url?: string, path?: string) {
         this.eventEmitter = new EventEmitter();
         this._url = url;   
+        this._path = url;
     }
     destroy() {
         this.eventEmitter.removeAllListeners();
@@ -29,9 +31,16 @@ export class Client implements IClient {
     getUrl(): string {
         return this._url;
     }
-    setUrl(value: string) {
+    setUrl(value: string, path?: string) {
         this._url = value;
+        this._path = path || this._path;
     }
+    getPath(): string {
+        return this._path;
+    }
+    setPath(value: string) {
+        this._path = value;
+    }    
 
     connected(): boolean {
         return this.socket && this.socket.connected
@@ -40,7 +49,7 @@ export class Client implements IClient {
         return this._connecting;
     }
 
-    connect(url?: string): Promise<any> {
+    connect(url?: string, path?: string): Promise<any> {
         if (this.connected()) {
             return Promise.resolve()
         }
@@ -48,13 +57,15 @@ export class Client implements IClient {
         let promise = new Promise((resolve, reject) => {
             delete this.socket;
             url = url || this.getUrl() || "";
-            url = url[url.length - 1] !== '/' ? url : url.substr(0, url.length - 1);            
+            url = url[url.length - 1] !== '/' ? url : url.substr(0, url.length - 1);  
+            path = path || this.getPath();          
             this.setUrl(url || this.getUrl());
             this.socket = io.connect(this.getUrl(), {
                 autoConnect: false,
                 reconnection: false,
                 transports: ['websocket'],
-                rejectUnauthorized: true
+                rejectUnauthorized: true,
+                path: path
             });        
             this.socket.compress(true);
             this.initEvents(this.socket);

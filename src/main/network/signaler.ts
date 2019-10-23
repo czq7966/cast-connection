@@ -6,7 +6,7 @@ export interface ISignaler {
     destroy()
     id(): string 
     getUrl(): string;    
-    setUrl(value: string);    
+    setUrl(value: string, path?: string);    
     connected(): boolean
     connecting(): boolean 
     connect(url?: string): Promise<any>
