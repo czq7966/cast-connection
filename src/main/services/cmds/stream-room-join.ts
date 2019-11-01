@@ -15,14 +15,19 @@ export class StreamRoomJoin extends Cmds.Common.Base {
         return new Promise((resolve, reject) => {
             this.join(instanceId, toUser.room)
             .then(() => {
-                let mMe =  ServiceModules.Rooms.getRoom(instanceId, toUser.room.id).me();
-                StreamRoomHello.hello(instanceId, mMe.item, toUser)
-                .then(data =>{
-                    resolve(data)
-                })
-                .catch(err => {
-                    reject(err)
-                })
+                let mRoom = ServiceModules.Rooms.getRoom(instanceId, toUser.room.id);
+                let mMe =  mRoom && mRoom.me();
+                if (!!mMe) {
+                    StreamRoomHello.hello(instanceId, mMe.item, toUser)
+                    .then(data =>{
+                        resolve(data)
+                    })
+                    .catch(err => {
+                        reject(err)
+                    })
+                } else {
+                    reject("have been destroyed for reason!");
+                }
             })
             .catch(err => {
                 reject(err)

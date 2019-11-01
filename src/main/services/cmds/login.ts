@@ -58,4 +58,15 @@ export class Login extends Cmds.Common.Base {
             }
         }
     }    
+    static Connection = {
+        onBeforeRoot: {
+            resp(connection: Modules.IConnection, cmd: Cmds.CommandLoginResp) {
+                adhoc_cast_connection_console.log(Tag, 'Connection', 'onBeforeRoot', 'Resp', cmd.data)
+                let data = cmd.data;
+                if (data.respResult && data.extra) {
+                    Object.assign(connection.params, data.extra);
+                }
+            }
+        }        
+    }
 }

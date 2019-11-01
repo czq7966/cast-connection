@@ -7,7 +7,12 @@ import { Common } from "./common";
 var Tag = "Service-Cmds-StreamWebrtcReady"
 export class StreamWebrtcReady {
     static ready(instanceId: string, toUser: Cmds.IUser, fromUser?: Cmds.IUser, iceRestart?: boolean): Promise<any> {
-        fromUser = fromUser || ServiceModules.Rooms.getRoom(instanceId, toUser.room.id).me().item;
+        let mRoom = ServiceModules.Rooms.getRoom(instanceId, toUser.room.id);
+        if (!mRoom || !mRoom.notDestroyed) {
+            return Promise.reject("have been destroyed for some reason!");
+        }
+
+        fromUser = fromUser || mRoom.me().item;
         let user = Object.assign({}, fromUser);
         let reqData: Cmds.Common.ICommandData<Cmds.ICommandReqDataProps> = {
             cmdId: Cmds.ECommandId.stream_webrtc_ready,

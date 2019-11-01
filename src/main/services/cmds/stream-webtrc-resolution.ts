@@ -4,7 +4,7 @@ import * as ServiceModules from '../modules/index'
 import { User } from "./user";
 import { StreamWebrtcSdp } from './stream-webtrc-sdp'
 
-var Tag = "Service-Cmds-StreamWebrtcEvents"
+var Tag = "Service-Cmds-StreamWebrtcResolution"
 export class StreamWebrtcResolution {
     static Streams = {
         onBeforeRoot: {
