@@ -12,95 +12,39 @@ export enum EPlatform {
 export interface IConfig {
     bandwidth: number
     codec: string
-    iceServers: RTCIceServer[]
     rtcConfig: RTCConfiguration    
 }
 export class Config implements IConfig {
     static platform: EPlatform = EPlatform.browser;
+    static Default: Config = new Config(0, ECodecs.default, {
+                                                iceTransportPolicy: "all",
+                                                iceServers: [
+                                                    {
+                                                        'urls': [
+                                                            'stun:servicediscovery.mypromethean.com:3478',
+                                                            'stun:servicediscovery.mypromethean.com?transport=udp',
+                                                        ]
+                                                    },
+                                                    {
+                                                        'urls': [
+                                                            'turn:servicediscovery.mypromethean.com:3478',
+                                                            // 'turn:adhoc-turn.101.com:3478?transport=tcp',
+                                                            // 'turn:adhoc-turn.101.com:3478?transport=udp',
+                                                        ],
+                                                        'username': 'u1',
+                                                        'credential': 'p1' 
+                                                    },          
+                                                ]
+                                            }
+                                        );
     bandwidth: number
     codec: string
-    iceServers: RTCIceServer[]
     rtcConfig: RTCConfiguration
 
-    constructor() {
-        this.bandwidth = 0;
-        this.codec = ECodecs.default;
-        this.iceServers = [
-            {
-                'urls': [
-                    'stun:adhoc-turn.101.com:3478',
-                    'stun:adhoc-turn.101.com:3478?transport=udp',
-                ]
-            },    
-            // {
-            //     'urls': [
-            //         // 'turn:192.168.252.87:3478',
-            //         'turn:192.168.252.87:3478?transport=udp',
-            //     ],
-            //     'username': 'test',
-            //     'credential': 'test'   
-            // },           
-            {
-                'urls': [
-                    'turn:adhoc-turn.101.com:3478',
-                    // 'turn:adhoc-turn.101.com:3478?transport=tcp',
-                    // 'turn:adhoc-turn.101.com:3478?transport=udp',
-                ],
-                'username': 'u1',
-                'credential': 'p1' 
-            },                
-            // {
-            //     'urls': [
-            //         'turn:webrtcweb.com:7788', // coTURN 7788+8877
-            //         'turn:webrtcweb.com:4455?transport=udp', // restund udp
-
-            //         'turn:webrtcweb.com:8877?transport=udp', // coTURN udp
-            //         'turn:webrtcweb.com:8877?transport=tcp', // coTURN tcp
-            //     ],
-            //     'username': 'muazkh',
-            //     'credential': 'muazkh'
-            // },
-              
-            // {
-            //     urls: ['turn:numb.viagenie.ca'],
-            //     credential: 'muazkh',
-            //     username: 'webrtc@live.com'
-            // },
-            // {
-            //     urls: ['turn:turn.bistri.com:80'],
-            //     credential: 'homeo',
-            //     username: 'homeo'                         
-            // }
-            // {
-            //     'urls': [
-            //         'stun:webrtcweb.com:7788', // coTURN
-            //         'stun:webrtcweb.com:7788?transport=udp', // coTURN
-            //     ],
-            //     'username': 'muazkh',
-            //     'credential': 'muazkh'
-            // },
-            // {
-            //     'urls': [
-            //         'turn:webrtcweb.com:7788', // coTURN 7788+8877
-            //         'turn:webrtcweb.com:4455?transport=udp', // restund udp
-
-            //         'turn:webrtcweb.com:8877?transport=udp', // coTURN udp
-            //         'turn:webrtcweb.com:8877?transport=tcp', // coTURN tcp
-            //     ],
-            //     'username': 'muazkh',
-            //     'credential': 'muazkh'
-            // },
-            // {
-            //     'urls': [
-            //         'stun:stun.l.google.com:19302',
-            //         'stun:stun.l.google.com:19302?transport=udp',
-            //     ]
-            // }            
-        ]
-        this.rtcConfig = {
-            iceServers: this.iceServers,
-            iceTransportPolicy: "all"
-        }
+    constructor(bandwidth?: number, codec?: ECodecs, rtcConfig?: RTCConfiguration) {
+        this.bandwidth = bandwidth != null ? bandwidth : Config.Default.bandwidth;
+        this.codec = codec != null ? codec : Config.Default.codec;
+        this.rtcConfig = rtcConfig != null ? rtcConfig : Config.Default.rtcConfig;
     }
 
     static setPlatform(platform: EPlatform, webrtc?: any) {

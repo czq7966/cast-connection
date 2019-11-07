@@ -65,6 +65,7 @@ export class Login extends Cmds.Common.Base {
                 let data = cmd.data;
                 if (data.respResult && data.extra) {
                     Object.assign(connection.params, data.extra);
+                    Object.assign(Modules.Webrtc.Config.Default, data.extra);
                 }
             }
         }        
