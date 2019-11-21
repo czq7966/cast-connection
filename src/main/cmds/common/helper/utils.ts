@@ -14,16 +14,13 @@ export function calResolutionRange(x: number, y: number, x1: number, y1: number,
         _y2 = _x1 * y / x;
         _x2 = x2 - (x1-_x1);
         _y1 = y1 - (y2 - _y2);            
-    } else if (z > z1 && z < z2) {
+    } else if (z >= z1 && z <= z2) {
         let xoff = 0;
         let yoff = 0;
         if ( x < x1) {
             xoff = x1 - x;
             yoff = y1 - y;                
-        } else if (x > x2) {
-            xoff = x - x2;
-            yoff = y - y2;
-        } 
+        }
         _x1 = x1 - xoff;
         _x2 = x2 - xoff;
         _y1 = y1 - yoff;
