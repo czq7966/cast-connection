@@ -3,8 +3,34 @@ import * as Common from './common/index'
 
 
 export class CommandCommon extends Common.Command<any>  {}
-export class CommandReq extends Common.Command<Dts.ICommandReqDataProps>{}
-export class CommandResp extends Common.Command<Dts.ICommandRespDataProps>{}
+export class CommandReq extends Common.Command<Dts.ICommandReqDataProps>{
+    static req(instanceId: string, data: Dts.ICommandData<Dts.ICommandReqDataProps>, waitForResp?: boolean): Promise<any> {
+        let cmd = new CommandReq({instanceId: instanceId})            
+        cmd.data = data;
+        let promise: Promise<any>;
+        if (waitForResp) {
+            promise = cmd.sendCommandForResp();
+        } else {
+            promise = cmd.sendCommand();
+        }
+
+        cmd.destroy();
+        cmd = null;  
+        return promise;
+    }
+}
+export class CommandResp extends Common.Command<Dts.ICommandRespDataProps>{
+    static resp(reqCmd: CommandReq, data: Dts.ICommandData<Dts.ICommandReqDataProps>) {
+        let cmd = new CommandResp({instanceId: reqCmd.instanceId})            
+        cmd.data = data;
+        cmd.data.sessionId = data.sessionId || reqCmd.data.sessionId;
+        cmd.data.to = cmd.data.to || reqCmd.data.from;
+        let promise = cmd.sendCommand();
+        cmd.destroy();
+        cmd = null;  
+        return promise;        
+    }
+}
 
 
 [
