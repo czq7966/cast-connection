@@ -51,4 +51,8 @@ export class User {
         }
         Modules.Dispatchers.Dispatcher.getInstance<Modules.Dispatchers.Dispatcher>(instanceId, false).onCommand(data);
     }     
+
+    static async dispatchCommand2(instanceId: string, cmd: Cmds.ICommandData<any>) {
+        Modules.Dispatchers.Dispatcher.getInstance<Modules.Dispatchers.Dispatcher>(instanceId, false).onCommand(cmd);
+    }         
 }

@@ -23,6 +23,8 @@ export class CommandResp extends Common.Command<Dts.ICommandRespDataProps>{
     static resp(reqCmd: CommandReq, data: Dts.ICommandData<Dts.ICommandReqDataProps>) {
         let cmd = new CommandResp({instanceId: reqCmd.instanceId})            
         cmd.data = data;
+        cmd.data.cmdId = cmd.data.cmdId || reqCmd.data.cmdId;
+        cmd.data.type = cmd.data.type || Dts.ECommandType.resp;
         cmd.data.sessionId = data.sessionId || reqCmd.data.sessionId;
         cmd.data.to = cmd.data.to || reqCmd.data.from;
         let promise = cmd.sendCommand();

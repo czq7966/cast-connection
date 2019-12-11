@@ -22,4 +22,19 @@ export class User{
     static CurrentUser(instanceId: string): Modules.IUser {
         return Rooms.getLoginRoom(instanceId).me();
     }
+    static getMyRecvStream(instanceId: string, userId: string): MediaStream {
+        let mLoginRomm = Rooms.getLoginRoom(instanceId);
+        let mUser = mLoginRomm ? mLoginRomm.getUser(userId) : null;
+        let mStreamRoom = mUser ? mUser.getStreamRoom() : null;
+        let mMe = mStreamRoom ? mStreamRoom.me() : null;
+        let streams = mMe ? mMe.peer.streams.recvs.values() : null;
+        return  (streams && streams.length > 0) ? streams[0] : null;
+    }
+
+    static getStreamRoom2(instanceId: string, userId: string): Modules.IRoom {
+        let mLoginRomm = Rooms.getLoginRoom(instanceId);
+        let mUser = mLoginRomm ? mLoginRomm.getUser(userId) : null;
+        let mStreamRoom = mUser ? mUser.getStreamRoom() : null;
+        return mStreamRoom;
+    }    
 }

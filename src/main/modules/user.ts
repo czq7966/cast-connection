@@ -22,6 +22,7 @@ export interface IUser extends Cmds.Common.ICommandRooter {
     syncHello():  Promise<any>
     hasSendStream(): boolean
     hasRedvStream(): boolean
+    hasRecvStream(): boolean
     hasStream(): boolean
     leaveRoom(): Promise<any>
 }
@@ -202,7 +203,11 @@ export class User extends Cmds.Common.CommandRooter implements IUser  {
     hasSendStream(): boolean {
         return this.peer.streams.sends.count() > 0
     }
+    
     hasRedvStream(): boolean {
+        return this.hasRecvStream();
+    }
+    hasRecvStream(): boolean {
         return this.peer.streams.recvs.count() > 0
     }
     hasStream(): boolean {
