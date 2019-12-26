@@ -33,6 +33,10 @@ export class StreamWebrtcStreams {
             if (!streams.sends.exist(stream.id)) {
                 ServiceModules.Webrtc.Streams.addSendStream(streams, stream);            
                 (peer.getRtc() as any).addStream(stream);
+                peer.getRtc().getSenders().forEach(sender => {
+                    let parameters = sender.getParameters();
+                    parameters.degradationPreference = "maintain-resolution";
+                })
                 peer.createDataChannels();
             }
             let promise = StreamWebrtcSdp.offer(mUser);            

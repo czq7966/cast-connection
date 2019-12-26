@@ -57,6 +57,9 @@ export class Streams extends Cmds.Common.CommandRooter {
             case Cmds.ECommandId.stream_webrtc_resolution:
                     Services.Cmds.StreamWebrtcResolution.Streams.onBeforeRoot.req(this, cmd as any)
                 break;             
+            case Cmds.ECommandId.stream_webrtc_video_constraints:
+                    Services.Cmds.StreamWebrtcVideoConstraints.Streams.onBeforeRoot.req(this, cmd as any)
+                break;                             
             default:
                 break;
         }

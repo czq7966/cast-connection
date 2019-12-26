@@ -21,7 +21,10 @@ export class Peer{
                     sdp.sdp = Helper.SdpHelper.preferCodec(sdp.sdp, codec);
                 }
                 if (bandwidth > 0) {                     
-                    sdp.sdp = Helper.SdpHelper.setVideoBitrates(sdp.sdp, {start: bandwidth, min:bandwidth, max: bandwidth})
+                    // sdp.sdp = Helper.SdpHelper.setVideoBitrates(sdp.sdp, {start: bandwidth, min:bandwidth, max: bandwidth})
+                    sdp.sdp = Helper.SdpHelper.updateBandwidthRestriction(sdp.sdp, bandwidth);
+                } else {
+                    sdp.sdp = Helper.SdpHelper.removeBandwidthRestriction(sdp.sdp);
                 }
                 // sdp.sdp = sdpHelper.disableNACK(sdp.sdp);
                 rtc.setLocalDescription(sdp)
@@ -131,6 +134,7 @@ export class Peer{
     }       
 
     static setAnswer(peer: Modules.Webrtc.IPeer, data: any): Promise<any>  {
+        data.sdp =  Helper.SdpHelper.removeBandwidthRestriction(data.sdp);
         switch(Modules.Webrtc.Config.platform) {
             case Modules.Webrtc.EPlatform.reactnative :
                 return this.setAnswer_reactnative(peer, data);
@@ -192,5 +196,17 @@ export class Peer{
             adhoc_cast_connection_console.log('add IceCandidate error:', err)
         })
     }       
-
+    static async setSenderMaxBitrate(peer: Modules.Webrtc.IPeer, maxBitrate: number) {
+        let promises = [];
+        let rtc = peer && peer.rtc;
+        rtc && rtc.getSenders().forEach(sender => {
+            let parameters = sender.getParameters();            
+            parameters.encodings.forEach(encoding => {
+                delete encoding.maxBitrate;
+                encoding.maxBitrate = maxBitrate;
+            })
+            promises.push(sender.setParameters(parameters));
+        })
+        await Promise.all(promises);
+    }    
 }

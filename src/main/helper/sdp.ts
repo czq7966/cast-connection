@@ -5,6 +5,9 @@ export interface ISdpInfo {
     vp8LineNumber?: string
     vp9LineNumber?: string
     h264LineNumber?: string
+    vp8LineNumbers?: Array<string>
+    vp9LineNumbers?: Array<string>
+    h264LineNumbers?: Array<string>
 
 }
 
@@ -39,17 +42,17 @@ export class SdpHelper {
             return sdp;
         }
 
-        if (codecName === 'vp8' && info.vp8LineNumber === info.videoCodecNumbers[0]) {
-            return sdp;
-        }
+        // if (codecName === 'vp8' && info.vp8LineNumber === info.videoCodecNumbers[0]) {
+        //     return sdp;
+        // }
 
-        if (codecName === 'vp9' && info.vp9LineNumber === info.videoCodecNumbers[0]) {
-            return sdp;
-        }
+        // if (codecName === 'vp9' && info.vp9LineNumber === info.videoCodecNumbers[0]) {
+        //     return sdp;
+        // }
 
-        if (codecName === 'h264' && info.h264LineNumber === info.videoCodecNumbers[0]) {
-            return sdp;
-        }
+        // if (codecName === 'h264' && info.h264LineNumber === info.videoCodecNumbers[0]) {
+        //     return sdp;
+        // }
 
         sdp = this.preferCodecHelper(sdp, codecName, info);
 
@@ -58,12 +61,14 @@ export class SdpHelper {
 
     static preferCodecHelper(sdp: string, codec: string, info: ISdpInfo, ignore?: boolean) {
         var preferCodecNumber = '';
+        var preferCodecNumbers = [];
 
         if (codec === 'vp8') {
             if (!info.vp8LineNumber) {
                 return sdp;
             }
             preferCodecNumber = info.vp8LineNumber;
+            preferCodecNumbers = info.vp8LineNumbers;
         }
 
         if (codec === 'vp9') {
@@ -71,6 +76,7 @@ export class SdpHelper {
                 return sdp;
             }
             preferCodecNumber = info.vp9LineNumber;
+            preferCodecNumbers = info.vp9LineNumbers;
         }
 
         if (codec === 'h264') {
@@ -79,22 +85,30 @@ export class SdpHelper {
             }
 
             preferCodecNumber = info.h264LineNumber;
+            preferCodecNumbers = info.h264LineNumbers;
         }
 
         var newLine = info.videoCodecNumbersOriginal.split('SAVPF')[0] + 'SAVPF ';
 
         var newOrder = [preferCodecNumber];
+        var newOrders = preferCodecNumbers;
 
         if (ignore) {
             newOrder = [];
+            newOrders = [];
         }
 
         info.videoCodecNumbers.forEach(function(codecNumber) {
-            if (codecNumber === preferCodecNumber) return;
-            newOrder.push(codecNumber);
+            // if (codecNumber === preferCodecNumber) return;
+            if (newOrder.indexOf(codecNumber) < 0)
+                newOrder.push(codecNumber);
+            if (newOrders.indexOf(codecNumber) < 0)
+                newOrders.push(codecNumber);
+
         });
 
-        newLine += newOrder.join(' ');
+        // newLine += newOrder.join(' ');
+        newLine += newOrders.join(' ');
 
         sdp = sdp.replace(info.videoCodecNumbersOriginal, newLine);
         return sdp;
@@ -106,6 +120,9 @@ export class SdpHelper {
         sdp.split('\n').forEach(line => {
             if (line.indexOf('m=video') === 0) {
                 info.videoCodecNumbers = [];
+                info.vp8LineNumbers = [];
+                info.vp9LineNumbers = [];
+                info.h264LineNumbers = [];
                 line.split('SAVPF')[1].split(' ').forEach(codecNumber => {
                     codecNumber = codecNumber.trim();
                     if (!codecNumber || !codecNumber.length) return;
@@ -114,18 +131,32 @@ export class SdpHelper {
                 });
             }
 
-            if (line.indexOf('VP8/90000') !== -1 && !info.vp8LineNumber) {
+            // if (line.indexOf('VP8/90000') !== -1 && !info.vp8LineNumber) {
+            if (line.indexOf('VP8/90000') !== -1) {
                 info.vp8LineNumber = line.replace('a=rtpmap:', '').split(' ')[0];
+                info.vp8LineNumbers.push(info.vp8LineNumber);
             }
 
-            if (line.indexOf('VP9/90000') !== -1 && !info.vp9LineNumber) {
+            // if (line.indexOf('VP9/90000') !== -1 && !info.vp9LineNumber) {
+            if (line.indexOf('VP9/90000') !== -1) {
                 info.vp9LineNumber = line.replace('a=rtpmap:', '').split(' ')[0];
+                info.vp9LineNumbers.push(info.vp9LineNumber);
             }
 
-            if (line.indexOf('H264/90000') !== -1 && !info.h264LineNumber) {
+            // if (line.indexOf('H264/90000') !== -1 && !info.h264LineNumber) {                
+            if (line.indexOf('H264/90000') !== -1) {
                 info.h264LineNumber = line.replace('a=rtpmap:', '').split(' ')[0];
+                // if (info.h264LineNumbers.indexOf("125") < 0)
+                //     info.h264LineNumbers.push("125");    
+                if (info.h264LineNumbers.indexOf(info.h264LineNumber) < 0) {
+                    info.h264LineNumbers.push(info.h264LineNumber);
+                }
             }
         });
+
+        info.vp8LineNumber = info.vp8LineNumbers.length > 0 ? info.vp8LineNumbers[0] : null;
+        info.vp9LineNumber = info.vp9LineNumbers.length > 0 ? info.vp9LineNumbers[0] : null;
+        info.h264LineNumber = info.h264LineNumbers.length > 0 ? info.h264LineNumbers[0] : null;
 
         return info;
     }
@@ -418,6 +449,22 @@ export class SdpHelper {
         sdp = sdpLines.join('\r\n');
         return sdp;
     }    
+
+    static removeBandwidthRestriction(sdp: string): string {
+        return sdp.replace(/b=AS:.*\r\n/, '').replace(/b=TIAS:.*\r\n/, '');
+    }    
+    static updateBandwidthRestriction(sdp: string, bandwidth: number): string { //bindwidth is Kbps
+        let modifier = 'AS';
+        // bandwidth = (bandwidth >>> 0) * 1000;
+        if (sdp.indexOf('b=' + modifier + ':') === -1) {
+            // insert b= after c= line.
+            sdp = sdp.replace(/c=IN (.*)\r\n/, 'c=IN $1\r\nb=' + modifier + ':' + bandwidth + '\r\n');
+        } else {
+            sdp = sdp.replace(new RegExp('b=' + modifier + ':.*\r\n'), 'b=' + modifier + ':' + bandwidth + '\r\n');
+        }
+        return sdp;
+    }
+
 }
 
 // var sdpHelper = new SdpHelper()

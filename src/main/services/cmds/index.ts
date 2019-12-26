@@ -23,6 +23,7 @@ export * from './stream-webtrc-events'
 export * from './stream-webtrc-streams'
 export * from './stream-webtrc-resolution'
 export * from './stream-webrtc-getconfig'
+export * from './stream-webrtc-video-constraints'
 
 export * from './stream-webrtc-io-datachannels'
 export * from './stream-webrtc-io-input'
