@@ -49,10 +49,11 @@ export class Connection extends Cmds.Common.CommandRooter implements IConnection
         this.signalerBase = params.signalerBase;
         this.dispatcherFitlers = new Cmds.Common.Helper.KeyValue<Dispatchers.IDispatcherFilter>()
 
-        this.signaler = Network.SignalerFactory.create(params.factorySignaler);
+        this.signaler = Network.SignalerFactory.create(params.factorySignaler, params.signalerBase, params.path);
         let pms: Dispatchers.IDispatcherConstructorParams = {
             instanceId: this.instanceId,
             signaler: this.signaler,
+            isServer: false
         }
         this.dispatcher = Dispatchers.Dispatcher.getInstance(pms) 
         this.rooms = new Rooms(this.instanceId, this.dispatcher);   

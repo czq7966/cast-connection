@@ -49,6 +49,8 @@ export enum ECommandId {
     adhoc_login = 'adhoc_login',
     adhoc_logout = 'adhoc_logout',
     adhoc_hello = 'adhoc_hello',
+    adhoc_offline = 'adhoc_offline',
+    adhoc_heart_beat = 'adhoc_heart_beat',
 
     room_open = 'room_open',
     room_close = 'room_close',
@@ -130,6 +132,7 @@ export interface IUser {
     states?: number //1: Receiver, 2: Sender, 4: Agency    
     room?: IRoom
     extra?: any
+    server?: string
 }
 export enum EUserState {
     none =                      0b0,

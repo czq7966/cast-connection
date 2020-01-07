@@ -16,7 +16,7 @@ export class Client implements IClient {
     constructor(url?: string, path?: string) {
         this.eventEmitter = new EventEmitter();
         this._url = url;   
-        this._path = url;
+        this._path = path;
     }
     destroy() {
         this.eventEmitter.removeAllListeners();

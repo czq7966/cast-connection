@@ -1,11 +1,10 @@
 import * as Network from '../../network'
 import * as Dts from "../../declare";
 import * as Cmds from '../../cmds/index'
-import { IDispatcherFilter } from './dispatcher-filter';
-
 
 
 export interface IDispatcherConstructorParams extends Cmds.Common.IBaseConstructorParams {
+    isServer: boolean
     signaler: Network.ISignaler
 }
 
@@ -18,12 +17,16 @@ export interface IDispatcher extends Cmds.Common.IDispatcher {
 }
 
 export class Dispatcher extends Cmds.Common.Base implements IDispatcher {
+    edCoder: Cmds.Common.IEDCoderClass
+    isServer: boolean
     signaler: Network.ISignaler
     eventRooter: Cmds.Common.IEventRooter
     recvFilter: Cmds.Common.IEventRooter;
     sendFilter: Cmds.Common.IEventRooter;
-    constructor(params: IDispatcherConstructorParams) {
+    constructor(params: IDispatcherConstructorParams, edCoder?: Cmds.Common.IEDCoderClass) {
         super(params);
+        this.isServer = params.isServer;
+        this.edCoder = edCoder || Cmds.Common.EDCoder
         this.signaler = params.signaler;
         this.eventRooter = new Cmds.Common.EventRooter();
         this.recvFilter = new Cmds.Common.EventRooter();
@@ -32,6 +35,7 @@ export class Dispatcher extends Cmds.Common.Base implements IDispatcher {
     }
     destroy() {
         this.unInitEvents();
+        this.edCoder.removeDispatcherInstance(this.instanceId)
         this.eventRooter.destroy();
         this.recvFilter.destroy();
         this.sendFilter.destroy();
@@ -43,14 +47,16 @@ export class Dispatcher extends Cmds.Common.Base implements IDispatcher {
     }
 
     initEvents() {
+        this.edCoder.addDispatcherInstance(this.instanceId, this);        
         this.signaler.eventEmitter.addListener(Dts.CommandID, this.onCommand);
         this.signaler.eventEmitter.addListener(Dts.EClientSocketEvents.disconnect, this.onDisconnect);
         this.eventEmitter.addListener(Dts.ECommandDispatchEvents.onDispatched, this.onDispatched)
     }
-    unInitEvents = () => {
+    unInitEvents() {
         this.signaler.eventEmitter.removeListener(Dts.CommandID, this.onCommand);
         this.signaler.eventEmitter.removeListener(Dts.EClientSocketEvents.disconnect, this.onDisconnect);        
         this.eventEmitter.removeListener(Dts.ECommandDispatchEvents.onDispatched, this.onDispatched);
+        this.edCoder.removeDispatcherInstance(this.instanceId);
     }
 
     // Command
@@ -86,4 +92,4 @@ export class Dispatcher extends Cmds.Common.Base implements IDispatcher {
     }
 }
 
-Cmds.Common.EDCoder.setDispatcher(Dispatcher as any, false)
+// Cmds.Common.EDCoder.setDispatcher(Dispatcher as any, false)
