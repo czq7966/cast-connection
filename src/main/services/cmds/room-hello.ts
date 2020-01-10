@@ -42,6 +42,7 @@ export class RoomHello extends Cmds.Common.Base {
         let cmd = respCmd || new Cmds.CommandRoomHelloResp({instanceId: instanceId});
         let respData = Object.assign({}, data, {
             type: Cmds.ECommandType.resp,
+            from: null,
             to: data.from,
             props: {
                 user: user

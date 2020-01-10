@@ -2,6 +2,7 @@ import { EventEmitter } from "events";
 
 export interface IKeyValue<T> {
     eventEmitter: EventEmitter
+    extra: any
     destroy()
     del(key: string): T
     add(key: string, value: T)
@@ -12,21 +13,25 @@ export interface IKeyValue<T> {
     clear()
     count(): number
     on(event: "del" | "add" | "clear" , listener: (...args: any[]) => void)
+    off(event: "del" | "add" | "clear" , listener: (...args: any[]) => void)
     emit(event: "del" | "add" | "clear", ...args: any[]): boolean
 }
 
 export class KeyValue<T> implements IKeyValue<T> {
     eventEmitter: EventEmitter
     items: {[key: string]: T}
-    constructor(event: boolean = false) {
+    extra: any
+    constructor(createEvent?: boolean, extra?: any) {
         this.items = {}
-        if(event) this.eventEmitter = new EventEmitter();
+        if (createEvent) this.eventEmitter = new EventEmitter();
+        this.extra = extra
     }
     destroy() {
         this.clear();
         this.eventEmitter && this.eventEmitter.removeAllListeners();
         delete this.eventEmitter;
         delete this.items;
+        delete this.extra;
     }
     del(key: string): T {
         let value = this.items[key];
@@ -36,7 +41,7 @@ export class KeyValue<T> implements IKeyValue<T> {
     }
     add(key: string, value: T) {
         this.items[key] = value;
-        this.emit("del", key, value);
+        this.emit("add", key, value);
     }
     get(key: string): T {
         return this.items[key] as T;
@@ -66,6 +71,9 @@ export class KeyValue<T> implements IKeyValue<T> {
     on(event: "del" | "add" | "clear", listener: (...args: any[]) => void) {
         this.eventEmitter && this.eventEmitter.on(event, listener);
     }    
+    off(event: "del" | "add" | "clear" , listener: (...args: any[]) => void) {
+        this.eventEmitter && this.eventEmitter.off(event, listener);
+    }
     emit(event: "del" | "add" | "clear", ...args: any[]): boolean {
         return !!this.eventEmitter && this.eventEmitter.emit(event, ...args, this)
     }
