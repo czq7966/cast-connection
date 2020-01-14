@@ -37,19 +37,19 @@ export class EDCoder extends Base {
     static setDispatcher(dispatcher: IBaseClass) {
         this.dispatcher = dispatcher;
     }
-    static onCommand(cmdData: Dts.ICommandData<any>, dispatcher: IDispatcher, ...args: any[]) {
+    static async onCommand(cmdData: Dts.ICommandData<any>, dispatcher: IDispatcher, ...args: any[]) {
         let cmd = CommandTypes.decode(cmdData, {instanceId: ''});
         if (cmd) {
             cmd.instanceId = dispatcher.instanceId;
             if (!this.cmdTimeout.respCmd(cmd, dispatcher.isServer)) {
-                this.dispatch(cmd, Dts.ECommandDispatchEvents.onDispatched, ...args)
+                await this.dispatch(cmd, Dts.ECommandDispatchEvents.onDispatched, ...args)
             } 
             cmd.destroy();
             cmd = null;
         }
     }
 
-    static dispatch(cmd: ICommand, event: Dts.ECommandDispatchEvents, ...args: any[]) {
+    static async dispatch(cmd: ICommand, event: Dts.ECommandDispatchEvents, ...args: any[]) {
         cmd.getInstance().instanceEventEmitter.emit(event, cmd, ...args);
         this.getDispatcher().getInstance<IDispatcher>(cmd.instanceId, false).eventEmitter.emit(event, cmd, ...args);
     }      

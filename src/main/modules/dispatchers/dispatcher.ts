@@ -35,7 +35,7 @@ export class Dispatcher extends Cmds.Common.Base implements IDispatcher {
     }
     destroy() {
         this.unInitEvents();
-        this.edCoder.removeDispatcherInstance(this.instanceId)
+        this.edCoder && this.edCoder.removeDispatcherInstance(this.instanceId)
         this.eventRooter.destroy();
         this.recvFilter.destroy();
         this.sendFilter.destroy();
@@ -47,16 +47,16 @@ export class Dispatcher extends Cmds.Common.Base implements IDispatcher {
     }
 
     initEvents() {
-        this.edCoder.addDispatcherInstance(this.instanceId, this);        
-        this.signaler.eventEmitter.addListener(Dts.CommandID, this.onCommand);
-        this.signaler.eventEmitter.addListener(Dts.EClientSocketEvents.disconnect, this.onDisconnect);
+        this.edCoder && this.edCoder.addDispatcherInstance(this.instanceId, this);        
+        this.signaler && this.signaler.eventEmitter.addListener(Dts.CommandID, this.onCommand);
+        this.signaler && this.signaler.eventEmitter.addListener(Dts.EClientSocketEvents.disconnect, this.onDisconnect);
         this.eventEmitter.addListener(Dts.ECommandDispatchEvents.onDispatched, this.onDispatched)
     }
     unInitEvents() {
-        this.signaler.eventEmitter.removeListener(Dts.CommandID, this.onCommand);
-        this.signaler.eventEmitter.removeListener(Dts.EClientSocketEvents.disconnect, this.onDisconnect);        
         this.eventEmitter.removeListener(Dts.ECommandDispatchEvents.onDispatched, this.onDispatched);
-        this.edCoder.removeDispatcherInstance(this.instanceId);
+        this.signaler && this.signaler.eventEmitter.removeListener(Dts.CommandID, this.onCommand);
+        this.signaler && this.signaler.eventEmitter.removeListener(Dts.EClientSocketEvents.disconnect, this.onDisconnect);        
+        this.edCoder && this.edCoder.removeDispatcherInstance(this.instanceId);
     }
 
     // Command
