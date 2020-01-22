@@ -60,10 +60,11 @@ export class KeyValue<T> implements IKeyValue<T> {
         return values;
     }
     clear() {
-        this.keys().forEach(key => {
+        let keys = this.keys();
+        keys.forEach(key => {
             this.del(key)
         })
-        this.emit("clear");
+        this.emit("clear", keys);
     }
     count(): number {
         return this.keys().length;

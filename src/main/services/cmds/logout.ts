@@ -34,7 +34,16 @@ export class Logout extends Cmds.Common.Base {
         })
     }
 
- 
+    static userLogout(instanceId: string, user: Cmds.IUser) {
+        let cmd: Cmds.ICommandData<Cmds.ICommandReqDataProps> = {
+            cmdId: Cmds.ECommandId.adhoc_logout,
+            props: {
+                user: user
+            }
+        }
+        let dispatcher = Cmds.Common.EDCoder.getDispatcher().getInstance<Cmds.Common.IDispatcher>(instanceId, false);
+        Cmds.Common.EDCoder.onCommand(cmd, dispatcher)
+    }
 
     static Rooms = {
         onAfterRoot: {

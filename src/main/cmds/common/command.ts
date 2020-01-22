@@ -17,6 +17,7 @@ export interface ICommand extends IBase {
     copyProperties(props: Object | string)
     assignData(data: Dts.ICommandData<any>)
     sendCommand(): Promise<any>
+    sendCommandForResp(beforeDispatch?: Function, ...args: any[]): Promise<any>
 };
 
 export interface ICommandClass extends IBaseClass {

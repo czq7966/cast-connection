@@ -35,6 +35,8 @@ export enum ECommandId {
     network_inputclient_connect = 'network_inputclient_connect',
     network_inputclient_connecting = 'network_inputclient_connecting',
     network_inputclient_disconnect = 'network_inputclient_disconnect',
+    //Server
+    network_exception = 'network_exception',
 
     //admin
     admin_config_update = "admin_config_update",

@@ -123,6 +123,10 @@ export class Connection extends Cmds.Common.CommandRooter implements IConnection
                 type === Cmds.ECommandType.req ?
                     Services.Cmds.StreamWebrtcGetConfig.Connection.onAfterRoot.req(this, cmd as any) : null;
                 break;
+            case Cmds.ECommandId.network_exception:
+                type === Cmds.ECommandType.req ?
+                    Services.Cmds.Network.Exception.Connection.onAfterRoot.req(this, cmd as any) : null;
+                break;                
             default:
                 break;
         }

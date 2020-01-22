@@ -5,7 +5,6 @@ import * as ServiceModules from '../modules'
 var Tag = "Service-Cmds-RoomHello"
 export class RoomHello extends Cmds.Common.Base {
     static hello(instanceId: string, fromUser: Cmds.IUser, toUser?: Cmds.IUser, reqCmd?: Cmds.Common.ICommand): Promise<any> {
-        return new Promise((resolve, reject) => {
             let cmd = reqCmd || new Cmds.CommandRoomHelloReq({instanceId: instanceId});
             let to: Cmds.IAddressData = {
                 type: toUser ? 'user': 'room',
@@ -15,24 +14,47 @@ export class RoomHello extends Cmds.Common.Base {
                 to: to,
                 props: {
                     user: fromUser
-                },            
-                onResp: toUser? (cmdResp: Cmds.CommandRoomHelloResp) => {
-                    let data = cmdResp.data;
-                    Cmds.Common.EDCoder.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
-                    resolve(data);    
-                } : null ,
-                onRespTimeout: toUser? (data: Cmds.ICommandData<Cmds.ICommandRoomHelloRespDataProps>) => {
-                    data.respResult = false;
-                    data.respMsg = 'time out!'
-                    reject(data)    
-                }: null
-    
+                }    
             }
-            let promise = cmd.sendCommand();        
+            let promise: Promise<any>
+            if (toUser)
+                promise = cmd.sendCommandForResp();
+            else 
+                promise = cmd.sendCommand();        
+
             !reqCmd && cmd.destroy();
             cmd = null;
             return promise;
-        })
+
+                
+        // return new Promise((resolve, reject) => {
+        //     let cmd = reqCmd || new Cmds.CommandRoomHelloReq({instanceId: instanceId});
+        //     let to: Cmds.IAddressData = {
+        //         type: toUser ? 'user': 'room',
+        //         id: toUser ? toUser.id: fromUser.room.id
+        //     }
+        //     cmd.data = {
+        //         to: to,
+        //         props: {
+        //             user: fromUser
+        //         },            
+        //         onResp: toUser? (cmdResp: Cmds.CommandRoomHelloResp) => {
+        //             let data = cmdResp.data;
+        //             Cmds.Common.EDCoder.dispatch(cmdResp , Cmds.ECommandDispatchEvents.onDispatched);
+        //             resolve(data);    
+        //         } : null ,
+        //         onRespTimeout: toUser? (data: Cmds.ICommandData<Cmds.ICommandRoomHelloRespDataProps>) => {
+        //             data.respResult = false;
+        //             data.respMsg = 'time out!'
+        //             reject(data)    
+        //         }: null
+    
+        //     }
+        //     let promise = cmd.sendCommand();        
+        //     !reqCmd && cmd.destroy();
+        //     cmd = null;
+        //     return promise;
+        // })
         
     }
  

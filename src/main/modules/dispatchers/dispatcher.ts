@@ -49,12 +49,14 @@ export class Dispatcher extends Cmds.Common.Base implements IDispatcher {
     initEvents() {
         this.edCoder && this.edCoder.addDispatcherInstance(this.instanceId, this);        
         this.signaler && this.signaler.eventEmitter.addListener(Dts.CommandID, this.onCommand);
+        this.signaler && this.signaler.eventEmitter.addListener(Dts.EClientSocketEvents.connect, this.onConnect);
         this.signaler && this.signaler.eventEmitter.addListener(Dts.EClientSocketEvents.disconnect, this.onDisconnect);
         this.eventEmitter.addListener(Dts.ECommandDispatchEvents.onDispatched, this.onDispatched)
     }
     unInitEvents() {
         this.eventEmitter.removeListener(Dts.ECommandDispatchEvents.onDispatched, this.onDispatched);
         this.signaler && this.signaler.eventEmitter.removeListener(Dts.CommandID, this.onCommand);
+        this.signaler && this.signaler.eventEmitter.removeListener(Dts.EClientSocketEvents.connect, this.onConnect);
         this.signaler && this.signaler.eventEmitter.removeListener(Dts.EClientSocketEvents.disconnect, this.onDisconnect);        
         this.edCoder && this.edCoder.removeDispatcherInstance(this.instanceId);
     }
@@ -81,6 +83,15 @@ export class Dispatcher extends Cmds.Common.Base implements IDispatcher {
     }
 
     // Network
+    onConnect = (...args: any[]) => {
+        adhoc_cast_connection_console.log(...args)
+        let data: Cmds.ICommandData<any> = {
+            cmdId: Cmds.ECommandId.network_connect,
+            props: {},
+            extra: args
+        }
+        this.onCommand(data);
+    }
     onDisconnect = (...args: any[]) => {
         adhoc_cast_connection_console.log(...args)
         let data: Cmds.ICommandData<any> = {

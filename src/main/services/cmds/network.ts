@@ -1,10 +1,12 @@
 import * as Cmds from "../../cmds";
 import * as Modules from '../../modules'
 import { User } from "./user";
+import { Hello } from "./hello";
+import { Logout } from "./logout";
 
 
 var Tag = "Service-Cmds-Network"
-export class Network extends Cmds.Common.Base {
+export class Network {
 
     static Disconnect = {
         Rooms: {
@@ -84,7 +86,31 @@ export class Network extends Cmds.Common.Base {
         }
     }
 
-  
+    static Exception = {
+        Connection: {
+            onAfterRoot: {
+                req(connection: Modules.IConnection , cmd: Cmds.CommandReq) {
+                    adhoc_cast_connection_console.log(Tag, 'Connection', 'onAfterRoot', 'Req', cmd.data)
+                    if (connection.isLogin()) {
+                        let mRoom = connection.rooms.getLoginRoom();
+                        let mMe = mRoom.me();
+                        let me = mMe.item;
+                        let mUsers = mRoom.users;
+                        mUsers.keys().forEach(key => {
+                            let mUser = mUsers.get(key);
+                            let user = mUser.item;
+                            if (user.id != me.id) {
+                                Hello.hello(connection.instanceId, me, user)
+                                .catch(e => {
+                                    Logout.userLogout(connection.instanceId, user);
+                                })                            
+                            }
+                        })    
+                    }
+                }                
+            }, 
+        }
+    }
 
 
 }
