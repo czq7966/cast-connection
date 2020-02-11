@@ -70,10 +70,10 @@ export class KeyValue<T> implements IKeyValue<T> {
         return this.keys().length;
     }
     on(event: "del" | "add" | "clear", listener: (...args: any[]) => void) {
-        this.eventEmitter && this.eventEmitter.on(event, listener);
+        this.eventEmitter && this.eventEmitter.addListener(event, listener);
     }    
     off(event: "del" | "add" | "clear" , listener: (...args: any[]) => void) {
-        this.eventEmitter && this.eventEmitter.off(event, listener);
+        this.eventEmitter && this.eventEmitter.removeListener(event, listener);
     }
     emit(event: "del" | "add" | "clear", ...args: any[]): boolean {
         return !!this.eventEmitter && this.eventEmitter.emit(event, ...args, this)
