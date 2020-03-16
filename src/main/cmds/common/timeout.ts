@@ -5,7 +5,7 @@ import { ICommand } from "./command";
 
 
 
-var defaultRespTimeout = 10 * 1000;
+var defaultRespTimeout = 30 * 1000;
 enum CmdTimeoutSubfix {
     onResp = '_onResp',
     onTimeout = '_onRespTimeout'

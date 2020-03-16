@@ -35,7 +35,7 @@ export class Login extends Cmds.Common.Base {
                     data.respMsg = 'time out!'                    
                     reject(data);
                 },
-                respTimeout: 20 * 1000   
+                // respTimeout: 30 * 1000   
             }
             cmd.sendCommand().catch(err => reject(err));   
             cmd.destroy();

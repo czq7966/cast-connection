@@ -261,7 +261,7 @@ export class Peer extends Cmds.Common.CommandRooter implements IPeer  {
                     this.rtc = new RTCPeerConnection(this.getConfig().rtcConfig);
                     break;
             }
-            this.initRTCEvents(this.rtc);
+           this.initRTCEvents(this.rtc);
         }
         return this.rtc
     }    
