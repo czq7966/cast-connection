@@ -35,7 +35,6 @@ export class Dispatcher extends Cmds.Common.Base implements IDispatcher {
     }
     destroy() {
         this.unInitEvents();
-        this.edCoder && this.edCoder.removeDispatcherInstance(this.instanceId)
         this.eventRooter.destroy();
         this.recvFilter.destroy();
         this.sendFilter.destroy();
@@ -66,7 +65,7 @@ export class Dispatcher extends Cmds.Common.Base implements IDispatcher {
         adhoc_cast_connection_console.warn('OnCommand', cmd)
         let result = this.recvFilter.root(cmd) ;
         !Cmds.Common.Helper.StateMachine.isset(result, Cmds.Common.EEventEmitterEmit2Result.preventRoot) &&
-        Cmds.Common.EDCoder.onCommand(cmd, this);
+        this.edCoder && this.edCoder.onCommand(cmd, this);
     }
     sendCommand(cmd: Cmds.ICommandData<any>): Promise<any> {
         adhoc_cast_connection_console.warn('SendCommand', cmd)
