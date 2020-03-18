@@ -45,6 +45,7 @@ export class Base {
             params = { instanceId: params }
         } else {
             params = params || { instanceId: Base.instanceDefauleName };
+            params.instanceId = params.instanceId === '' ? params.instanceId : (params.instanceId  || Base.instanceDefauleName);
         }
         params.instanceSingle = params.instanceSingle === false ? false : true
         let id = params.instanceId;
