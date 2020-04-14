@@ -1,5 +1,5 @@
 import * as Cmds from '../../cmds/index'
-import * as Modules from '../modules'
+import * as Modules from '../../modules'
 
 var Tag = 'ServiceCommon'
 export class Common {
@@ -45,4 +45,7 @@ export class Common {
         respCmd = null;
         return promise;
     }
+    static async dispatchCommand(instanceId: string, cmd: Cmds.ICommandData<any>) {
+        Modules.Dispatchers.Dispatcher.getInstance<Modules.Dispatchers.Dispatcher>(instanceId, false).onCommand(cmd);
+    }   
 }

@@ -1,6 +1,6 @@
 {
   "name": "adhoc-cast-connection",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "description": "nd adhoc cast connection",
   "main": "index.js",
   "scripts": {
