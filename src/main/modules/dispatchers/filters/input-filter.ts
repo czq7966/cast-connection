@@ -46,10 +46,7 @@ export class BaseInputFilter extends DispatcherFilter implements IBaseInputFilte
             let cmdId = cmd.cmdId;
             switch(cmdId) {                
                 case this.filterId:                        
-                    let _cmd = Object.assign({}, cmd);
-                    _cmd.cmdId = Cmds.ECommandId.extension_capture_on_io_input;
-                    this.sendCommand(_cmd);
-                    return Cmds.Common.EEventEmitterEmit2Result.preventRoot; 
+                    return this.sendCommand(cmd); 
                     break;
                 default:
          
@@ -60,7 +57,7 @@ export class BaseInputFilter extends DispatcherFilter implements IBaseInputFilte
     onCommand(cmd: Cmds.Common.ICommandData<Cmds.ICommandDataProps>) {
         return;
     }
-    sendCommand(cmd: Cmds.ICommandData<Cmds.ICommandDataProps>): Promise<any> {
-        return Promise.resolve();
+    sendCommand(cmd: Cmds.ICommandData<Cmds.ICommandDataProps>): any {
+        return Cmds.Common.EEventEmitterEmit2Result.preventRoot; 
     }
 }
