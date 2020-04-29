@@ -161,37 +161,38 @@ export class Gesture extends Base implements IGesture {
         }        
     }
     handleTouchEvent(evt: InputDts.ITouchEvent) {     
-        let valid = false;
-        evt.changedTouches.forEach(point => {            
-            let p = this.calcInputEventXY({x: point.x, y: point.y}, {x: evt.sourceX, y: evt.sourceY}, {x: evt.destX, y: evt.destY});
-            if (p.x >= 0 ) {
-                point.x = p.x;
-                point.y = p.y;
-                valid = true;
+        // let valid = false;
+        // evt.changedTouches.forEach(point => {            
+        //     let p = this.calcInputEventXY({x: point.x, y: point.y}, {x: evt.sourceX, y: evt.sourceY}, {x: evt.destX, y: evt.destY});
+        //     if (p.x >= 0 ) {
+        //         point.x = p.x;
+        //         point.y = p.y;
+        //         valid = true;
 
-                // if (evt.type === InputDts.EInputDeviceTouchType.touchmove) {
-                //     let prePoint = this.getPreviousTouchPoint(point.id)
-                //     if (prePoint) {
-                //         let delta = point.timestamp - prePoint.timestamp;
-                //         p = this.calcInputEventDeltaXY({x: prePoint.x, y: prePoint.y}, {x: point.x, y: point.y}, 1);
-                //         if (p.y <=5 && p.y >=-5 ) return;
-                //         valid = false;
-                //         point.deltaX = 0;
-                //         point.deltaY = p.y;
-                //     }    
-                // }    
-            }          
-        })        
+        //         // if (evt.type === InputDts.EInputDeviceTouchType.touchmove) {
+        //         //     let prePoint = this.getPreviousTouchPoint(point.id)
+        //         //     if (prePoint) {
+        //         //         let delta = point.timestamp - prePoint.timestamp;
+        //         //         p = this.calcInputEventDeltaXY({x: prePoint.x, y: prePoint.y}, {x: point.x, y: point.y}, 1);
+        //         //         if (p.y <=5 && p.y >=-5 ) return;
+        //         //         valid = false;
+        //         //         point.deltaX = 0;
+        //         //         point.deltaY = p.y;
+        //         //     }    
+        //         // }    
+        //     }          
+        // })        
 
-        if (valid) {
-            // this.previousTouchEvent = null;            
-            // if (evt.type === InputDts.EInputDeviceTouchType.touchmove) 
-            //     this.previousTouchEvent = evt;
-            this.input.dispatchEvent(evt)
-        }
+        // if (valid) {
+        //     // this.previousTouchEvent = null;            
+        //     // if (evt.type === InputDts.EInputDeviceTouchType.touchmove) 
+        //     //     this.previousTouchEvent = evt;
+        //     this.input.dispatchEvent(evt)
+        // }
 
-        return;
+        // return;
 
+        // this.input.touchMode = InputDts.EInputDevice.mouse;
         if (this.input.touchMode === InputDts.EInputDevice.mouse) {
             this.handleTouchToMouseEvent(evt)
         } else {
@@ -204,7 +205,7 @@ export class Gesture extends Base implements IGesture {
                 }            
             })
             evt.touchPoints = evt.changedTouches;
-            switch(event.type) {
+            switch(evt.type) {
                 case InputDts.EInputDeviceTouchType.touchcancel:
                     evt.touchPoints = [];
                     this.touchCount = 0;

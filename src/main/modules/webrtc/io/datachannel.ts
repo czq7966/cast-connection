@@ -53,6 +53,7 @@ export class  DataChannel  extends Cmds.Common.CommandRooter implements IDataCha
     }  
     initChannelEvents() {
         let datachannel = this.rtcdatachannel;
+        datachannel.bufferedAmountLowThreshold = 1024 * 4;
         Object.keys(EDataChannelEvents).forEach(key => {            
             let value = EDataChannelEvents[key];
             let event = (...args: any[]) => {
