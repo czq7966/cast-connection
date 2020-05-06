@@ -35,3 +35,16 @@ export function calResolutionRange(x: number, y: number, x1: number, y1: number,
     return [_x1, _y1, _x2, _y2]
 
 }
+export function versionToCode(version: string, byteLen?: number): number {
+    byteLen = byteLen || 2;
+    version = version || '0';
+    version = version + '.0.0.0.0'
+    let versions = version.split('.');
+    let code: number = 0;
+    let major = parseInt(versions[0]) << 8 * byteLen * 3;
+    let minor = parseInt(versions[1]) << 8 * byteLen * 2;
+    let patch = parseInt(versions[2]) << 8 * byteLen * 1;
+    let build = parseInt(versions[3]) << 8 * byteLen * 0;
+    code = major + minor + patch + build;
+    return code;
+}
