@@ -126,7 +126,25 @@ export enum ERoomPrefix {
     stream = 'stream#',
     turn = 'turn#'
 }
-
+// 缩主数据
+export interface IHost {
+    os?: {
+        name: string
+        version: string
+        extra?: any
+    },
+    app?: {
+        name: string,
+        version: string,
+        extra?: any
+    },
+    sdk?: {
+        name: string,
+        version: string,
+        extra?: any
+    }
+    extra?: any
+}
 // 用户数据
 export interface IUser {
     id: string,
@@ -137,6 +155,7 @@ export interface IUser {
     extra?: any
     serverId?: string
     socketId?: string
+    host?: IHost
 }
 export enum EUserState {
     none =                      0b0,
