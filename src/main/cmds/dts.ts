@@ -84,6 +84,7 @@ export enum ECommandId {
     stream_webrtc_resolution = 'stream_webrtc_resolution',
     stream_webrtc_io_input = 'stream_webrtc_io_input',
     stream_webrtc_video_constraints  = 'stream_webrtc_video_constraints',
+    stream_webrtc_stats = 'stream_webrtc_stats',
 
     stream_webrtc_onconnectionstatechange = 'stream_webrtc_onconnectionstatechange',
     stream_webrtc_ondatachannel = 'stream_webrtc_ondatachannel',

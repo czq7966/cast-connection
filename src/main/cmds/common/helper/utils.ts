@@ -36,7 +36,7 @@ export function calResolutionRange(x: number, y: number, x1: number, y1: number,
 
 }
 export function versionToCode(version: string, byteLen?: number): number {
-    byteLen = byteLen || 2;
+    byteLen = byteLen || 1;
     version = version || '0';
     version = version + '.0.0.0.0'
     let versions = version.split('.');

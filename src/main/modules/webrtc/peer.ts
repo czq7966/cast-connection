@@ -35,6 +35,7 @@ export interface IPeer extends Cmds.Common.ICommandRooter {
     streams: IStreams;
     datachannels: IO.IDataChannels;
     input: IO.IInput;  
+    signaler: IO.ISignaler;
     rtc: RTCPeerConnection
     getRtc(create?: boolean): RTCPeerConnection
     delRtc()
@@ -50,6 +51,7 @@ export class Peer extends Cmds.Common.CommandRooter implements IPeer  {
     streams: IStreams;
     datachannels: IO.IDataChannels;
     input: IO.IInput;
+    signaler: IO.ISignaler;
     rtc: RTCPeerConnection
     private _rtcevents;
     constructor(user: IUser) {
@@ -59,12 +61,14 @@ export class Peer extends Cmds.Common.CommandRooter implements IPeer  {
         this.config = new Config();
         this.streams = new Streams(this);
         this.input = new IO.Input(this);        
+        this.signaler = new IO.Signaler(this);
         this.datachannels = new IO.DataChannels(this);
         this.initEvents();
     }
     destroy() {
         this.unInitEvents();
         this.input.destroy();
+        this.signaler.destroy();
         this.datachannels.close();
         this.datachannels.destroy();
         this.streams.destroy();     
@@ -75,6 +79,7 @@ export class Peer extends Cmds.Common.CommandRooter implements IPeer  {
         delete this.config;
         delete this.streams;
         delete this.input;
+        delete this.signaler;
         delete this.datachannels;  
         delete this.user;        
         super.destroy();

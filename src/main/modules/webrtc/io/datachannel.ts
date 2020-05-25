@@ -11,7 +11,8 @@ export enum EDataChannelEvents {
 var DataChannelEventPrefix = 'datachannel';
 export enum EDataChannelLabel {
     // default = 'datachannel_label_default',
-    input = 'datachannel_label_input'
+    input = 'datachannel_label_input',
+    signaler = 'datachannel_label_signaler'
 }
 // export enum EDataChannelEvents {
 //     onbufferedamountlow = "datachannel_bufferedamountlow",
@@ -67,6 +68,7 @@ export class  DataChannel  extends Cmds.Common.CommandRooter implements IDataCha
                     },
                     extra: datachannel.label
                 }
+                console.error('1111111111', cmdId, datachannel.label);
                 this.datachannels.peer.user.room.rooms.dispatcher.onCommand(data)
             }
             this._channelevents[value] = event;
@@ -88,6 +90,7 @@ export class  DataChannel  extends Cmds.Common.CommandRooter implements IDataCha
     sendMessage(msg: Object): Promise<any> {
         if (this.rtcdatachannel && this.rtcdatachannel.readyState === 'open') {
             this.rtcdatachannel.send(JSON.stringify(msg));
+            return Promise.resolve();
         } else {
             return Promise.reject('data channel is ' + this.rtcdatachannel.readyState)
         }

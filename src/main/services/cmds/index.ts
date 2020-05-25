@@ -27,6 +27,7 @@ export * from './stream-webrtc-video-constraints'
 
 export * from './stream-webrtc-io-datachannels'
 export * from './stream-webrtc-io-input'
+export * from './stream-webrtc-io-signaler'
 
 export * from './user-state-onchange'
 export * from './user-get'
