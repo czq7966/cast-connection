@@ -23,7 +23,7 @@ export class Streams extends Cmds.Common.CommandRooter {
     constructor(peer: IPeer) {
         super(peer.instanceId);
         this.peer = peer;
-        this.sends = new Cmds.Common.Helper.KeyValue<MediaStream>();
+        this.sends = new Cmds.Common.Helper.KeyValue<MediaStream>(true);
         this.recvs = new Cmds.Common.Helper.KeyValue<MediaStream>();
         this.resolutions = new  Cmds.Common.Helper.KeyValue<IStreamResolution>();
         this.initEvents();
@@ -42,11 +42,17 @@ export class Streams extends Cmds.Common.CommandRooter {
         this.eventRooter.setParent(this.peer.eventRooter);        
         this.eventRooter.onBeforeRoot.add(this.onBeforeRoot)
         this.eventRooter.onAfterRoot.add(this.onAfterRoot)
+        this.sends.on('add', this.onSendsAdd);
+        this.sends.on('del', this.onSendsDel);
+        this.sends.on('clear', this.onSendsClear);
     }
     unInitEvents() {
         this.eventRooter.onBeforeRoot.remove(this.onBeforeRoot)
         this.eventRooter.onAfterRoot.remove(this.onAfterRoot)
         this.eventRooter.setParent();           
+        this.sends.off('add', this.onSendsAdd);
+        this.sends.off('del', this.onSendsDel);
+        this.sends.off('clear', this.onSendsClear);
     }  
 
     // Command
@@ -95,5 +101,70 @@ export class Streams extends Cmds.Common.CommandRooter {
                 }               
                 break;
         }        
+    }
+
+    onSendsAdd = (key: string, value: MediaStream) => {
+        let owner = this.peer.user.room.owner().item;
+        let getStats = () => {
+            let stream = this.notDestroyed && this.sends.get(key);
+            if (stream) {
+                if (this.peer && this.peer.rtc) { 
+                    let rtc = this.peer.rtc; 
+                    let promises = [];
+
+                    stream.getVideoTracks().forEach(track => {
+                        let promise = rtc.getStats();
+                        promise.then( report => {
+                            let stats = {};
+                            report.forEach((value, key, parent) => {
+                                if (value && value.kind == 'video') {
+                                    switch(value.type) {
+                                        case 'remote-inbound-rtp':
+                                        case 'track':
+                                        case 'outbound-rtp':
+                                            stats[value.id] = value;
+                                            break;
+                                    }
+                                }
+                            })  
+                            let cmd: Cmds.ICommandData<any> = {
+                                cmdId: Cmds.ECommandId.stream_webrtc_stats,
+                                type: Cmds.ECommandType.resp,
+                                props: {
+                                    user: owner
+                                },
+                                extra: stats
+                            }
+                            this.peer.signaler.sendCommand(cmd)
+                            .catch(e => {console.error(e)});              
+                        });
+                        promises.push(promise);
+                    })
+                    if (promises.length > 0) {
+                        Promise.all(promises)
+                        .then(v => {
+                            timeoutGetStats();
+                        })
+                        .catch(e => {
+                            timeoutGetStats();
+                        })
+                    }
+                } else {
+                    timeoutGetStats();                 
+                }
+            }
+        } 
+        let timeoutGetStats = (timeout?: number) => {
+            setTimeout(() => {getStats(); }, timeout || 1000);                 
+        }
+
+        timeoutGetStats(); 
+
+    }
+    onSendsDel = (key: string, value: MediaStream) => {
+
+    }
+    onSendsClear = (keys: string[]) => {
+
     }
 }

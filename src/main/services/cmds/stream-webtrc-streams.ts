@@ -32,7 +32,16 @@ export class StreamWebrtcStreams {
         } else {
             if (!streams.sends.exist(stream.id)) {
                 ServiceModules.Webrtc.Streams.addSendStream(streams, stream);            
-                (peer.getRtc() as any).addStream(stream);
+                // (peer.getRtc() as any).addStream(stream);
+                let mStream = new MediaStream();
+                // setTimeout(() => {
+                //     stream.getTracks().forEach(track => {
+                //         mStream.addTrack(track);
+                //     });                    
+                // }, 5000);
+
+                
+                (peer.getRtc() as any).addStream(mStream);
                 peer.getRtc().getSenders().forEach(sender => {
                     let parameters = sender.getParameters();
                     parameters.degradationPreference = "maintain-resolution";

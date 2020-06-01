@@ -68,7 +68,6 @@ export class  DataChannel  extends Cmds.Common.CommandRooter implements IDataCha
                     },
                     extra: datachannel.label
                 }
-                console.error('1111111111', cmdId, datachannel.label);
                 this.datachannels.peer.user.room.rooms.dispatcher.onCommand(data)
             }
             this._channelevents[value] = event;
@@ -89,7 +88,8 @@ export class  DataChannel  extends Cmds.Common.CommandRooter implements IDataCha
     }     
     sendMessage(msg: Object): Promise<any> {
         if (this.rtcdatachannel && this.rtcdatachannel.readyState === 'open') {
-            this.rtcdatachannel.send(JSON.stringify(msg));
+            let strMsg = JSON.stringify(msg);
+            this.rtcdatachannel.send(strMsg);
             return Promise.resolve();
         } else {
             return Promise.reject('data channel is ' + this.rtcdatachannel.readyState)

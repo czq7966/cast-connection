@@ -10,10 +10,12 @@ export interface IDispatcherConstructorParams extends Cmds.Common.IBaseConstruct
 
 export interface IDispatcher extends Cmds.Common.IDispatcher {
     signaler: Network.ISignaler
+    // signalers: Cmds.Common.Helper.KeyValue<Network.ISignaler>
     eventRooter: Cmds.Common.IEventRooter
     recvFilter: Cmds.Common.IEventRooter;
     sendFilter: Cmds.Common.IEventRooter;
     onCommand(cmd: Cmds.ICommandData<any>)
+    // getSignaler(cmd: Cmds.ICommandData<any>): Network.ISignaler
 }
 
 export class Dispatcher extends Cmds.Common.Base implements IDispatcher {

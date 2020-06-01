@@ -89,5 +89,9 @@ export class Signaler extends Cmds.Common.CommandRooter implements ISignaler {
         } else {
             Promise.reject('signaler dataChannel is null');            
         }
-    }    
+    }
+    
+    handshake() {
+        
+    }
 }
